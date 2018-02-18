@@ -7,7 +7,7 @@ The purpose of this project is to begin compiling a dataset of demographic infor
 
 While we would like the dataset and web app eventually to cover all policy-making elected offices in NC, as a first step we will focus on county commissions since this represents a more manageable set of data and data analysis questions. We also hope that the data can eventually be connected to metrics that capture policy impact, since the connection between demographic representation and the impact of the resulting policy-making is complex, at best.
 
-### Is this a political project?
+### Is this a partisan project?
 
 Code for America and the Code for America brigade network are non-partisan, as is this project. At the same time, our work is grounded in a [set of principles and values](https://www.codeforamerica.org/how/values) that drive our choices about which projects we undertake and how we approach them. In particular, we believe strongly that government benefits and services should benefit all and that political processes need to be inclusive. We also firmly believe that policy-making needs to be informed by data. This project reflects those core values.
 
@@ -26,10 +26,13 @@ So, our target app basically needs to be a mobile-friendly website that makes av
 
 Item 2 is italicized because it may be more difficult to obtain and so may not be included, at least in the first iteration.
 
-The website should provide a reasonably user-friendly way to look at any given county, along the lines of the [mockup produced for the Datapalooza competition](https://ppbsvv.axshare.com/#g=1&p=home). The [Open Data Policing](https://opendatapolicing.com/) site offers similar capabilities that may inspire the tool being developed here. The site should also make the raw data behind the visual presentation available as a download.
+The website should provide a reasonably user-friendly way to look at any given county, along the lines of this mockup (see also below):
+![Mobile app mockup](https://github.com/Open-NC/Are-We-Represented-Project-Center/blob/master/assets/AWR-Home.png "Logo Title Text 1"). The [Open Data Policing](https://opendatapolicing.com/) site offers capabilities that may also inspire the tool being developed here. The site should also make the raw data behind the visual presentation available as a download.
 
 Until candidates have filed and voter registration begins in earnest, we should take #3 from the 2016 data, which is the last time there were county commission data. As a test set, we might also use the 2016 data for #5. There are two possible views: how the data looks just before the election and how it looks after (where #4 and #6 change as a result of the election).
 
 # Community Stakeholders
 
 Potential users of the data include journalists, academics, get-out-the-vote (GOTV) organizations, and equity advocates, among others. Our initial work will focus on making the raw data available while project participants work with these potential stakeholders to identify use cases and gather requirements that will drive development of the web site or application.
+
+# Mockups of Possible Mobile Friendly Web app
