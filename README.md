@@ -26,8 +26,7 @@ So, our target app basically needs to be a mobile-friendly website that makes av
 
 Item 2 is italicized because it may be more difficult to obtain and so may not be included, at least in the first iteration.
 
-The website should provide a reasonably user-friendly way to look at any given county, along the lines of this mockup (see also below):
-![Mobile app mockup](https://github.com/Open-NC/Are-We-Represented-Project-Center/blob/master/assets/AWR-Home.png "Logo Title Text 1"). The [Open Data Policing](https://opendatapolicing.com/) site offers capabilities that may also inspire the tool being developed here. The site should also make the raw data behind the visual presentation available as a download.
+The website should provide a reasonably user-friendly way to look at any given county, along the lines of the mockups below. The [Open Data Policing](https://opendatapolicing.com/) site offers capabilities that may also inspire the tool being developed here. The site should also make the raw data behind the visual presentation available as a download.
 
 Until candidates have filed and voter registration begins in earnest, we should take #3 from the 2016 data, which is the last time there were county commission data. As a test set, we might also use the 2016 data for #5. There are two possible views: how the data looks just before the election and how it looks after (where #4 and #6 change as a result of the election).
 
@@ -36,3 +35,13 @@ Until candidates have filed and voter registration begins in earnest, we should 
 Potential users of the data include journalists, academics, get-out-the-vote (GOTV) organizations, and equity advocates, among others. Our initial work will focus on making the raw data available while project participants work with these potential stakeholders to identify use cases and gather requirements that will drive development of the web site or application.
 
 # Mockups of Possible Mobile Friendly Web app
+
+## Mobile App
+![Mobile app mockup](https://github.com/Open-NC/Are-We-Represented-Project-Center/blob/master/assets/AWR-Home.png "Mockup of mobile app")
+
+## Race Details Page
+![Mockup of race details page](https://github.com/Open-NC/Are-We-Represented-Project-Center/blob/master/assets/AWR-Race.png "Mockup of race details page")
+
+## Gender Details Page
+
+![Mockup of gender details page](https://github.com/Open-NC/Are-We-Represented-Project-Center/blob/master/assets/AWR-Gender.png "Mockup of gener details page")
