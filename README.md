@@ -1,5 +1,5 @@
 # Are We Represented?
-This is the project center for the _Are We Represented?_ work. This is the repository that will be used to post issues, create documentation, etc. Additional repositories may be created for code, data and other resources associated with the project.
+This is the project center that will be used to post issues, create documentation, etc. Additional repositories may be created for code, data and other resources associated with the project.
 
 ## Purpose 
 
