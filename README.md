@@ -2,10 +2,9 @@
 This is the project center that will be used to post issues, create documentation, etc. Additional repositories may be created for code, data and other resources associated with the project.
 
 ## Purpose 
+The purpose of this project is to compile a dataset of demographic information about communities and their elected officials and to create a web application that allows community members, academics, journalists, policy-makers and advocates to access and use the information.
 
-The purpose of this project is to begin compiling a dataset of demographic information about populations and the policy-makers who represent their interests, as well as a web application that allows community members, academics, journalists, policy-makers and advocates to access and use this information.
-
-While we would like the dataset and web app eventually to cover all policy-making elected offices in NC, as a first step we will focus on county commissions since this represents a more manageable set of data and data analysis questions. We also hope that the data can eventually be connected to metrics that capture policy impact, since the connection between demographic representation and the impact of the resulting policy-making is complex, at best.
+The first phase will focus on North Carolina county commissions since this represents a more manageable set of data and data analysis questions. In the future, we hope to include more elected offices and possibly use the information to look at the impact of representation on policy and outcomes
 
 ### Is this a partisan project?
 
