@@ -1,0 +1,5 @@
+David Hopp
+April 9, 2018
+
+This is a folder required by the scripts. It would hold data files, but due to github size and utilization restrictions, these files
+are located in the project AWS S3 instance (see README for AWR_data_munging). More on this as I figure out what to say.
