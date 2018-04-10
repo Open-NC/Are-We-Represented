@@ -1,0 +1,825 @@
+---
+title: "AreWeRepresented Census and NCACC Data Munging"
+output: 
+  html_document: default
+author: "D. Hopp"
+date: "April 2018"
+---
+
+R requires packages plyr, dplyr, reshape2, readr  
+
+INPUT:  
+Data files that must be present (see context for sources):  
+FIPS.csv  
+cc-est2016-alldata-37.csv  
+results_pct_20161108.txt  
+voter_stats_20161108.txt  
+2016 Election Demographics for Website_1_extract.csv  
+  
+SIGNIFICANT R OBJECTS CREATED:  
+df_FIPS  county and FIPS code  
+df_cc_est2016_alldata_37  reads df_cc_est2016_alldata_37.csv  
+df_cc_est2016_tot  census count of population (includes records for all and for voting age)  
+df_results_pct_20161108  reads results_pct_20161108.txt  
+df_results_pct_20161108_clean  munged df_results_pct_20161108  
+dfcl_results_precinct_Contest.Type.Name  code list  
+dfcl_results_precinct_Choice  code list  
+df_results_pct_20161108_subset based on df_results_pct_20161108_clean  
+df_regis_stats_20161108 reads df_regis_stats_20161108.txt  
+dfcl_regis_party_cd code list  
+dfcl_regis_race_code code list  
+dfcl_regis_ethnic_code  code list  
+dfcl_regis_sex_code code list  
+df_regis_age_dcast based on df_regis_stats_20161108  
+df_regis_stats_20161108_county_rollup county rollup  
+df_NCACC_2016_demog read 2016 Election Demographics for Website_1_extract.csv  
+
+OUTPUT:  
+df_cc_est2016_tot.csv.gz  
+df_NCACC_2016_demog.csv.gz  
+AWR_Census_NCACC.RData  
+
+DIRECTORY STRUCTURE:  
+
+```{r adieu}
+data_dir <- "data/"
+```  
+
+Check for existence  
+
+```{r naty}
+Census_NCACC_files_in_ <- c(
+  "FIPS.csv",
+  "cc-est2016-alldata-37.csv",
+  "results_pct_20161108.txt",
+  "voter_stats_20161108.txt",
+  "2016 Election Demographics for Website_1_extract.csv"
+)
+for (f_ in Census_NCACC_files_in_) {
+  tmp_ <- paste0(data_dir,f_)
+  if (!file.exists(tmp_)) {
+    print(paste(tmp_,"does not exist."))
+    knitr::knit_exit()
+  }
+}
+#
+rm(f_,tmp_)
+```  
+
+## A. FIPS Code  
+
+Add 3-char FIPS3 code since some sources use as a numeric, some as character.  
+Also add county_id used in NCSBE data.  
+This code chunk appears in several places to assure that df_FIPS exists.  
+
+```{r yew}
+df_FIPS <- read.csv(
+  paste0(data_dir,"FIPS.csv"),
+  header=TRUE,
+  stringsAsFactors = FALSE
+) %>%
+dplyr::rowwise() %>%
+dplyr::mutate(
+   FIPS3=paste0(substr("00",1,3-nchar(as.character(FIPS))),as.character(FIPS))
+) %>%
+as.data.frame() 
+#
+df_FIPS %<>%
+cbind(
+  rownames(df_FIPS)
+) %>%
+plyr::rename(
+  c("rownames(df_FIPS)"="county_id")
+) %>%
+dplyr::mutate(
+  county_id=as.character(county_id)
+)
+```  
+
+```{r knit}
+str(df_FIPS)
+```  
+
+## B. County voting-age population counts  
+Produce a csv file of county voting-age population counts  
+
+data source:  
+https://www.census.gov/data/tables/2016/demo/popest/counties-detail.html  
+to retrieve cc-est2016-alldata-37.csv  
+from "Annual County Resident Population Estimates by Age, Sex, Race, and Hispanic Origin: April 1, 2010 to July 1, 2016"  
+
+COUNTY is the FIPS code (watch out for this!)  
+
+we want  
+YEAR=9 is latest estimate    
+Note that AGEGRP 0 is a summary figure.  
+AGEGRP >= 5 ages 20 and higher  
+  note: 4 is ages 15-19  
+  take 2/5 of AGEGRP 4 as an estimate of ages 18-19  
+
+Read cc-est2016-alldata-37.csv into data frame  
+ 
+```{r baby}
+df_cc_est2016_alldata_37 <- read.csv(  
+  paste0(data_dir,"cc-est2016-alldata-37.csv"),
+  sep=",",
+  header=TRUE,
+  stringsAsFactors=FALSE
+)
+```  
+
+```{r exalt}
+str(df_cc_est2016_alldata_37)
+```  
+
+Create a function that produces the desired data frame. 
+Less clutter this way and intermediate structures can be inspected.  
+
+```{r glad}
+fn_df_cc_est2016_tot <- function() {
+
+  # AGEGRP >= 5  
+ 
+  df_cc_est2016_20 <-
+    df_cc_est2016_alldata_37 %>%
+    dplyr::filter(
+      YEAR == 9 &
+      AGEGRP >= 5
+    ) %>%  
+    dplyr::select(
+      -SUMLEV,
+      -STATE,
+      -STNAME,
+      -CTYNAME,
+      -YEAR
+    )
+
+  # AGEGRP == 4  
+
+  df_cc_est2016_ <-
+    df_cc_est2016_alldata_37 %>%
+    dplyr::filter(
+      YEAR == 6 &
+      AGEGRP == 4
+    ) %>%  
+    dplyr::select(
+      -SUMLEV,
+      -STATE,
+      -STNAME,
+      -CTYNAME,
+      -YEAR
+    )
+
+  # This computes 2/5 of ages 15-19 population  
+ 
+  df_cc_est2016_tmp <- df_cc_est2016_ %>%
+    dplyr::select(
+      -COUNTY,
+      -AGEGRP
+    ) 
+  df_cc_est2016_tmp[] <- round(0.4*df_cc_est2016_tmp[])
+
+# Paste back together into a single data frame  
+ 
+  df_cc_est2016_18 <-
+    cbind(
+      df_cc_est2016_ %>%
+      dplyr::select(
+        COUNTY,
+        AGEGRP
+      ),
+      df_cc_est2016_tmp
+    )
+    
+  # Combine to get all ages in one data frame  
+
+  df_cc_est2016_voteage <-
+    rbind(
+      df_cc_est2016_20,
+      df_cc_est2016_18
+    ) %>%
+    dplyr::arrange(
+      COUNTY,
+      AGEGRP
+    )
+    
+  # Roll up to get total per county and add FIPS3  
+
+  df_cc_est2016_voteagetot <-
+    df_cc_est2016_voteage %>%
+    dplyr::select(
+      -AGEGRP
+    ) %>%
+    dplyr::group_by(
+      COUNTY
+    ) %>%
+    dplyr::summarize_all(
+      funs(sum)
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      pop="voteage"
+    )
+  #
+  # dataframe with all ages
+  #
+  df_cc_est2016_alltot <-
+  df_cc_est2016_alldata_37  %>%
+    dplyr::filter(
+      YEAR==9 &
+      AGEGRP==0
+    ) %>%
+    dplyr::select(
+      -SUMLEV,
+      -STATE,
+      -STNAME,
+      -CTYNAME,
+      -YEAR,
+      -AGEGRP
+    ) %>%
+    dplyr::mutate(
+      pop="all"
+    )
+  #
+  # combine
+  #
+  df_ <-
+    rbind(
+      df_cc_est2016_alltot,
+      df_cc_est2016_voteagetot
+    ) %>%
+    dplyr::inner_join(
+      df_FIPS %>% 
+        dplyr::select(FIPS,FIPS3),
+      by=c("COUNTY"="FIPS")
+    )
+  #
+  return(df_)
+}
+```  
+
+```{r sinew}
+  df_cc_est2016_tot <- fn_df_cc_est2016_tot()
+  str(df_cc_est2016_tot)
+```  
+
+Write out df_cc_est2016_tot as compressed file.  
+
+```{r stove}
+readr::write_csv(
+  df_cc_est2016_tot,
+  "df_cc_est2016_tot.csv.gz"
+)
+```  
+
+### County rollups  
+WA White alone  
+BA Black or African American alone  
+IA American Indian and Alaska Native alone  
+AA Asian alone  
+NA Native Hawaiian and Other Pacific Islander alone  
+TOM  Two or More Races  
+
+Hispanic is double-counted but included as an additional column:  
+H Hispanic  
+
+These are double-counted and are not included:  
+WAC  White alone or in combination  
+BAC  Black or African American alone  
+IAC  American Indian and Alaska Native alone or in combination  
+
+The following function (data base view) works with df_cc_est2016_tot  
+It can be used to generate a dataframe (as per SAS) or as an on-demand view.  
+
+```{r angelo}
+fn_df_cc_est2016_tot_subset <- function() {
+  db_subset <-
+  df_cc_est2016_tot %>%
+  dplyr::select( 
+    FIPS3,
+    TOT_POP,
+    TOT_MALE,
+    TOT_FEMALE,
+    WA_MALE,
+    WA_FEMALE,
+    BA_MALE,
+    BA_FEMALE,
+    IA_MALE,
+    IA_FEMALE,
+    AA_MALE,
+    AA_FEMALE,
+    NA_MALE,
+    NA_FEMALE,
+    TOM_MALE,
+    TOM_FEMALE,
+    WAC_MALE,
+    WAC_FEMALE,
+    BAC_MALE,
+    BAC_FEMALE,
+    IAC_MALE,
+    IAC_FEMALE,
+    AAC_MALE,
+    AAC_FEMALE,
+    H_MALE,
+    H_FEMALE,
+    pop
+  ) %>%
+  dplyr::mutate(
+    nWA=WA_MALE+WA_FEMALE,
+    nBA=BA_MALE+BA_FEMALE,
+    nIA=IA_MALE+IA_FEMALE,
+    nAA=AA_MALE+AA_FEMALE,
+    nNA=NA_MALE+NA_FEMALE,
+    nTOM=TOM_MALE+TOM_FEMALE,
+    nH=H_MALE+H_FEMALE
+  ) %>%
+  dplyr::select(
+    -TOT_MALE,
+    -TOT_FEMALE,
+    -WA_MALE,
+    -WA_FEMALE,
+    -BA_MALE,
+    -BA_FEMALE,
+    -IA_MALE,
+    -IA_FEMALE,
+    -AA_MALE,
+    -AA_FEMALE,
+    -NA_MALE,
+    -NA_FEMALE,
+    -TOM_MALE,
+    -TOM_FEMALE,
+    -WAC_MALE,
+    -WAC_FEMALE,
+    -BAC_MALE,
+    -BAC_FEMALE,
+    -IAC_MALE,
+    -IAC_FEMALE,
+    -AAC_MALE,
+    -AAC_FEMALE,
+    -H_MALE,
+    -H_FEMALE
+  )
+  return(db_subset)
+}
+```  
+
+```{r ash}  
+df_cc_est2016_tot_subset <- fn_df_cc_est2016_tot_subset()
+str(df_cc_est2016_tot_subset)
+```  
+
+Convenience function to produce dataframe of male proportion:  
+
+```{r spore}
+fn_df_cc_est2016_mfprop <- function(){
+# produces dataframe of
+# proportion male based on df_cc_est2016_tot
+#
+  df_mf <- 
+    df_cc_est2016_tot %>% 
+    dplyr::select(
+      TOT_POP:AAC_FEMALE,
+      FIPS3,
+      pop
+    )
+  #
+  # get proportion male
+  #
+  df_mf %<>%
+    dplyr::mutate(
+      pmTOT=round(TOT_MALE/(TOT_MALE+TOT_FEMALE),digits=3),
+      nTOT=TOT_MALE+TOT_FEMALE,
+      pmWA=round(WA_MALE/(WA_MALE+WA_FEMALE),digits=3),
+      nWA=WA_MALE+WA_FEMALE,    
+      pmBA=round(BA_MALE/(BA_MALE+BA_FEMALE),digits=3),
+      nBA=BA_MALE+BA_FEMALE,  
+      pmIA=round(IA_MALE/(IA_MALE+IA_FEMALE),digits=3),
+      nIA=IA_MALE+IA_FEMALE,  
+      pmAA=round(AA_MALE/(AA_MALE+AA_FEMALE),digits=3),
+      nAA=AA_MALE+AA_FEMALE,  
+      pmTOM=round(TOM_MALE/(TOM_MALE+TOM_FEMALE),digits=3),
+      nTOM=TOM_MALE+TOM_FEMALE
+    ) %>%
+    dplyr::select(
+      pmTOT,
+      pmWA,
+      pmBA,
+      pmIA,
+      pmAA,
+      pmTOM,
+      nTOT,
+      nWA,
+      nBA,
+      nIA,
+      nAA,
+      nTOM,
+      FIPS3,
+      pop
+    ) 
+
+  return(df_mf)
+}
+```  
+
+```{r tong}
+str(fn_df_cc_est2016_mfprop())
+```  
+## C. Precinct results file  
+This has a lot of detail but says nothing about who voted.  
+
+data source:  
+https://dl.ncsbe.gov/index.html?prefix=ENRS/2016_11_08/  
+
+```{r comic}
+df_results_pct_20161108 <- read.csv(
+  paste0(data_dir,"results_pct_20161108.txt"),
+  sep="\t",
+  header=TRUE,
+  stringsAsFactors = FALSE
+  )
+```  
+
+```{r pant}
+str(df_results_pct_20161108)
+```   
+
+Trim all character columns  
+Replace all blank or missing numerics with NA  
+Mainly for Choice.Party  
+
+```{r show}
+df_results_pct_20161108_clean <- 
+  df_results_pct_20161108 %>%
+  mutate_if(
+    is.character, funs(trimws(.)) 
+  ) %>%
+  base::replace(., .=="", NA)
+```  
+
+```{r tar}
+str(df_results_pct_20161108_clean)
+```  
+
+Introduce some normalization  
+Get distinct values for a few columns  
+First, check that Contest.Name is independent of Contest.Type  
+
+```{r vein}
+fn_results2016_indep01 <- function() {
+  df1 <- df_results_pct_20161108_clean %>%
+    dplyr::distinct(
+      Contest.Type,
+      Contest.Name
+    ) %>%
+    dplyr::select(
+      -Contest.Type
+    ) %>%
+    dplyr::group_by(
+      Contest.Name
+    ) %>%
+    dplyr::filter(
+      n()>1
+    ) %>%
+    dplyr::ungroup()
+  return(df1)
+}
+#
+# Stop Rmd execution if problem found
+# Not sure if the View does anything
+#
+tmp_ <- nrow(fn_results2016_indep01())
+if (tmp_!=0) {
+  print(
+    paste(
+      "fn_results2016_indep01() should be empty but row count is",tmp_
+    )
+  )
+  knitr::knit_exit()
+}  
+rm(tmp_)
+```  
+  
+Now normalize  
+"dfcl_" denotes a data frame that is a code list  
+
+Contest.Name and Contest.Type are unambiguously paired.  
+
+```{r wail}
+dfcl_results_precinct_Contest.Type.Name <-
+  dplyr::distinct(
+    df_results_pct_20161108,
+    Contest.Type,
+    Contest.Name
+  ) %>%
+  dplyr::mutate(
+    Contest.Type.Name.Code=as.numeric(rownames(.))
+  )
+#
+dfcl_results_precinct_Choice <-
+  dplyr::distinct(
+    df_results_pct_20161108_clean,
+    Choice
+  ) %>%
+  dplyr::mutate(
+    Choice.Code=as.numeric(rownames(.))
+  )
+```  
+
+```{r achoo}
+str(dfcl_results_precinct_Contest.Type.Name)
+str(dfcl_results_precinct_Choice)
+```  
+
+Drop meaningless trailing column X  
+Replace County with FIPS3 code (not FIPS)  
+
+```{r kulak}
+df_results_pct_20161108_clean %<>%
+  dplyr::inner_join(
+    df_FIPS %>% 
+      dplyr::select(
+        County,
+        FIPS3
+      ) %>%
+      dplyr::mutate(
+        County=toupper(County)
+      ),
+    by="County") %>%
+  dplyr::select(
+    -County,
+    -X
+  )
+```  
+
+```{r moral}
+str(df_results_pct_20161108_clean)
+```  
+
+Replace Contest.Type/Contest.Name with Contest.Type.Name.Code  
+
+```{r fairy}
+df_results_pct_20161108_clean %<>%
+  dplyr::inner_join(
+    dfcl_results_precinct_Contest.Type.Name,
+    by=c("Contest.Type","Contest.Name")
+  ) %>%
+  dplyr::select(
+    -Contest.Type,
+    -Contest.Name
+  )
+```  
+
+```{r mans}
+str(df_results_pct_20161108_clean)
+```  
+
+Replace Choice with Choice.Code  
+
+```{r price}
+df_results_pct_20161108_clean %<>%
+  dplyr::inner_join(
+    dfcl_results_precinct_Choice,
+    by="Choice") %>%
+  dplyr::select(
+    -Choice
+  )
+```  
+
+```{r macho}
+str(df_results_pct_20161108_clean)
+```  
+
+Simplify.
+
+```{r dew}
+df_results_pct_20161108_subset <-
+  df_results_pct_20161108_clean %>%
+  dplyr::select(
+    FIPS3,
+    Precinct,
+    Choice.Party,
+    Vote.For,
+    Total.Votes,
+    Contest.Type.Name.Code,
+    Choice.Code
+  )
+```  
+
+```{r lure}
+str(df_results_pct_20161108_subset)
+```  
+
+## D. Registered voters, not actual votes.  
+
+See https://vt.ncsbe.gov/RegStat/Results/?date=11%2F08%2F2016 for rollup.  
+
+```{r slow}
+df_regis_stats_20161108 <- read.csv(  
+  paste0(data_dir,"voter_stats_20161108.txt"),
+  sep="\t",
+  header=TRUE,
+  stringsAsFactors=FALSE
+)
+```  
+
+```{r loud}
+str(df_regis_stats_20161108)
+```  
+
+stat_type: `r unique(df_regis_stats_20161108$stats_type)`
+
+voter_type is "voter" only  
+update_date has no content  
+replace any missing character-type with NA   
+
+```{r hefty}
+df_regis_stats_20161108 %<>%
+  dplyr::select(
+    -stats_type,
+    -update_date
+  )  %>%
+  mutate_if(
+    is.character, funs(trimws(.)) 
+  ) %>%
+  base::replace(., .=="", NA)
+```  
+
+```{r lisp}
+str(df_regis_stats_20161108)
+```  
+
+Number of records with race_code NA: `r nrow(df_regis_stats_20161108 %>% dplyr::filter(is.na(race_code)))`  
+
+Replace race_code NA with "U"
+
+```{r fda}
+df_regis_stats_20161108 %<>%
+  dplyr::mutate(
+    race_code=ifelse(is.na(race_code),"U",race_code)
+  )
+```  
+
+```{r knee}
+str(df_regis_stats_20161108)
+```  
+
+add FIPS3 and remove county_desc 
+
+```{r isle}
+df_regis_stats_20161108 %<>%
+  dplyr::inner_join(
+    df_FIPS %>% 
+      dplyr::select(
+        County,
+        FIPS3
+      ) %>%
+      dplyr::mutate(
+        County=toupper(County)
+      ),
+    by=c("county_desc"="County")
+  ) %>%
+  dplyr::select(
+    -county_desc
+  )
+```  
+
+```{r kazoo}
+str(df_regis_stats_20161108)
+```  
+
+Note here that precinct_abbrv is missing in some records (WHY?!):  
+The number of rows with missing data: `r sum(!complete.cases(df_regis_stats_20161108))`    
+The number of rows with misssing precinct_abbrv: `r nrow(df_regis_stats_20161108[is.na(df_regis_stats_20161108$precinct_abbrv),])`  
+  
+Party codes: `r unique(df_regis_stats_20161108$party_cd)`  
+Race codes: `r unique(df_regis_stats_20161108$race_code)`  
+Ethnic codes: `r unique(df_regis_stats_20161108$ethnic_code)`  
+Sex codes: `r unique(df_regis_stats_20161108$sex_code)`  
+
+Create codelists:
+
+```{r bah}
+dfcl_regis_party_cd <- df_regis_stats_20161108 %>% dplyr::distinct(party_cd)
+dfcl_regis_race_code <- df_regis_stats_20161108 %>% dplyr::distinct(race_code)
+dfcl_regis_ethnic_code <- df_regis_stats_20161108 %>% dplyr::distinct(ethnic_code)
+dfcl_regis_sex_code <- df_regis_stats_20161108 %>% dplyr::distinct(sex_code)
+```  
+
+```{r doubt}
+str(dfcl_regis_party_cd)
+str(dfcl_regis_race_code)
+str(dfcl_regis_ethnic_code)
+str(dfcl_regis_sex_code)
+```  
+
+Number of voters in age groups:
+
+```{r brace}
+df_regis_age_dcast <-
+reshape2::dcast(
+  df_regis_stats_20161108,
+  age~.,
+  value.var="total_voters",
+  function(x) sum(x),
+  margins=TRUE
+)
+```  
+
+```{r sorry}
+str(df_regis_age_dcast)
+```  
+
+### County rollup  
+Ignore age.  
+This dataframe facilitates summaries for party, sex, race, etc.  
+
+```{r dixie}
+df_regis_stats_20161108_county_rollup <-
+  df_regis_stats_20161108 %>%
+  dplyr::select(
+    -precinct_abbrv,
+    -election_date,
+    -vtd_abbrv
+  ) %>%
+  dplyr::group_by(
+    FIPS3,
+    party_cd,
+    race_code,
+    ethnic_code,
+    sex_code
+  ) %>%
+  dplyr::summarize(
+    tot_voters=sum(total_voters)
+  ) %>%
+  dplyr::ungroup()
+```  
+
+## E. NCACC Elections spreadsheet  
+Source is https://www.ncacc.org/409/County-Elections  
+File is "2016 Election Demographics for Website_1_extract.csv"  
+Skip row 1, which holds text for columns.  
+
+```{r manic}
+df_NCACC_2016_demog <- read.csv(  
+  paste0(data_dir,"2016 Election Demographics for Website_1_extract.csv"),
+  sep=",",
+  skip=1,
+  header=TRUE,
+  stringsAsFactors=FALSE
+)
+```  
+
+```{r dowel}
+str(df_NCACC_2016_demog)
+```  
+
+Add FIPS3 and remove County  
+Replace NA with zero  
+
+```{r say}
+df_NCACC_2016_demog %<>%
+  dplyr::inner_join(
+    df_FIPS,
+    by="County"
+  ) %>%
+  dplyr::select(
+    FIPS3,
+    ncomm,
+    new,
+    nrep,
+    ndem,
+    nother,
+    nfemale,
+    nwhite,
+    nafam,
+    namin
+  ) %>%
+  dplyr::mutate_if(
+    is.numeric, funs(ifelse(is.na(.), 0, .))
+  )
+```  
+
+```{r oxnard}
+str(df_NCACC_2016_demog)
+```   
+
+Write out df_NCACC_2016_demog as a compressed file.  
+
+```{r tyler}
+readr::write_csv(
+  df_NCACC_2016_demog,
+  "df_NCACC_2016_demog.csv.gz"
+)
+``` 
+
+## F. Finish  
+
+```{r fly}
+ls()
+```  
+
+```{r dose}
+save.image("AWR_Census_NCACC.RData")
+```  
+
+### END

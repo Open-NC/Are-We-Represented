@@ -1,0 +1,418 @@
+---
+title: "AreWeRepresented NCSBE Data"
+output: 
+  html_document: default
+author: "D. Hopp"
+date: "April 8, 2018"
+--- 
+
+R requires packages plyr, dplyr, reshape2, lubridate, data.table, readr  
+
+INPUT:  
+FIPS.csv  
+DATA FILES that must be present (see context for sources)  
+Change as appropriate for your data:  
+ncvhis_Statewide_20180331_11082016.txt  
+ncvhis_Statewide_20180331_11082016.txt  (<- an extract from ncvhis_Statewide.txt)  
+
+SIGNIFICANT R OBJECTS CREATED:  
+df_FIPS  county and FIPS codes  
+df_ncvoter_in  munged ncvoter  
+df_ncvhis_in  munged ncvhis  
+df_nc_voted  joined ncvoter and ncvhis  
+df_ncvhis_dups  if any dups in ncvhis  
+
+OUTPUT:  
+df_ncvoter_in.RData  
+df_ncvhis_in.RData  
+df_nc_voted.RData  
+AWR_NCSBE.RData (image but not including df_ncvoter_in, df_ncvhis_in, df_nc_voted)  
+
+DIRECTORY STRUCTURE:  
+
+```{r yawn}
+data_dir <- "data/"
+data_ncvhis_dir <- "data/ncvhis/"
+data_ncvoter_dir <- "data/ncvoter/"
+```  
+
+Data files and as_of date:
+
+```{r zebra}
+#
+# must use a canonical form for the date:
+as_of <- "2018-04-07"
+#
+ncvhis_file <- "ncvhis_Statewide_20180407_11082016.txt"
+ncvoter_file <- "ncvoter_Statewide_20180407.txt" 
+```  
+Check for existence  
+
+```{r same}
+tmp_ <- paste0(data_ncvhis_dir,ncvhis_file)
+if (!file.exists(tmp_)) {
+  print(paste(tmp_,"does not exist."))
+  knitr::knit_exit()
+}
+#
+tmp_ <- paste0(data_ncvoter_dir,ncvoter_file)
+if (!file.exists(tmp_)) {
+  print(paste(tmp_,"does not exist."))
+  knitr::knit_exit()
+}
+rm(tmp_)
+```  
+
+## A. FIPS Code  
+
+Add 3-char FIPS3 code since some sources use as a numeric, some as character.  
+Also add county_id used in NCSBE data.  
+This code chunk appears in several places to assure that df_FIPS exists.  
+
+```{r wheel}
+df_FIPS <- read.csv(
+  paste0(data_dir,"FIPS.csv"),
+  header=TRUE,
+  stringsAsFactors = FALSE
+) %>%
+dplyr::rowwise() %>%
+dplyr::mutate(
+   FIPS3=paste0(substr("00",1,3-nchar(as.character(FIPS))),as.character(FIPS))
+) %>%
+as.data.frame() 
+#
+df_FIPS %<>%
+cbind(
+  rownames(df_FIPS)
+) %>%
+plyr::rename(
+  c("rownames(df_FIPS)"="county_id")
+) %>%
+dplyr::mutate(
+  county_id=as.character(county_id)
+)
+```  
+
+```{r pray}
+str(df_FIPS)
+#
+readr::write_csv(
+  df_FIPS,
+  "df_FIPS.csv.gz"
+)
+```  
+
+## B. ncvhis  
+
+### Read ncvhis files and move selected data to postgreSQL data base.   
+
+Ref: http://amunategui.github.io/dealing-with-large-files/   
+
+### Postgres table def:  
+  
+Note: election is kept as a char field even though it seems to hold a data mm/dd/yyyy  
+since there do not seem to be any guarantees that it will always be a date.  
+Any sorts can be done in some pragmatic way.  
+  
+CREATE TABLE public.ncvhis  
+(  
+    county_id character(3) COLLATE pg_catalog."default" NOT NULL,  
+    voter_reg_num character(12) COLLATE pg_catalog."default" NOT NULL,  
+    election character(10) COLLATE pg_catalog."default" NOT NULL,  
+    as_of_date date NOT NULL,  
+    CONSTRAINT ncvhis_pkey PRIMARY KEY (county_id, voter_reg_num)  
+)  
+WITH (  
+    OIDS = FALSE  
+)  
+TABLESPACE pg_default;  
+  
+ALTER TABLE public.ncvhis  
+    OWNER to postgres;  
+COMMENT ON TABLE public.ncvhis   
+    IS 'from NCSBE ncvhis zip file';  
+
+### Handling the data file ncvhis_Statewide.zip  
+
+Use the ncvhis_Statewide.zip file located in data/ncvhis/chunk  
+      IMPORTANT  
+Prior to this script, unzip and use such as Windows FINDSTR to create a  
+file with only the "11/08/2016" records:  
+findstr /L "11/08/2016" ncvhis_Statewide.txt > ncvhis_Statewide_found.txt  
+  
+This has 4,768,160 lines   
+
+
+```{r deter}
+#
+# FILE COLS:
+#  "county_id","county_desc","voter_reg_num","election_lbl","election_desc",
+#  "voting_method","voted_party_cd","voted_party_desc","pct_label",
+#	"pct_description","ncid","voted_county_id","voted_county_desc","vtd_label",
+#  "vtd_description"
+#
+# keep only these columns
+#
+file_cols_keep <- c(
+  "county_id",
+  "voter_reg_num",
+  "election_lbl"
+)
+```  
+
+### IMPORTANT:  
+input txt file MUST ALREADY be filtered on election date  
+fast read using data.table  
+convert to data frame for ease of computation  
+
+```{r one}
+df_ncvhis_in <- data.table::fread(
+  paste0(data_ncvhis_dir,ncvhis_file),
+  header=FALSE,
+  select=c(1,3,4),
+  col.names=file_cols_keep
+) %>%
+as.data.frame() %>%
+dplyr::rename(
+  election=election_lbl
+) %<>%
+dplyr::mutate(
+  as_of_date=lubridate::as_date(as_of)
+)
+```  
+
+There may be duplicates  
+if there are, remember them and remove them  
+
+```{r land}
+str(df_ncvhis_in)
+```  
+
+```{r lab}
+# remove df_ncvhis_dups if it already exists
+if (exists("df_ncvhis_dups")) {
+  rm(df_ncvhis_dups)
+}
+#
+v_ncvhis_dups <- 
+  which(
+    duplicated(
+      df_ncvhis_in
+    )
+  )  
+#
+if (length(v_ncvhis_dups)>0) {
+  # save list of dups 
+  # (there are only 2 per instance although this might require verification in the future)
+  df_ncvhis_dups <- 
+    df_ncvhis_in %>% .[v_ncvhis_dups,]
+  # remove them
+  df_ncvhis_in %<>%
+    dplyr::distinct(
+    )
+}
+```  
+
+```{r heat}
+if (exists("df_ncvhis_dups")) {
+  str(df_ncvhis_dups)
+  readr::write_csv(
+    df_ncvhis_dups,
+    paste0("df_ncvhis_dups_",as_of,".csv.gz")
+  )
+} else {
+  print("No duplicates.")
+}
+str(df_ncvhis_in)
+```  
+
+## C. ncvoter  
+
+### Read ncvoter file   
+
+These are the values for status_cd:  
+
+A Active  
+D Denied  
+I Inactive  
+R Removed  
+S Temporary  
+
+reason_cd are some finer detail for status_cd  
+
+election_lbl is a 10 char field that seems to hold a date mm/dd/yyyy  
+but without any guarantees that it will always be a date.  
+For our purposes, treat as a character field and convert to date  
+as required.  
+
+
+### Postgres table def:  
+
+CREATE TABLE public.ncvoter  
+(  
+    county_id character(3) COLLATE pg_catalog."default" NOT NULL,  
+    voter_reg_num character(12) COLLATE pg_catalog."default" NOT NULL,  
+    race_code character(3) COLLATE pg_catalog."default" NOT NULL,  
+    ethnic_code character(3) COLLATE pg_catalog."default" NOT NULL,  
+    gender_code character(1) COLLATE pg_catalog."default",  
+    birth_year integer,  
+    status_cd character(1) COLLATE pg_catalog."default" NOT NULL,  
+    reason_cd character(2) COLLATE pg_catalog."default",  
+    as_of_date date NOT NULL,  
+    registr_dt date,  
+    CONSTRAINT ncvoter_pkey PRIMARY KEY (county_id, voter_reg_num)  
+)  
+WITH (  
+    OIDS = FALSE  
+)  
+TABLESPACE pg_default;  
+  
+ALTER TABLE public.ncvoter  
+    OWNER to postgres;  
+COMMENT ON TABLE public.ncvoter  
+    IS 'From NCSBE ncvoter data';  
+
+### Handling the data file ncvoter_Statewide.txt    
+Files are located in data/ncvoter/  
+Use ncvoter_Statewide.txt  
+UNZIP ncvoter_Statewide.zip prior to this script  
+Easier than repeatedly unzipping  
+
+FILE COLS:  
+"county_id"	"county_desc"	"voter_reg_num"	"status_cd"	"voter_status_desc"	"reason_cd"	"voter_status_reason_desc"	"absent_ind"	"name_prefx_cd"	"last_name"	 
+"first_name"	"middle_name"	"name_suffix_lbl"	"res_street_address"	"res_city_desc"	"state_cd"	"zip_code"	"mail_addr1"	"mail_addr2"	"mail_addr3"	
+"mail_addr4"	"mail_city"	"mail_state"	"mail_zipcode"	"full_phone_number"	"race_code"	"ethnic_code"	"party_cd"	"gender_code"	"birth_age"	 
+"birth_state"	"drivers_lic"	"registr_dt"	"precinct_abbrv"	"precinct_desc"	"municipality_abbrv"	"municipality_desc"	"ward_abbrv"	"ward_desc"	"cong_dist_abbrv"	 
+"super_court_abbrv"	"judic_dist_abbrv"	"nc_senate_abbrv"	"nc_house_abbrv"	"county_commiss_abbrv"	"county_commiss_desc"	"township_abbrv"	"township_desc"	"school_dist_abbrv"	"school_dist_desc"	
+"fire_dist_abbrv"	"fire_dist_desc"	"water_dist_abbrv"	"water_dist_desc"	"sewer_dist_abbrv"	"sewer_dist_desc"	"sanit_dist_abbrv"	"sanit_dist_desc"	"rescue_dist_abbrv"	"rescue_dist_desc"	
+"munic_dist_abbrv"	"munic_dist_desc"	"dist_1_abbrv"	"dist_1_desc"	"dist_2_abbrv"	"dist_2_desc"	"confidential_ind"	"birth_year"	"ncid"	"vtd_abbrv"	"vtd_desc"  
+
+This is how to unzip from a script if desired:  
+system(paste0('"c:/program files/7-zip/7z.exe" x ', data_dir ,files, ' -o', data_dir,' -y -r'))  
+
+```{r gray}
+#
+# HEADER IS IN FILE SINCE THERE WAS NO GREPPING
+#
+# keep these columns:
+#
+file_cols_keep <- c(
+  "county_id",
+  "voter_reg_num",
+  "status_cd",
+  "voter_status_desc",
+  "reason_cd",
+  "voter_status_reason_desc",
+  "race_code",
+  "ethnic_code",
+  "gender_code",
+  "registr_dt",
+  "birth_year"
+)
+#
+# fast read using data.table
+# convert to data frame for ease of computation
+#
+df_ncvoter_in <- data.table::fread(
+  paste0(data_ncvoter_dir,ncvoter_file),
+  select=file_cols_keep
+) %>%
+as.data.frame()
+```  
+
+Clarify codes and keep on hand  
+```{r bitter}
+df_ncvoter_codes_dcast <- df_ncvoter_in %>% reshape2::dcast(race_code+gender_code+ethnic_code~.)
+df_ncvoter_reason_dcast <- df_ncvoter_in %>% reshape2::dcast(status_cd+voter_status_desc+reason_cd+voter_status_reason_desc~.)
+```  
+Heal ncvoter data frame  
+
+IMPORTANT  
+Inspection of the above dcasts shows some missing data  
+Replace as appropriate  
+```{r hoyt}
+df_ncvoter_in %<>%
+dplyr::select(
+  -voter_status_desc,
+  -voter_status_reason_desc
+) %>%
+dplyr::mutate(
+  reason_cd=ifelse(trimws(reason_cd)=="",NA,race_code),
+  race_code=ifelse(trimws(race_code)=="","U",race_code),
+  gender_code=ifelse(trimws(gender_code)=="","U",gender_code),
+  registr_dt=lubridate::as_date(lubridate::mdy(registr_dt)),
+  as_of_date=lubridate::as_date(as_of)
+)
+```  
+
+```{r sybil}
+str(df_ncvoter_in)
+```  
+
+## D. df_nc_voted
+
+### Data frame of those who voted  
+
+```{r quail}
+df_nc_voted <- 
+  dplyr::inner_join(
+    df_ncvoter_in %>% 
+    dplyr::select(-registr_dt),
+  df_ncvhis_in %>% 
+    dplyr::select(county_id,voter_reg_num),
+  by=c("county_id","voter_reg_num")
+  )
+```  
+
+```{r waxen}
+str(df_nc_voted)
+```  
+
+## E. Finish  
+
+Save large data frames to pare down size of image  
+
+```{r equip}
+save(df_ncvoter_in,file="df_ncvoter_in.RData")
+save(df_ncvhis_in,file="df_ncvhis_in.RData")
+save(df_nc_voted,file="df_nc_voted.RData")
+```  
+
+```{r tiger}
+readr::write_csv(
+  df_ncvoter_in,
+  paste0("df_ncvoter_in_",as_of,".csv.gz")
+)
+```  
+
+```{r fuel}
+readr::write_csv(
+  df_ncvhis_in,
+  paste0("df_ncvhis_in_",as_of,".csv.gz")
+)
+```  
+
+```{r mash}
+readr::write_csv(
+  df_nc_voted,
+  paste0("df_nc_voted_",as_of,".csv.gz")
+)
+```  
+
+```{r medal}
+rm(
+  df_ncvoter_in,
+  df_ncvhis_in,
+  df_nc_voted
+)
+```  
+
+```{r arrow}
+save.image("AWR_NCSBE.RData")
+```  
+
+```{r lucia}
+ls()
+```  
+
+## END
