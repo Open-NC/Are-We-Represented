@@ -1,0 +1,22 @@
+David Hopp
+April 9, 2018
+
+This folder, and its descendants, comprise an R project that explores and cleans data from the Census Bureau, NCSBE (State Board of 
+Elections), and NCACC (Association of County Commissioners). This is intended to be the basis for a back end for any of the public-facing 
+parts of the Are We Represented project. It should be of interest to anyone who wants to get into the details of the data available 
+from these several sources. Rather than complete, AWR_data_munging is intended to be informative, and as a place for addressing such
+topics as standardizing race and ethnicity coding.
+
+Due to the large size of the NCSBE data files (and the data structures derived from them), some files are located in an AWS S3 instance, 
+at https://us-east-2.console.aws.amazon.com/console/home?region=us-east-2# Documentation regarding access to this will be provided soon
+(as soon as I can figure out what to say).
+
+There are three R scripts integral to using AWR_data_munging: .Rprofile (a minimal set of required packages), and two rmarkdown scripts,
+AWR_Census_NCACC.Rmd and AWR_NCSBE.Rmd
+
+AWR_NCSBE.Rmd defaults to use the NCSBE ncvoter and ncvhis files date stamped 4/7/2018, located in the AWS S3 instance. They use
+specifically the data for the 11/8/2016 General Election, grepped from the ncvhis file. You are welcome to change to use of data for
+other dates - just be very careful about making the few changes that will be necessary, and should be obvious, in the script.
+
+I have tried to write readily understandable R, relying primarily on dplyr. Please observe the requirements of reproducible research
+in whatever changes or extensions you make. 
