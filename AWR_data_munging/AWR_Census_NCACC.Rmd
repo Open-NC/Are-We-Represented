@@ -368,6 +368,16 @@ df_cc_est2016_tot_subset <- fn_df_cc_est2016_tot_subset()
 str(df_cc_est2016_tot_subset)
 ```  
 
+Race by county:  
+
+```{r gas}
+df_cc_est2016_county_race_dcast <-
+fn_df_cc_est2016_tot_subset() %>%
+dplyr::select(TOT_POP,nWA,nBA,nIA,nAA,nTOM,pop,FIPS3) %>%
+reshape2::melt(id.vars=c("pop","FIPS3")) %>%
+reshape2::dcast(pop+FIPS3~variable,value.var = "value",sum)
+```  
+
 Convenience function to produce dataframe of male proportion:  
 
 ```{r spore}
@@ -424,6 +434,7 @@ fn_df_cc_est2016_mfprop <- function(){
 ```{r tong}
 str(fn_df_cc_est2016_mfprop())
 ```  
+
 ## C. Precinct results file  
 This has a lot of detail but says nothing about who voted.  
 

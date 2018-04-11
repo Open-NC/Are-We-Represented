@@ -610,6 +610,12 @@ str(df_cc_est2016_tot_subset)</code></pre>
 ##  $ nNA    : num  140 16 4 17 12 10 31 20 11 158 ...
 ##  $ nTOM   : num  3381 563 151 357 293 ...
 ##  $ nH     : num  20069 1740 1040 1034 1422 ...</code></pre>
+<p>Race by county:</p>
+<pre class="r"><code>df_cc_est2016_county_race_dcast &lt;-
+fn_df_cc_est2016_tot_subset() %&gt;%
+dplyr::select(TOT_POP,nWA,nBA,nIA,nAA,nTOM,pop,FIPS3) %&gt;%
+reshape2::melt(id.vars=c(&quot;pop&quot;,&quot;FIPS3&quot;)) %&gt;%
+reshape2::dcast(pop+FIPS3~variable,value.var = &quot;value&quot;,sum)</code></pre>
 <p>Convenience function to produce dataframe of male proportion:</p>
 <pre class="r"><code>fn_df_cc_est2016_mfprop &lt;- function(){
 # produces dataframe of
@@ -1126,26 +1132,27 @@ Replace NA with zero</p>
 <pre><code>##  [1] &quot;Census_NCACC_files_in_&quot;                 
 ##  [2] &quot;data_dir&quot;                               
 ##  [3] &quot;df_cc_est2016_alldata_37&quot;               
-##  [4] &quot;df_cc_est2016_tot&quot;                      
-##  [5] &quot;df_cc_est2016_tot_subset&quot;               
-##  [6] &quot;df_FIPS&quot;                                
-##  [7] &quot;df_NCACC_2016_demog&quot;                    
-##  [8] &quot;df_regis_age_dcast&quot;                     
-##  [9] &quot;df_regis_stats_20161108&quot;                
-## [10] &quot;df_regis_stats_20161108_county_rollup&quot;  
-## [11] &quot;df_results_pct_20161108&quot;                
-## [12] &quot;df_results_pct_20161108_clean&quot;          
-## [13] &quot;df_results_pct_20161108_subset&quot;         
-## [14] &quot;dfcl_regis_ethnic_code&quot;                 
-## [15] &quot;dfcl_regis_party_cd&quot;                    
-## [16] &quot;dfcl_regis_race_code&quot;                   
-## [17] &quot;dfcl_regis_sex_code&quot;                    
-## [18] &quot;dfcl_results_precinct_Choice&quot;           
-## [19] &quot;dfcl_results_precinct_Contest.Type.Name&quot;
-## [20] &quot;fn_df_cc_est2016_mfprop&quot;                
-## [21] &quot;fn_df_cc_est2016_tot&quot;                   
-## [22] &quot;fn_df_cc_est2016_tot_subset&quot;            
-## [23] &quot;fn_results2016_indep01&quot;</code></pre>
+##  [4] &quot;df_cc_est2016_county_race_dcast&quot;        
+##  [5] &quot;df_cc_est2016_tot&quot;                      
+##  [6] &quot;df_cc_est2016_tot_subset&quot;               
+##  [7] &quot;df_FIPS&quot;                                
+##  [8] &quot;df_NCACC_2016_demog&quot;                    
+##  [9] &quot;df_regis_age_dcast&quot;                     
+## [10] &quot;df_regis_stats_20161108&quot;                
+## [11] &quot;df_regis_stats_20161108_county_rollup&quot;  
+## [12] &quot;df_results_pct_20161108&quot;                
+## [13] &quot;df_results_pct_20161108_clean&quot;          
+## [14] &quot;df_results_pct_20161108_subset&quot;         
+## [15] &quot;dfcl_regis_ethnic_code&quot;                 
+## [16] &quot;dfcl_regis_party_cd&quot;                    
+## [17] &quot;dfcl_regis_race_code&quot;                   
+## [18] &quot;dfcl_regis_sex_code&quot;                    
+## [19] &quot;dfcl_results_precinct_Choice&quot;           
+## [20] &quot;dfcl_results_precinct_Contest.Type.Name&quot;
+## [21] &quot;fn_df_cc_est2016_mfprop&quot;                
+## [22] &quot;fn_df_cc_est2016_tot&quot;                   
+## [23] &quot;fn_df_cc_est2016_tot_subset&quot;            
+## [24] &quot;fn_results2016_indep01&quot;</code></pre>
 <pre class="r"><code>save.image(&quot;AWR_Census_NCACC.RData&quot;)</code></pre>
 <div id="end" class="section level3">
 <h3>END</h3>
