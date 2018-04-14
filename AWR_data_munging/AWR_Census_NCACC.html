@@ -153,7 +153,8 @@ df_cc_est2016_tot.csv.gz<br />
 df_NCACC_2016_demog.csv.gz<br />
 AWR_Census_NCACC.RData</p>
 <p>DIRECTORY STRUCTURE:</p>
-<pre class="r"><code>data_dir &lt;- &quot;data/&quot;</code></pre>
+<pre class="r"><code>data_dir &lt;- &quot;data/&quot;
+output_dir &lt;- &quot;output/&quot;</code></pre>
 <p>Check for existence</p>
 <pre class="r"><code>Census_NCACC_files_in_ &lt;- c(
   &quot;FIPS.csv&quot;,
@@ -207,6 +208,7 @@ dplyr::mutate(
 <div id="b.-county-voting-age-population-counts" class="section level2">
 <h2>B. County voting-age population counts</h2>
 <p>Produce a csv file of county voting-age population counts</p>
+<p>Census 2010 Race Methodology: <a href="https://www2.census.gov/programs-surveys/popest/technical-documentation/methodology/modified-race-summary-file-method/mrsf2010.pdf">here</a> and <a href="https://www.census.gov/prod/cen2010/briefs/c2010br-02.pdf">here</a></p>
 <p>data source:<br />
 <a href="https://www.census.gov/data/tables/2016/demo/popest/counties-detail.html" class="uri">https://www.census.gov/data/tables/2016/demo/popest/counties-detail.html</a><br />
 to retrieve cc-est2016-alldata-37.csv<br />
@@ -510,7 +512,7 @@ take 2/5 of AGEGRP 4 as an estimate of ages 18-19</p>
 <p>Write out df_cc_est2016_tot as compressed file.</p>
 <pre class="r"><code>readr::write_csv(
   df_cc_est2016_tot,
-  &quot;df_cc_est2016_tot.csv.gz&quot;
+  paste0(output_dir,&quot;df_cc_est2016_tot.csv.gz&quot;)
 )</code></pre>
 <div id="county-rollups" class="section level3">
 <h3>County rollups</h3>
@@ -1060,6 +1062,41 @@ This dataframe facilitates summaries for party, sex, race, etc.</p>
     tot_voters=sum(total_voters)
   ) %&gt;%
   dplyr::ungroup()</code></pre>
+<p>A note on how to roll this up even tighter.<br />
+This will create a data frame without party_cd or ethnic_code, and with totals adjusted accordingly.</p>
+<pre class="r"><code>fn_df_regis_stats_20161108_county_rollup_narrow &lt;- function(){
+  df_  &lt;-
+  df_regis_stats_20161108_county_rollup %&gt;%
+  dplyr::select(
+    FIPS3,
+    race_code,
+    sex_code,
+    tot_voters
+  ) %&gt;%
+  dplyr::group_by(
+    FIPS3,
+    race_code,
+    sex_code
+  ) %&gt;% 
+  dplyr::summarise(
+    N=sum(tot_voters)
+  ) %&gt;%
+  dplyr::ungroup() %&gt;%
+  dplyr::select(
+    FIPS3,
+    N,
+    sex_code,
+    race_code
+  )
+  #
+  return(df_)
+}</code></pre>
+<pre class="r"><code>str(fn_df_regis_stats_20161108_county_rollup_narrow())</code></pre>
+<pre><code>## Classes 'tbl_df', 'tbl' and 'data.frame':    1972 obs. of  4 variables:
+##  $ FIPS3    : chr  &quot;001&quot; &quot;001&quot; &quot;001&quot; &quot;001&quot; ...
+##  $ N        : int  356 278 18 12017 8564 138 154 114 6 433 ...
+##  $ sex_code : chr  &quot;F&quot; &quot;M&quot; &quot;U&quot; &quot;F&quot; ...
+##  $ race_code: chr  &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;B&quot; ...</code></pre>
 </div>
 </div>
 <div id="e.-ncacc-elections-spreadsheet" class="section level2">
@@ -1123,36 +1160,38 @@ Replace NA with zero</p>
 <p>Write out df_NCACC_2016_demog as a compressed file.</p>
 <pre class="r"><code>readr::write_csv(
   df_NCACC_2016_demog,
-  &quot;df_NCACC_2016_demog.csv.gz&quot;
+  paste0(output_dir,&quot;df_NCACC_2016_demog.csv.gz&quot;)
 )</code></pre>
 </div>
 <div id="f.-finish" class="section level2">
 <h2>F. Finish</h2>
 <pre class="r"><code>ls()</code></pre>
-<pre><code>##  [1] &quot;Census_NCACC_files_in_&quot;                 
-##  [2] &quot;data_dir&quot;                               
-##  [3] &quot;df_cc_est2016_alldata_37&quot;               
-##  [4] &quot;df_cc_est2016_county_race_dcast&quot;        
-##  [5] &quot;df_cc_est2016_tot&quot;                      
-##  [6] &quot;df_cc_est2016_tot_subset&quot;               
-##  [7] &quot;df_FIPS&quot;                                
-##  [8] &quot;df_NCACC_2016_demog&quot;                    
-##  [9] &quot;df_regis_age_dcast&quot;                     
-## [10] &quot;df_regis_stats_20161108&quot;                
-## [11] &quot;df_regis_stats_20161108_county_rollup&quot;  
-## [12] &quot;df_results_pct_20161108&quot;                
-## [13] &quot;df_results_pct_20161108_clean&quot;          
-## [14] &quot;df_results_pct_20161108_subset&quot;         
-## [15] &quot;dfcl_regis_ethnic_code&quot;                 
-## [16] &quot;dfcl_regis_party_cd&quot;                    
-## [17] &quot;dfcl_regis_race_code&quot;                   
-## [18] &quot;dfcl_regis_sex_code&quot;                    
-## [19] &quot;dfcl_results_precinct_Choice&quot;           
-## [20] &quot;dfcl_results_precinct_Contest.Type.Name&quot;
-## [21] &quot;fn_df_cc_est2016_mfprop&quot;                
-## [22] &quot;fn_df_cc_est2016_tot&quot;                   
-## [23] &quot;fn_df_cc_est2016_tot_subset&quot;            
-## [24] &quot;fn_results2016_indep01&quot;</code></pre>
+<pre><code>##  [1] &quot;Census_NCACC_files_in_&quot;                         
+##  [2] &quot;data_dir&quot;                                       
+##  [3] &quot;df_cc_est2016_alldata_37&quot;                       
+##  [4] &quot;df_cc_est2016_county_race_dcast&quot;                
+##  [5] &quot;df_cc_est2016_tot&quot;                              
+##  [6] &quot;df_cc_est2016_tot_subset&quot;                       
+##  [7] &quot;df_FIPS&quot;                                        
+##  [8] &quot;df_NCACC_2016_demog&quot;                            
+##  [9] &quot;df_regis_age_dcast&quot;                             
+## [10] &quot;df_regis_stats_20161108&quot;                        
+## [11] &quot;df_regis_stats_20161108_county_rollup&quot;          
+## [12] &quot;df_results_pct_20161108&quot;                        
+## [13] &quot;df_results_pct_20161108_clean&quot;                  
+## [14] &quot;df_results_pct_20161108_subset&quot;                 
+## [15] &quot;dfcl_regis_ethnic_code&quot;                         
+## [16] &quot;dfcl_regis_party_cd&quot;                            
+## [17] &quot;dfcl_regis_race_code&quot;                           
+## [18] &quot;dfcl_regis_sex_code&quot;                            
+## [19] &quot;dfcl_results_precinct_Choice&quot;                   
+## [20] &quot;dfcl_results_precinct_Contest.Type.Name&quot;        
+## [21] &quot;fn_df_cc_est2016_mfprop&quot;                        
+## [22] &quot;fn_df_cc_est2016_tot&quot;                           
+## [23] &quot;fn_df_cc_est2016_tot_subset&quot;                    
+## [24] &quot;fn_df_regis_stats_20161108_county_rollup_narrow&quot;
+## [25] &quot;fn_results2016_indep01&quot;                         
+## [26] &quot;output_dir&quot;</code></pre>
 <pre class="r"><code>save.image(&quot;AWR_Census_NCACC.RData&quot;)</code></pre>
 <div id="end" class="section level3">
 <h3>END</h3>

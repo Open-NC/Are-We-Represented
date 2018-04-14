@@ -34,6 +34,7 @@ DIRECTORY STRUCTURE:
 data_dir <- "data/"
 data_ncvhis_dir <- "data/ncvhis/"
 data_ncvoter_dir <- "data/ncvoter/"
+output_dir <- "output/"
 ```  
 
 Data files and as_of date:
@@ -98,7 +99,7 @@ str(df_FIPS)
 #
 readr::write_csv(
   df_FIPS,
-  "df_FIPS.csv.gz"
+  paste0(output_dir,"df_FIPS.csv.gz")
 )
 ```  
 
@@ -218,7 +219,7 @@ if (exists("df_ncvhis_dups")) {
   str(df_ncvhis_dups)
   readr::write_csv(
     df_ncvhis_dups,
-    paste0("df_ncvhis_dups_",as_of,".csv.gz")
+    paste0(output_dir,"df_ncvhis_dups_",as_of,".csv.gz")
   )
 } else {
   print("No duplicates.")
@@ -381,21 +382,21 @@ save(df_nc_voted,file="df_nc_voted.RData")
 ```{r tiger}
 readr::write_csv(
   df_ncvoter_in,
-  paste0("df_ncvoter_in_",as_of,".csv.gz")
+  paste0(output_dir,"df_ncvoter_in_",as_of,".csv.gz")
 )
 ```  
 
 ```{r fuel}
 readr::write_csv(
   df_ncvhis_in,
-  paste0("df_ncvhis_in_",as_of,".csv.gz")
+  paste0(output_dir,"df_ncvhis_in_",as_of,".csv.gz")
 )
 ```  
 
 ```{r mash}
 readr::write_csv(
   df_nc_voted,
-  paste0("df_nc_voted_",as_of,".csv.gz")
+  paste0(output_dir,"df_nc_voted_",as_of,".csv.gz")
 )
 ```  
 

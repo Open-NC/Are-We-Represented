@@ -144,7 +144,8 @@ AWR_NCSBE.RData (image but not including df_ncvoter_in, df_ncvhis_in, df_nc_vote
 <p>DIRECTORY STRUCTURE:</p>
 <pre class="r"><code>data_dir &lt;- &quot;data/&quot;
 data_ncvhis_dir &lt;- &quot;data/ncvhis/&quot;
-data_ncvoter_dir &lt;- &quot;data/ncvoter/&quot;</code></pre>
+data_ncvoter_dir &lt;- &quot;data/ncvoter/&quot;
+output_dir &lt;- &quot;output/&quot;</code></pre>
 <p>Data files and as_of date:</p>
 <pre class="r"><code>#
 # must use a canonical form for the date:
@@ -200,7 +201,7 @@ dplyr::mutate(
 <pre class="r"><code>#
 readr::write_csv(
   df_FIPS,
-  &quot;df_FIPS.csv.gz&quot;
+  paste0(output_dir,&quot;df_FIPS.csv.gz&quot;)
 )</code></pre>
 </div>
 <div id="b.-ncvhis" class="section level2">
@@ -274,12 +275,10 @@ dplyr::mutate(
 )</code></pre>
 <pre><code>## 
 Read 0.0% of 4768165 rows
-Read 16.6% of 4768165 rows
-Read 34.0% of 4768165 rows
-Read 48.7% of 4768165 rows
-Read 60.8% of 4768165 rows
-Read 70.7% of 4768165 rows
-Read 93.5% of 4768165 rows
+Read 18.9% of 4768165 rows
+Read 35.2% of 4768165 rows
+Read 52.0% of 4768165 rows
+Read 70.0% of 4768165 rows
 Read 96.7% of 4768165 rows
 Read 4768165 rows and 3 (of 15) columns from 0.700 GB file in 00:00:15</code></pre>
 <p>There may be duplicates<br />
@@ -316,7 +315,7 @@ if (length(v_ncvhis_dups)&gt;0) {
   str(df_ncvhis_dups)
   readr::write_csv(
     df_ncvhis_dups,
-    paste0(&quot;df_ncvhis_dups_&quot;,as_of,&quot;.csv.gz&quot;)
+    paste0(output_dir,&quot;df_ncvhis_dups_&quot;,as_of,&quot;.csv.gz&quot;)
   )
 } else {
   print(&quot;No duplicates.&quot;)
@@ -420,22 +419,24 @@ df_ncvoter_in &lt;- data.table::fread(
 as.data.frame()</code></pre>
 <pre><code>## 
 Read 0.0% of 7994605 rows
-Read 6.8% of 7994605 rows
-Read 13.3% of 7994605 rows
-Read 20.0% of 7994605 rows
-Read 26.8% of 7994605 rows
-Read 33.1% of 7994605 rows
+Read 5.1% of 7994605 rows
+Read 10.9% of 7994605 rows
+Read 16.9% of 7994605 rows
+Read 22.5% of 7994605 rows
+Read 28.4% of 7994605 rows
+Read 33.8% of 7994605 rows
 Read 39.5% of 7994605 rows
-Read 46.2% of 7994605 rows
-Read 52.9% of 7994605 rows
-Read 58.9% of 7994605 rows
-Read 64.9% of 7994605 rows
-Read 71.2% of 7994605 rows
-Read 77.6% of 7994605 rows
-Read 84.6% of 7994605 rows
-Read 90.7% of 7994605 rows
+Read 45.5% of 7994605 rows
+Read 51.3% of 7994605 rows
+Read 56.7% of 7994605 rows
+Read 62.3% of 7994605 rows
+Read 67.9% of 7994605 rows
+Read 73.7% of 7994605 rows
+Read 79.6% of 7994605 rows
+Read 85.3% of 7994605 rows
+Read 90.9% of 7994605 rows
 Read 96.3% of 7994605 rows
-Read 7994605 rows and 11 (of 71) columns from 3.500 GB file in 00:01:08</code></pre>
+Read 7994605 rows and 11 (of 71) columns from 3.500 GB file in 00:00:57</code></pre>
 <p>Clarify codes and keep on hand</p>
 <pre class="r"><code>df_ncvoter_codes_dcast &lt;- df_ncvoter_in %&gt;% reshape2::dcast(race_code+gender_code+ethnic_code~.)</code></pre>
 <pre><code>## Using birth_year as value column: use value.var to override.</code></pre>
@@ -506,15 +507,15 @@ save(df_ncvhis_in,file=&quot;df_ncvhis_in.RData&quot;)
 save(df_nc_voted,file=&quot;df_nc_voted.RData&quot;)</code></pre>
 <pre class="r"><code>readr::write_csv(
   df_ncvoter_in,
-  paste0(&quot;df_ncvoter_in_&quot;,as_of,&quot;.csv.gz&quot;)
+  paste0(output_dir,&quot;df_ncvoter_in_&quot;,as_of,&quot;.csv.gz&quot;)
 )</code></pre>
 <pre class="r"><code>readr::write_csv(
   df_ncvhis_in,
-  paste0(&quot;df_ncvhis_in_&quot;,as_of,&quot;.csv.gz&quot;)
+  paste0(output_dir,&quot;df_ncvhis_in_&quot;,as_of,&quot;.csv.gz&quot;)
 )</code></pre>
 <pre class="r"><code>readr::write_csv(
   df_nc_voted,
-  paste0(&quot;df_nc_voted_&quot;,as_of,&quot;.csv.gz&quot;)
+  paste0(output_dir,&quot;df_nc_voted_&quot;,as_of,&quot;.csv.gz&quot;)
 )</code></pre>
 <pre class="r"><code>rm(
   df_ncvoter_in,
@@ -528,7 +529,8 @@ save(df_nc_voted,file=&quot;df_nc_voted.RData&quot;)</code></pre>
 ##  [5] &quot;df_FIPS&quot;                 &quot;df_ncvhis_dups&quot;         
 ##  [7] &quot;df_ncvoter_codes_dcast&quot;  &quot;df_ncvoter_reason_dcast&quot;
 ##  [9] &quot;file_cols_keep&quot;          &quot;ncvhis_file&quot;            
-## [11] &quot;ncvoter_file&quot;            &quot;v_ncvhis_dups&quot;</code></pre>
+## [11] &quot;ncvoter_file&quot;            &quot;output_dir&quot;             
+## [13] &quot;v_ncvhis_dups&quot;</code></pre>
 </div>
 <div id="end" class="section level2">
 <h2>END</h2>

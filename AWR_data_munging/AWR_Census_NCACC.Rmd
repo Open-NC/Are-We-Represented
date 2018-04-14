@@ -43,11 +43,12 @@ DIRECTORY STRUCTURE:
 
 ```{r adieu}
 data_dir <- "data/"
+output_dir <- "output/"
 ```  
 
 Check for existence  
 
-```{r naty}
+```{r natty}
 Census_NCACC_files_in_ <- c(
   "FIPS.csv",
   "cc-est2016-alldata-37.csv",
@@ -102,6 +103,10 @@ str(df_FIPS)
 
 ## B. County voting-age population counts  
 Produce a csv file of county voting-age population counts  
+
+Census 2010 Race Methodology: 
+[here](https://www2.census.gov/programs-surveys/popest/technical-documentation/methodology/modified-race-summary-file-method/mrsf2010.pdf) 
+and [here](https://www.census.gov/prod/cen2010/briefs/c2010br-02.pdf)  
 
 data source:  
 https://www.census.gov/data/tables/2016/demo/popest/counties-detail.html  
@@ -268,7 +273,7 @@ Write out df_cc_est2016_tot as compressed file.
 ```{r stove}
 readr::write_csv(
   df_cc_est2016_tot,
-  "df_cc_est2016_tot.csv.gz"
+  paste0(output_dir,"df_cc_est2016_tot.csv.gz")
 )
 ```  
 
@@ -765,6 +770,44 @@ df_regis_stats_20161108_county_rollup <-
   dplyr::ungroup()
 ```  
 
+A note on how to roll this up even tighter.  
+This will create a data frame without party_cd or ethnic_code, 
+and with totals adjusted accordingly.   
+
+```{r alive}
+fn_df_regis_stats_20161108_county_rollup_narrow <- function(){
+  df_  <-
+  df_regis_stats_20161108_county_rollup %>%
+  dplyr::select(
+    FIPS3,
+    race_code,
+    sex_code,
+    tot_voters
+  ) %>%
+  dplyr::group_by(
+    FIPS3,
+    race_code,
+    sex_code
+  ) %>% 
+  dplyr::summarise(
+    N=sum(tot_voters)
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(
+    FIPS3,
+    N,
+    sex_code,
+    race_code
+  )
+  #
+  return(df_)
+}
+```  
+
+```{r banal}
+str(fn_df_regis_stats_20161108_county_rollup_narrow())
+```  
+
 ## E. NCACC Elections spreadsheet  
 Source is https://www.ncacc.org/409/County-Elections  
 File is "2016 Election Demographics for Website_1_extract.csv"  
@@ -819,7 +862,7 @@ Write out df_NCACC_2016_demog as a compressed file.
 ```{r tyler}
 readr::write_csv(
   df_NCACC_2016_demog,
-  "df_NCACC_2016_demog.csv.gz"
+  paste0(output_dir,"df_NCACC_2016_demog.csv.gz")
 )
 ``` 
 
