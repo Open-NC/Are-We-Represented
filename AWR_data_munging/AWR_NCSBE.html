@@ -135,7 +135,7 @@ df_FIPS county and FIPS codes<br />
 df_ncvoter_in munged ncvoter<br />
 df_ncvhis_in munged ncvhis<br />
 df_nc_voted joined ncvoter and ncvhis<br />
-df_ncvhis_dups if any dups in ncvhis</p>
+df_ncvhis_dups if any dups in ncvhis reason_cd</p>
 <p>OUTPUT:<br />
 df_ncvoter_in.RData<br />
 df_ncvhis_in.RData<br />
@@ -275,10 +275,13 @@ dplyr::mutate(
 )</code></pre>
 <pre><code>## 
 Read 0.0% of 4768165 rows
-Read 18.9% of 4768165 rows
+Read 12.0% of 4768165 rows
+Read 24.3% of 4768165 rows
 Read 35.2% of 4768165 rows
 Read 52.0% of 4768165 rows
-Read 70.0% of 4768165 rows
+Read 69.6% of 4768165 rows
+Read 74.5% of 4768165 rows
+Read 92.1% of 4768165 rows
 Read 96.7% of 4768165 rows
 Read 4768165 rows and 3 (of 15) columns from 0.700 GB file in 00:00:15</code></pre>
 <p>There may be duplicates<br />
@@ -419,24 +422,30 @@ df_ncvoter_in &lt;- data.table::fread(
 as.data.frame()</code></pre>
 <pre><code>## 
 Read 0.0% of 7994605 rows
-Read 5.1% of 7994605 rows
-Read 10.9% of 7994605 rows
-Read 16.9% of 7994605 rows
-Read 22.5% of 7994605 rows
-Read 28.4% of 7994605 rows
-Read 33.8% of 7994605 rows
-Read 39.5% of 7994605 rows
-Read 45.5% of 7994605 rows
-Read 51.3% of 7994605 rows
-Read 56.7% of 7994605 rows
-Read 62.3% of 7994605 rows
-Read 67.9% of 7994605 rows
-Read 73.7% of 7994605 rows
-Read 79.6% of 7994605 rows
-Read 85.3% of 7994605 rows
-Read 90.9% of 7994605 rows
+Read 4.4% of 7994605 rows
+Read 8.6% of 7994605 rows
+Read 13.0% of 7994605 rows
+Read 17.3% of 7994605 rows
+Read 21.4% of 7994605 rows
+Read 25.9% of 7994605 rows
+Read 30.1% of 7994605 rows
+Read 34.1% of 7994605 rows
+Read 38.4% of 7994605 rows
+Read 42.7% of 7994605 rows
+Read 46.8% of 7994605 rows
+Read 51.2% of 7994605 rows
+Read 55.2% of 7994605 rows
+Read 59.0% of 7994605 rows
+Read 63.0% of 7994605 rows
+Read 67.4% of 7994605 rows
+Read 71.5% of 7994605 rows
+Read 75.8% of 7994605 rows
+Read 79.9% of 7994605 rows
+Read 84.2% of 7994605 rows
+Read 88.3% of 7994605 rows
+Read 92.2% of 7994605 rows
 Read 96.3% of 7994605 rows
-Read 7994605 rows and 11 (of 71) columns from 3.500 GB file in 00:00:57</code></pre>
+Read 7994605 rows and 11 (of 71) columns from 3.500 GB file in 00:00:37</code></pre>
 <p>Clarify codes and keep on hand</p>
 <pre class="r"><code>df_ncvoter_codes_dcast &lt;- df_ncvoter_in %&gt;% reshape2::dcast(race_code+gender_code+ethnic_code~.)</code></pre>
 <pre><code>## Using birth_year as value column: use value.var to override.</code></pre>
@@ -453,10 +462,13 @@ dplyr::select(
   -voter_status_desc,
   -voter_status_reason_desc
 ) %&gt;%
+  mutate_if(
+    is.character, funs(trimws(.)) 
+  ) %&gt;%
+  base::replace(., .==&quot;&quot;, NA)</code></pre>
+<p>Coerce to dates</p>
+<pre class="r"><code>df_ncvoter_in %&lt;&gt;%
 dplyr::mutate(
-  reason_cd=ifelse(trimws(reason_cd)==&quot;&quot;,NA,race_code),
-  race_code=ifelse(trimws(race_code)==&quot;&quot;,&quot;U&quot;,race_code),
-  gender_code=ifelse(trimws(gender_code)==&quot;&quot;,&quot;U&quot;,gender_code),
   registr_dt=lubridate::as_date(lubridate::mdy(registr_dt)),
   as_of_date=lubridate::as_date(as_of)
 )</code></pre>
@@ -465,7 +477,7 @@ dplyr::mutate(
 ##  $ county_id    : chr  &quot;1&quot; &quot;1&quot; &quot;1&quot; &quot;1&quot; ...
 ##  $ voter_reg_num: chr  &quot;000009005990&quot; &quot;000009048723&quot; &quot;000009019674&quot; &quot;000009129589&quot; ...
 ##  $ status_cd    : chr  &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; ...
-##  $ reason_cd    : chr  &quot;W&quot; &quot;W&quot; &quot;W&quot; &quot;W&quot; ...
+##  $ reason_cd    : chr  &quot;AV&quot; &quot;AV&quot; &quot;AV&quot; &quot;AV&quot; ...
 ##  $ race_code    : chr  &quot;W&quot; &quot;W&quot; &quot;W&quot; &quot;W&quot; ...
 ##  $ ethnic_code  : chr  &quot;NL&quot; &quot;UN&quot; &quot;NL&quot; &quot;UN&quot; ...
 ##  $ gender_code  : chr  &quot;F&quot; &quot;F&quot; &quot;F&quot; &quot;M&quot; ...
@@ -491,7 +503,7 @@ dplyr::mutate(
 ##  $ county_id    : chr  &quot;1&quot; &quot;1&quot; &quot;1&quot; &quot;1&quot; ...
 ##  $ voter_reg_num: chr  &quot;000009005990&quot; &quot;000009048723&quot; &quot;000009019674&quot; &quot;000009129589&quot; ...
 ##  $ status_cd    : chr  &quot;A&quot; &quot;A&quot; &quot;A&quot; &quot;A&quot; ...
-##  $ reason_cd    : chr  &quot;W&quot; &quot;W&quot; &quot;W&quot; &quot;W&quot; ...
+##  $ reason_cd    : chr  &quot;AV&quot; &quot;AV&quot; &quot;AV&quot; &quot;AV&quot; ...
 ##  $ race_code    : chr  &quot;W&quot; &quot;W&quot; &quot;W&quot; &quot;W&quot; ...
 ##  $ ethnic_code  : chr  &quot;NL&quot; &quot;UN&quot; &quot;NL&quot; &quot;UN&quot; ...
 ##  $ gender_code  : chr  &quot;F&quot; &quot;F&quot; &quot;F&quot; &quot;M&quot; ...

@@ -20,7 +20,7 @@ df_FIPS  county and FIPS codes
 df_ncvoter_in  munged ncvoter  
 df_ncvhis_in  munged ncvhis  
 df_nc_voted  joined ncvoter and ncvhis  
-df_ncvhis_dups  if any dups in ncvhis  
+df_ncvhis_dups  if any dups in ncvhis  reason_cd
 
 OUTPUT:  
 df_ncvoter_in.RData  
@@ -331,16 +331,24 @@ Heal ncvoter data frame
 IMPORTANT  
 Inspection of the above dcasts shows some missing data  
 Replace as appropriate  
+
 ```{r hoyt}
 df_ncvoter_in %<>%
 dplyr::select(
   -voter_status_desc,
   -voter_status_reason_desc
 ) %>%
+  mutate_if(
+    is.character, funs(trimws(.)) 
+  ) %>%
+  base::replace(., .=="", NA)
+``` 
+
+Coerce to dates  
+
+```{r revel}
+df_ncvoter_in %<>%
 dplyr::mutate(
-  reason_cd=ifelse(trimws(reason_cd)=="",NA,race_code),
-  race_code=ifelse(trimws(race_code)=="","U",race_code),
-  gender_code=ifelse(trimws(gender_code)=="","U",gender_code),
   registr_dt=lubridate::as_date(lubridate::mdy(registr_dt)),
   as_of_date=lubridate::as_date(as_of)
 )
