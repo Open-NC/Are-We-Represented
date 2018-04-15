@@ -11,7 +11,7 @@
 
 <meta name="author" content="D. Hopp" />
 
-<meta name="date" content="2018-04-14" />
+<meta name="date" content="2018-04-15" />
 
 <title>AreWeRepresented Census and NCACC Categorical Data</title>
 
@@ -119,14 +119,20 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">AreWeRepresented Census and NCACC Categorical Data</h1>
 <h4 class="author"><em>D. Hopp</em></h4>
-<h4 class="date"><em>April 14, 2018</em></h4>
+<h4 class="date"><em>April 15, 2018</em></h4>
 
 </div>
 
 
+<p>INPUT:<br />
+AWR_Census_NCACC.RData<br />
+df_nc_voted.RData</p>
+<p>OUTPUT:<br />
+df_merge_county_sex_race_20161108 as a csv file<br />
+AWR_Census_NCACC_cat.RData an amalgamation of AWR_Census_NCACC.RData and objects created in this script</p>
 <div id="who-is-using-which-codes-for-what" class="section level2">
 <h2>Who is Using Which Codes for What</h2>
-<p>The RData image includes dat_dir and output_dir</p>
+<p>The AWR_Census_NCACC.RData image includes the directory paths data_dir and output_dir</p>
 <pre class="r"><code>load(&quot;AWR_Census_NCACC.RData&quot;)
 load(&quot;df_nc_voted.RData&quot;)</code></pre>
 </div>
@@ -255,7 +261,7 @@ IA American Indian and Alaska Native alone<br />
 AA Asian alone<br />
 NA Native Hawaiian and Other Pacific Islander alone<br />
 TOM Two or More Races</p>
-<p>Hispanic is double-counted but included as an additional column:<br />
+<p>Hispanic is double-counted but included as additional columns:<br />
 H Hispanic</p>
 <p>These are double-counted and are not included:<br />
 WAC White alone or in combination<br />
@@ -512,6 +518,11 @@ W: White</p>
 ##  $ sex  : chr  &quot;F&quot; &quot;F&quot; &quot;F&quot; &quot;F&quot; ...
 ##  $ race : chr  &quot;A&quot; &quot;B&quot; &quot;I&quot; &quot;M&quot; ...
 ##  $ N    : num  356 12017 154 433 1005 ...</code></pre>
+<p>Write df_merge_county_sex_race_20161108 as a csv file.</p>
+<pre class="r"><code>readr::write_csv(
+  df_merge_county_sex_race_20161108,
+  paste0(output_dir,&quot;df_merge_county_sex_race_20161108.csv.gz&quot;)
+)</code></pre>
 <p>Any analysis has to be aware of the numbers by race,<br />
 which present comparison challenges across the sources.<br />
 The “O” and “U” categories are of particular note.</p>
