@@ -770,6 +770,18 @@ df_regis_stats_20161108_county_rollup <-
   dplyr::ungroup()
 ```  
 
+Check on race categories:  
+
+```{r warren}
+df_regis_stats_20161108_county_rollup %>% 
+reshape2::dcast(
+  race_code~.,
+  value.var="tot_voters",
+  sum,
+  margins=TRUE
+)
+```  
+
 A note on how to roll this up even tighter.  
 This will create a data frame without party_cd or ethnic_code, 
 and with totals adjusted accordingly.   

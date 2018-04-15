@@ -1,0 +1,467 @@
+---
+title: "AreWeRepresented Census and NCACC Categorical Data"
+output: 
+  html_document: default
+author: "D. Hopp"
+date: "April 15, 2018"
+---
+
+INPUT:  
+AWR_Census_NCACC.RData  
+df_nc_voted.RData  
+
+OUTPUT:  
+df_merge_county_sex_race_20161108 as a csv file  
+AWR_Census_NCACC_cat.RData an amalgamation of AWR_Census_NCACC.RData and objects created in this script  
+
+## Who is Using Which Codes for What  
+
+The AWR_Census_NCACC.RData image includes the directory paths data_dir and output_dir  
+
+```{r garb}
+load("AWR_Census_NCACC.RData")
+load("df_nc_voted.RData")
+```  
+
+## NCSBE  
+### Registration Data Race and Ethnicity   
+
+results_pct_20161108.txt via  
+https://dl.ncsbe.gov/index.html?prefix=ENRS/2016_11_08/    
+
+Defined as:  
+dfcl_regis_party_cd <- df_regis_stats_20161108 %>% dplyr::distinct(party_cd)
+dfcl_regis_race_code <- df_regis_stats_20161108 %>% dplyr::distinct(race_code)  
+dfcl_regis_ethnic_code <- df_regis_stats_20161108 %>% dplyr::distinct(ethnic_code)  
+dfcl_regis_sex_code <- df_regis_stats_20161108 %>% dplyr::distinct(sex_code)  
+
+```{r rsvp}
+dfcl_regis_party_cd
+dfcl_regis_race_code
+dfcl_regis_ethnic_code
+dfcl_regis_sex_code
+```  
+Convenience data frame:  
+Race (only) by county in wide format:  
+
+```{r myth}
+fn_df_regis_stats_20161108_county_race_wide <- function() {
+  df_ <-
+  df_regis_stats_20161108 %>%
+  dplyr::select(
+    total_voters,
+    race_code,
+    FIPS3
+  ) %>%
+  reshape2::dcast(
+    FIPS3~race_code,
+    value.var = "total_voters",
+    sum
+  )
+  #
+  return(df_)
+}
+```  
+
+Convenience data frame:  
+Race (only) by county in long format:  
+
+```{r froth}
+fn_df_regis_stats_20161108_county_race_long <- function(){
+  df_ <-
+  df_regis_stats_20161108 %>%
+  dplyr::select(
+    total_voters,
+    race_code,
+    FIPS3
+  ) %>%
+  dplyr::group_by(
+    FIPS3,
+    race_code
+  ) %>%
+  dplyr::summarize(
+    N=sum(total_voters)
+  ) %>%
+  dplyr::ungroup()
+  #
+  return(df_)
+}
+```  
+
+```{r calm}
+str(fn_df_regis_stats_20161108_county_race_long())
+```  
+
+Race and sex by county:  
+
+```{r ward}
+fn_df_regis_stats_20161108_county_sex_race <- function(){
+  df_ <-
+  df_regis_stats_20161108 %>%
+  dplyr::select(
+    total_voters,
+    sex_code,
+    race_code,
+    FIPS3
+  ) %>% 
+  dplyr::group_by(
+    FIPS3,
+    sex_code,
+    race_code
+  ) %>% 
+  dplyr::summarise(
+    N=sum(total_voters)
+  ) %>%
+  dplyr::ungroup()
+  #
+  return(df_)
+}
+```  
+
+```{r rhino}
+str(fn_df_regis_stats_20161108_county_sex_race())
+```  
+
+## Census Bureau  
+### Race and Ethnicity  
+
+cc-est2016-alldata-37.csv via  
+https://www.census.gov/data/tables/2016/demo/popest/counties-detail.html  
+"Annual County Resident Population Estimates by Age, Sex, Race, and Hispanic Origin: April 1, 2010 to July 1, 2016"  
+
+Census 2010 Race Methodology: 
+[here](https://www2.census.gov/programs-surveys/popest/technical-documentation/methodology/modified-race-summary-file-method/mrsf2010.pdf) 
+and [here](https://www.census.gov/prod/cen2010/briefs/c2010br-02.pdf)  
+
+Gender is for each Race, and also total, e.g.,  
+TOT_MALE, TOT_FEMALE, WA_MALE, WA_FEMALE etc.  
+
+WA White alone  
+BA Black or African American alone  
+IA American Indian and Alaska Native alone  
+AA Asian alone  
+NA Native Hawaiian and Other Pacific Islander alone  
+TOM  Two or More Races  
+
+Hispanic is double-counted but included as additional columns:  
+H Hispanic  
+
+These are double-counted and are not included:  
+WAC  White alone or in combination  
+BAC  Black or African American alone  
+IAC  American Indian and Alaska Native alone or in combination  
+
+Counts by total population (all) and by voting age (18 and older)  
+Breakdown by race, ignoring ethnicity.  
+This is for entire state:  
+
+```{r tern}
+fn_df_cc_est2016_tot_subset() %>%
+dplyr::select(TOT_POP,nWA,nBA,nIA,nAA,nTOM,pop) %>%
+reshape2::melt(
+  id.vars="pop"
+) %>%
+reshape2::dcast(
+  pop~variable,
+  value.var = "value",
+  sum
+)
+```  
+
+This is by county (by FIPS3): df_cc_est2016_county_race_dcast  
+
+```{r mulch}
+str(df_cc_est2016_county_race_dcast)
+```  
+
+## Reasonable Mappings  
+
+Gender:  
+NCSBE sex_code: M, F, U
+Census Gender is for each Race, and also total, e.g.,  TOT_MALE, TOT_FEMALE, WA_MALE, WA_FEMALE etc.  
+
+Race:
+NCSBE race_code: A, B, I, M, O, U, W (does not include Native Hawaiian explicitly)  
+Census Race (see Gender): WA, BA, IA (American Indian), AA, NA (Native Hawaiian etc.), TOM (two or more)  
+
+### Remapping  
+
+Convince census to look like NCSBE data:  
+
+```{r maria}
+df_cc_est2016_county_sex_race_long_recoded <-
+  df_cc_est2016_tot %>%
+  dplyr::select( 
+    FIPS3,
+    WA_MALE,
+    WA_FEMALE,
+    BA_MALE,
+    BA_FEMALE,
+    IA_MALE,
+    IA_FEMALE,
+    AA_MALE,
+    AA_FEMALE,
+    NA_MALE,
+    NA_FEMALE,
+    TOM_MALE,
+    TOM_FEMALE,
+    pop
+  ) %>%
+  reshape2::melt(
+    id.vars=c("pop","FIPS3")
+  ) %>%
+  dplyr::mutate(
+    variable=as.character(variable)
+  ) %>%
+  dplyr::mutate(
+    sex=
+      ifelse(
+        stringr::str_detect(variable,"FEMALE"),"F","M"
+      ),
+    race=
+      ifelse(stringr::str_detect(variable,"TOT_"),"all",
+        (ifelse(stringr::str_detect(variable,"WA_"),"W",        
+          (ifelse(stringr::str_detect(variable,"BA_"),"B",
+            (ifelse(stringr::str_detect(variable,"IA_"),"I",
+              (ifelse(stringr::str_detect(variable,"AA_"),"A",
+                (ifelse(stringr::str_detect(variable,"TOM_"),"M","O")
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ) 
+      )
+    )
+  ) %>%
+  dplyr::select(
+    pop,
+    FIPS3,
+    sex,
+    race,
+    value
+  ) %>%
+  dplyr::rename(
+    N=value
+  ) %>%
+  dplyr::arrange(
+    pop,
+    FIPS3,
+    sex,
+    race
+  )
+```   
+
+```{r abba}
+str(df_cc_est2016_county_sex_race_long_recoded)
+```  
+
+## NCACC    
+
+Notice that categories do NOT provide sex vs. race, just totals.  
+In that sense, NCACC data is not compatible with census or NCSBE.  
+Keep in mind that race most likely is self-reported.  
+
+```{r churn}
+fn_df_NCACC_2016_demog_subset <- function(){
+  df_ <-
+  df_NCACC_2016_demog %>%
+  dplyr::mutate(
+    nmale=ncomm-nfemale,
+    nother_race=ncomm-(nwhite+nafam+namin)
+  ) %>%
+  dplyr::select(
+    FIPS3,
+    nmale,
+    nfemale,
+    nwhite,
+    nafam,
+    namin,
+    nother_race
+  )
+  #
+  return(df_)
+}
+```  
+
+```{r polka}
+str(fn_df_NCACC_2016_demog_subset())
+```  
+
+## NCSBE Voting Data  
+
+```{r burma}
+df_nc_voted_subset_long <-
+df_nc_voted %>%
+dplyr::filter(
+  status_cd=="A"
+) %>%
+dplyr::inner_join(
+  df_FIPS %>%
+    dplyr::select(
+      county_id,
+      FIPS3
+    ),
+  by="county_id"
+) %>%
+dplyr::select(
+  FIPS3,
+  gender_code,
+  race_code
+) %>%
+reshape2::dcast(
+  FIPS3+gender_code+race_code~.
+) %>%
+plyr::rename(
+  c(
+    "."="N",
+    "race_code"="race",
+    "gender_code"="sex"
+  )
+) %>%
+na.omit() %>%
+dplyr::arrange(
+  FIPS3,
+  sex,
+  race
+)
+```  
+
+```{r yodel}
+str(df_nc_voted_subset_long)
+```  
+
+## Bring Together  
+
+Create one data frame to hold all of above (long shape)  
+* Columns:  
+* pop: 
+  + all: Census Bureau all population  
+  + voteage: Census Bureau 18 years and older  
+  + regis: NCSBE registered to vote  
+  + voted: NCSBE voted  
+* sex:  
+  + F: Female  
+  + M: Male  
+  + U: Unknown  
+* race:  
+  A: Asian  
+  B: African-American  
+  I: American Indian  
+  M: More than one  
+  O: Other  
+  U: Unknown  
+  W: White  
+
+```{r groton}
+df_merge_county_sex_race_20161108 <-
+  rbind(
+    fn_df_regis_stats_20161108_county_sex_race() %>%
+    dplyr::rename(
+      sex=sex_code,
+      race=race_code
+    ) %>%
+    dplyr::mutate(
+      pop="regis"
+    ) %>%
+    dplyr::select(
+      pop,
+      FIPS3,
+      sex,
+      race,
+      N
+    ),
+    df_cc_est2016_county_sex_race_long_recoded %>%
+      dplyr::filter(
+        race != "all"
+      ),
+    df_nc_voted_subset_long %>%
+    dplyr::mutate(
+      pop="voted"
+    ) %>%
+    dplyr::select(
+      pop,
+      FIPS3,
+      sex,
+      race,
+      N
+    )
+  )
+```  
+
+```{r icy}
+str(df_merge_county_sex_race_20161108)
+```  
+
+Write df_merge_county_sex_race_20161108 as a csv file.  
+
+```{r pencil}
+readr::write_csv(
+  df_merge_county_sex_race_20161108,
+  paste0(output_dir,"df_merge_county_sex_race_20161108.csv.gz")
+)
+```  
+
+Any analysis has to be aware of the numbers by race,  
+which present comparison challenges across the sources.  
+The "O" and "U" categories are of particular note.  
+
+O (Other) and U (Unknown) are used in the NCSBE data, as per
+ncvhis_ncvoter_data_format.txt but only O in the Census data.  
+Are both O designations to be considered comparable?  
+
+Display counts by race:  
+
+```{r spire}
+fn_merge_county_sex_race_20161108_dcast <- function(){
+  # all this to get a nice lookin dcast
+  # there must be a better way
+  # use an ordered factor
+  #
+  df_ <- df_merge_county_sex_race_20161108 
+  df_$pop <- as.factor(df_$pop)
+  df_$pop <- ordered(
+    df_$pop, 
+    levels=c("all","voteage","regis","voted")
+  )
+  #
+  df_dcast <-
+  df_ %>% 
+  dplyr::select(
+    pop,
+    race,
+    N
+  ) %>% 
+  reshape2::dcast(
+    race~pop, 
+    value.var="N",
+    sum,  
+    margins="race"
+  )
+  #
+  return(
+    df_dcast
+  )
+}
+```    
+
+```{r etch}
+fn_merge_county_sex_race_20161108_dcast()
+```  
+
+## Finish  
+
+Do not resave df_nc_voted  
+
+```{r moose}
+rm(df_nc_voted)
+ls()
+```
+
+```{r flop}
+save.image("AWR_Census_NCACC_cat.RData")
+```  
+
+### END  
