@@ -3,7 +3,7 @@ title: "AreWeRepresented Census and NCACC Data Munging"
 output: 
   html_document: default
 author: "D. Hopp"
-date: "April 2018"
+date: "April 23, 2018"
 ---
 
 R requires packages plyr, dplyr, reshape2, readr  
@@ -35,8 +35,8 @@ df_regis_stats_20161108_county_rollup county rollup
 df_NCACC_2016_demog read 2016 Election Demographics for Website_1_extract.csv  
 
 OUTPUT:  
-df_cc_est2016_tot.csv.gz  
-df_NCACC_2016_demog.csv.gz  
+df_merge_county_sex_race_20161108.csv.gz
+df_NCACC_2016_demog.csv.gz
 AWR_Census_NCACC.RData  
 
 DIRECTORY STRUCTURE:  
@@ -116,7 +116,7 @@ from "Annual County Resident Population Estimates by Age, Sex, Race, and Hispani
 COUNTY is the FIPS code (watch out for this!)  
 
 we want  
-YEAR=9 is latest estimate    
+YEAR=6 is 2016      
 Note that AGEGRP 0 is a summary figure.  
 AGEGRP >= 5 ages 20 and higher  
   note: 4 is ages 15-19  
@@ -148,7 +148,7 @@ fn_df_cc_est2016_tot <- function() {
   df_cc_est2016_20 <-
     df_cc_est2016_alldata_37 %>%
     dplyr::filter(
-      YEAR == 9 &
+      YEAR == 6 &
       AGEGRP >= 5
     ) %>%  
     dplyr::select(
@@ -231,7 +231,7 @@ fn_df_cc_est2016_tot <- function() {
   df_cc_est2016_alltot <-
   df_cc_est2016_alldata_37  %>%
     dplyr::filter(
-      YEAR==9 &
+      YEAR==6 &
       AGEGRP==0
     ) %>%
     dplyr::select(

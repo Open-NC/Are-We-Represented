@@ -1,22 +1,25 @@
 ---
 title: "AreWeRepresented Census and NCACC Categorical Data"
-output: 
+output:  
   html_document: default
 author: "D. Hopp"
-date: "April 15, 2018"
+date: "April 25, 2018"
 ---
 
 INPUT:  
 AWR_Census_NCACC.RData  
 df_nc_voted.RData  
 
+The AWR_Census_NCACC.RData image includes the directory paths data_dir and output_dir  
+
 OUTPUT:  
-df_merge_county_sex_race_20161108 as a csv file  
+df_merge_county_sex_race_20161108.csv.gz  
+df_cc_est2016_compare.csv.gz  
+df_cc_est2016_compare_Hisp.csv.gz
+df_merge_county_sex_race_OMU_20161108.csv.gz - this is a view, see v_df_merge_county_sex_race_OMU_20161108()  
 AWR_Census_NCACC_cat.RData an amalgamation of AWR_Census_NCACC.RData and objects created in this script  
 
 ## Who is Using Which Codes for What  
-
-The AWR_Census_NCACC.RData image includes the directory paths data_dir and output_dir  
 
 ```{r garb}
 load("AWR_Census_NCACC.RData")
@@ -189,7 +192,15 @@ Census Race (see Gender): WA, BA, IA (American Indian), AA, NA (Native Hawaiian 
 Convince census to look like NCSBE data:  
 
 ```{r maria}
-df_cc_est2016_county_sex_race_long_recoded <-
+fn_df_cc_est2016_county_sex_race_long_recoded <- function(){
+  #
+  #lst_colHead_code <- list(
+  #  "WA_"="W","BA_"="B","IA_"="I","AA_"="A","TOM_"="M"
+  #)
+  #lst_colHead_code_names <- names(lst_colHead_code)
+  recode_colHead <- "'WA_MALE'='W'; 'BA_MALE'='B'; 'IA_MALE'='I'; 'AA_MALE'='A'; 'TOM_MALE'='M'; 'WA_FEMALE'='W'; 'BA_FEMALE'='B'; 'IA_FEMALE'='I'; 'AA_FEMALE'='A'; 'TOM_FEMALE'='M'; else='O'"
+  #
+  df_ <-
   df_cc_est2016_tot %>%
   dplyr::select( 
     FIPS3,
@@ -219,22 +230,7 @@ df_cc_est2016_county_sex_race_long_recoded <-
         stringr::str_detect(variable,"FEMALE"),"F","M"
       ),
     race=
-      ifelse(stringr::str_detect(variable,"TOT_"),"all",
-        (ifelse(stringr::str_detect(variable,"WA_"),"W",        
-          (ifelse(stringr::str_detect(variable,"BA_"),"B",
-            (ifelse(stringr::str_detect(variable,"IA_"),"I",
-              (ifelse(stringr::str_detect(variable,"AA_"),"A",
-                (ifelse(stringr::str_detect(variable,"TOM_"),"M","O")
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          )
-        ) 
-      )
-    )
+      car::recode(variable,recode_colHead)
   ) %>%
   dplyr::select(
     pop,
@@ -252,10 +248,14 @@ df_cc_est2016_county_sex_race_long_recoded <-
     sex,
     race
   )
+  #
+  return(df_)
+}
 ```   
 
 ```{r abba}
-str(df_cc_est2016_county_sex_race_long_recoded)
+str(fn_df_cc_est2016_county_sex_race_long_recoded())
+df_cc_est2016_county_sex_race_long_recoded <- fn_df_cc_est2016_county_sex_race_long_recoded()
 ```  
 
 ## NCACC    
@@ -404,12 +404,10 @@ readr::write_csv(
 )
 ```  
 
-Any analysis has to be aware of the numbers by race,  
-which present comparison challenges across the sources.  
+Any analysis has to be aware of the numbers by race, which present comparison challenges across the sources.  
 The "O" and "U" categories are of particular note.  
 
-O (Other) and U (Unknown) are used in the NCSBE data, as per
-ncvhis_ncvoter_data_format.txt but only O in the Census data.  
+O (Other) and U (Unknown) are used in the NCSBE data, as per ncvhis_ncvoter_data_format.txt but only O in the Census data.  
 Are both O designations to be considered comparable?  
 
 Display counts by race:  
@@ -450,6 +448,721 @@ fn_merge_county_sex_race_20161108_dcast <- function(){
 ```{r etch}
 fn_merge_county_sex_race_20161108_dcast()
 ```  
+
+### This combines the df_merge_county_sex_race_20161108 race categories M, O, and U into O alone.  
+
+```{r evade}
+v_df_merge_county_sex_race_OMU_20161108 <- function(){
+  df_ <-
+  df_merge_county_sex_race_20161108 %>%
+    dplyr::mutate(
+      race=ifelse(race %in% c("M","U"),"O",race)
+    ) %>%
+  reshape2::dcast(
+    pop+FIPS3+sex+race~.,
+    value.var="N",
+    sum
+  ) %>%
+  plyr::rename(
+    c("."="N")
+  )
+  #
+  return(df_)
+}
+```
+
+```{r garner}
+str(v_df_merge_county_sex_race_OMU_20161108())
+```  
+
+Check on counts:
+
+```{r hunt}
+df_merge_county_sex_race_20161108 %>%
+  dplyr::filter(
+    race %in% c("O","M","U")
+  ) %>%
+  reshape2::dcast(
+    pop+race~.,
+    value.var="N",
+    sum
+  )
+```  
+
+```{r prep}
+v_df_merge_county_sex_race_OMU_20161108() %>%
+  dplyr::filter(
+    race == "O"
+  ) %>%
+  reshape2::dcast(
+    pop+race~.,
+    value.var="N",
+    sum
+  )
+```
+
+```{r widen}
+readr::write_csv(
+  v_df_merge_county_sex_race_OMU_20161108(),
+  paste0(output_dir,"df_merge_county_sex_race_OMU_20161108.csv.gz")
+)
+```  
+## How do the Census Bureau race classification sets compare?  
+
+### Discussion  
+
+These are the column headings in cc-est2016-alldata-37.csv as described in cc-est2016-alldata.pdf  
+
+SUMLEV,STATE,COUNTY,STNAME,CTYNAME,YEAR,AGEGRP,  
+TOT_POP,TOT_MALE,TOT_FEMALE,  
+WA_MALE,WA_FEMALE,BA_MALE,BA_FEMALE,IA_MALE,IA_FEMALE,AA_MALE,AA_FEMALE,NA_MALE,NA_FEMALE,TOM_MALE,TOM_FEMALE,  
+WAC_MALE,WAC_FEMALE,BAC_MALE,BAC_FEMALE,IAC_MALE,IAC_FEMALE,AAC_MALE,AAC_FEMALE,NAC_MALE,NAC_FEMALE,  
+NH_MALE,NH_FEMALE,NHWA_MALE,NHWA_FEMALE,NHBA_MALE,NHBA_FEMALE,NHIA_MALE,NHIA_FEMALE,NHAA_MALE,NHAA_FEMALE,
+NHNA_MALE,NHNA_FEMALE,NHTOM_MALE,NHTOM_FEMALE,
+NHWAC_MALE,NHWAC_FEMALE,NHBAC_MALE,NHBAC_FEMALE,NHIAC_MALE,NHIAC_FEMALE,NHAAC_MALE,NHAAC_FEMALE,NHNAC_MALE,NHNAC_FEMALE,
+H_MALE,H_FEMALE,HWA_MALE,HWA_FEMALE,HBA_MALE,HBA_FEMALE,HIA_MALE,HIA_FEMALE,HAA_MALE,HAA_FEMALE,HNA_MALE,
+HNA_FEMALE,HTOM_MALE,HTOM_FEMALE,
+HWAC_MALE,HWAC_FEMALE,HBAC_MALE,HBAC_FEMALE,HIAC_MALE,HIAC_FEMALE,HAAC_MALE,HAAC_FEMALE,HNAC_MALE,HNAC_FEMALE  
+
+Question: Are there any significant differences in counts when looking at the "WA_MALE..." and the "WAC_MALE..." categorizations? For now, we will ignore the Hispanic categorizations (NH_MALE...). Notice that there is no Unknown category. We will refer to the WA_... as Source A, and the WAC_... as Source B.  
+
+The following is from https://www2.census.gov/programs-surveys/popest/technical-documentation/methodology/2010-2016/2016-natstcopr-meth.pdf   
+
+ "we modify the 2010 Census race categories to be consistent with the race categories that appear in our input data. The 2010 Census allowed for responses that included one or more of the race groups defined by the Office of Management and Budget (OMB) in 1997: White; Black or African American; American Indian and Alaska Native; Asian; and Native Hawaiian and Other Pacific Islander. The 2010 Census also allowed responses that included “Some other race.” The Population Estimates program produces estimates in five race categories and their combinations. "Some other race" responses have been “modified” to be consistent with these race
+categories.  
+
+This modification process recategorizes responses that include “Some other race” alone or in combination with other races into one or more of the five OMB race categories. When a “Some other race” response appears in combination with one or more of the OMB races, we remove the “Some other race” category. Responses that
+include “Some other race” alone are allocated to one or more of the five OMB categories listed above using information on the household when available or a hot decking procedure if necessary.  
+
+Note that this editing process produces tabulations for our estimates that show fewer people reporting two or more races than similar tabulations from the 2010 Census. This is primarily because responses of “Some other race” and one of the OMB defined races in the 2010 Census appear in the single OMB race category in the
+estimates base."  
+
+### Conclusion  
+
+This conclusion is substantiated in the script that follows below. It is presented here for clarity.  
+
+The problem with these talleys seems to be that the "HWA_..." (including HTOM_) sum equals H_MALE+H_FEMALE,  
+while the "HWAC_..." series sum is larger. Whatever the source of this, for our purposes the Hispanic counts  
+will be represented by the "HWA_..." series.  
+
+### Create R Objects  
+
+Utility data frame
+
+```{r peel}
+df_cc_est2016_tot_only <-
+  df_cc_est2016_tot %>%
+  dplyr::select(
+    pop,
+    FIPS3,
+    TOT_POP,
+    TOT_MALE,
+    TOT_FEMALE
+  )
+```  
+
+```{r lydia}
+str(df_cc_est2016_tot_only)
+```  
+
+Function to create a data frame used in comparison of the two categorizations as per above.  
+
+```{r round}  
+fn_df_cc_est2016_compare <- function(){
+  #
+  # Use vectors to parse column headings.
+  #
+  # 4 categories + Other (which includes TOM_)
+  #
+  #colHead_A_code <- c("WA_","BA_","IA_","AA_")
+  #colHead_A_abbrev <- c("W","B","I","A")
+  #lst_colHead_A_code <- list(
+  #  "WA_"="W","BA_"="B","IA_"="I","AA_"="A"
+  #)
+  #lst_colHead_A_code_names <- names(lst_colHead_A_code)
+  recode_colHead_A <- 
+    "'WA_MALE'='W'; 'BA_MALE'='B'; 'IA_MALE'='I'; 'AA_MALE'='A'; 'WA_FEMALE'='W'; 'BA_FEMALE'='B'; 'IA_FEMALE'='I'; 'AA_FEMALE'='A'; else='O'"
+  #
+  df_ <-
+  df_cc_est2016_tot %>%
+  dplyr::select( 
+    FIPS3,
+    WA_MALE,
+    WA_FEMALE,
+    BA_MALE,
+    BA_FEMALE,
+    IA_MALE,
+    IA_FEMALE,
+    AA_MALE,
+    AA_FEMALE,
+    NA_MALE,
+    NA_FEMALE,
+    TOM_MALE,
+    TOM_FEMALE,
+    pop
+    ) %>%
+  reshape2::melt(
+    id.vars=c("pop","FIPS3")
+  ) %>%
+  dplyr::mutate(
+    variable=as.character(variable)
+  ) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    sex=
+      ifelse(
+        stringr::str_detect(variable,"FEMALE"),
+        "F",
+        "M"
+      ),
+  race=
+    car::recode(variable,recode_colHead_A),
+  source="A"
+  ) %>%
+  data.frame() %>%
+  dplyr::select(
+    pop,
+    source,
+    FIPS3,
+    sex,
+    race,
+    value
+  ) 
+  #
+  # 4 categories + Other
+  #
+  #lst_colHead_B_code <- list(
+  #  "WAC_"="W","BAC_"="B","IAC_"="I","AAC_"="A"
+  #)
+  #lst_colHead_B_code_names <- names(lst_colHead_B_code)
+  recode_colHead_B <- 
+    "'WAC_MALE'='W'; 'BAC_MALE'='B'; 'IAC_MALE'='I'; 'AAC_MALE'='A'; 'WAC_FEMALE'='W'; 'BAC_FEMALE'='B'; 'IAC_FEMALE'='I'; 'AAC_FEMALE'='A'; else='O'"
+  #
+  df_B <-
+  df_cc_est2016_tot %>%
+  dplyr::select( 
+    FIPS3,
+    WAC_MALE,
+    WAC_FEMALE,
+    BAC_MALE,
+    BAC_FEMALE,
+    IAC_MALE,
+    IAC_FEMALE,
+    AAC_MALE,
+    AAC_FEMALE,
+    NAC_MALE,
+    NAC_FEMALE,
+    pop
+    ) %>%
+  reshape2::melt(
+    id.vars=c("pop","FIPS3")
+  ) %>%
+  dplyr::mutate(
+    variable=as.character(variable)
+  ) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    sex=
+      ifelse(
+        stringr::str_detect(variable,"FEMALE"),
+        "F",
+        "M"
+      ),
+  race=
+    car::recode(variable,recode_colHead_B),
+    source="B"
+  ) %>%
+  data.frame() %>%
+  dplyr::select(
+    pop,
+    source,
+    FIPS3,
+    sex,
+    race,
+    value
+  ) 
+  # 
+  # summarize
+  #
+  df_ <-
+  rbind(
+    df_,
+    df_B
+  ) %>%
+  dplyr::group_by(
+    pop,
+    source,
+    FIPS3,
+    sex,
+    race
+  ) %>%
+  dplyr::summarize(
+    N=sum(value)
+  ) %>%
+  dplyr::ungroup()
+  #
+  return(df_)
+}
+```  
+
+```{r briar}
+df_cc_est2016_compare <- fn_df_cc_est2016_compare()
+str(df_cc_est2016_compare) 
+```  
+Write as a csv file
+
+```{r oat}
+readr::write_csv(
+  df_cc_est2016_compare,
+  paste0(output_dir,"df_cc_est2016_compare.csv.gz")
+)
+```
+
+View to sum male and female  
+
+```{r baton}
+v_df_cc_est2016_compare <- function(){
+  fn_df_cc_est2016_compare() %>%
+  dplyr::group_by(
+    pop,
+    source,
+    FIPS3,
+    race
+  ) %>%
+  dplyr::summarize(
+    N_F_M=sum(N)
+  ) %>%
+  dplyr::ungroup()
+}
+```  
+
+```{r tunnel}
+str(v_df_cc_est2016_compare())
+```  
+
+### Compare source A vs B to try to see what race count differences might be.  
+
+```{r stamp}
+# drop sex
+df_cc_est2016_compare_N <- v_df_cc_est2016_compare()
+#
+df_cc_est2016_compare_N_source <-
+dplyr::inner_join(
+  df_cc_est2016_compare_N %>%
+    dplyr::filter(
+      source=="A" &
+      pop=="all"
+    ),
+  df_cc_est2016_compare_N %>%
+    dplyr::filter(
+      source=="B" &
+      pop=="all"
+    ),  
+  by=c("pop","FIPS3","race")
+) %>%
+dplyr::select(
+  pop,
+  FIPS3,
+  race,
+  N_F_M.x,
+  N_F_M.y
+) %>%
+dplyr::rename(
+  N.A=N_F_M.x,
+  N.B=N_F_M.y
+) %>%
+dplyr::mutate(
+  pctN.A=round(N.A/(N.A+N.B),digits=3),
+  logitN.A=round(log((N.A/(N.A+N.B))/(1-(N.A/(N.A+N.B)))),digits=3)
+)
+```  
+
+```{r mabel}
+str(df_cc_est2016_compare_N_source)
+```  
+
+### Quintiles  
+
+```{r bulb}
+fn_df_cc_est2016_compare_N_quintile <- function(race_){
+  ret <- list()
+  df_ <-
+  df_cc_est2016_compare_N_source %>%
+    dplyr::filter(
+      race==race_
+    ) 
+  ret[[1]] <- median(df_[["logitN.A"]])
+  ret[[2]] <- quantile(df_[["logitN.A"]],probs=seq(0,1,.2))
+  #
+  return(ret)
+}
+#
+B_df_cc_est2016_compare_N_quintile <- fn_df_cc_est2016_compare_N_quintile("B")
+W_df_cc_est2016_compare_N_quintile <- fn_df_cc_est2016_compare_N_quintile("W")
+```  
+
+The Black median is `r B_df_cc_est2016_compare_N_quintile[[1]]` and the White median is `r W_df_cc_est2016_compare_N_quintile[[1]]`.  
+
+The quintiles for Blacks are  
+```{r sears}
+B_df_cc_est2016_compare_N_quintile[[2]]
+```  
+and for Whites are  
+```{r rebut}
+W_df_cc_est2016_compare_N_quintile[[2]]
+```  
+
+### Cleveland Plots  
+
+Here are Cleveland plots for the logit of Source A (WA_...) proportion. A logit of 0 means that N.A=N.B, since the total is N.A+N.B. Negative values mean that N.A<N.B. Logit used, rather than percentage, since there is a great range in total count over the counties. Reporting percentages would be associated with larger erros for the smaller counties.  
+
+The two plots show a remarkable difference in scale, the difference between N.A and N.B being much larger for Black than for White.  
+
+White  
+
+```{r rest, fig.width=10,fig.height=12}
+df_cc_est2016_compare_N_source %>%
+  dplyr::filter(
+    race=="W"
+  ) %>%
+  ggplot( 
+    aes(y=reorder(FIPS3,logitN.A), x=logitN.A) 
+  ) +
+  geom_point(size=3) +
+  scale_x_continuous(breaks=seq(-.1,0,.01)) +
+  labs(
+    title="Logit for Whites Comparing Source A to Source B",
+    subtitle="log((N.A/(N.A+N.B))/(1-(N.A/(N.A+N.B))))"
+  ) +
+  ylab("County FIPS3") +
+  theme_bw() +
+  theme(
+    plot.title=element_text(hjust=0.5),
+    plot.subtitle=element_text(hjust=0.5),
+    panel.grid.major.x=element_blank(),
+    panel.grid.minor.x=element_blank(),
+    panel.grid.major.y=element_line(colour="grey60",linetype="dashed")
+  )
+```  
+
+Black  
+
+```{r dial, fig.width=10, fig.height=12}
+df_cc_est2016_compare_N_source %>%
+  dplyr::filter(
+    race=="B"
+  ) %>%
+  ggplot( 
+    aes(y=reorder(FIPS3,logitN.A), x=logitN.A) 
+  ) +
+  geom_point(size=3) +
+  scale_x_continuous(breaks=seq(-1.0,0,.1)) +
+  labs(
+    title="Logit for Blacks Comparing Source A to Source B",
+    subtitle="log((N.A/(N.A+N.B))/(1-(N.A/(N.A+N.B))))"
+  ) +
+  ylab("County FIPS3") +
+  theme_bw() +
+  theme(
+    plot.title=element_text(hjust=0.5),
+    plot.subtitle=element_text(hjust=0.5),
+    panel.grid.major.x=element_blank(),
+    panel.grid.minor.x=element_blank(),
+    panel.grid.major.y=element_line(colour="grey60",linetype="dashed")
+  )
+```  
+
+## Considering the Hispanic Census Bureau Categories  
+
+```{r crab}
+fn_df_cc_est2016_compare_Hisp <- function(){
+  #
+  # Use vectors to parse column headings.
+  #  
+  #lst_colHead_HA_code <- list(
+  #  "NHWA_"="W","HWA_"="W","NHBA_"="B","HBA_"="B","NHIA_"="I","HIA_"="I","NHAA_"="A","HAA_"="A" 
+  #)
+  #lst_colHead_HA_code_names <- names(lst_colHead_HA_code)
+  recode_colHeadHA <- "'NHWA_MALE'='W'; 'HWA_MALE'='W'; 'NHBA_MALE'='B'; 'HBA_MALE'='B'; 'NHIA_MALE'='I'; 'HIA_MALE'='I'; 'NHAA_MALE'='A'; 'HAA_MALE'='A'; 'NHWA_FEMALE'='W'; 'HWA_FEMALE'='W'; 'NHBA_FEMALE'='B'; 'HBA_FEMALE'='B'; 'NHIA_FEMALE'='I'; 'HIA_FEMALE'='I'; 'NHAA_FEMALE'='A'; 'HAA_FEMALE'='A'; else='O'"
+  #
+  df_ <-
+  df_cc_est2016_tot %>%
+  dplyr::select( 
+    FIPS3,
+    NHWA_MALE,
+    NHWA_FEMALE,
+    NHBA_MALE,
+    NHBA_FEMALE,
+    NHIA_MALE,
+    NHIA_FEMALE,
+    NHAA_MALE,
+    NHAA_FEMALE,
+    NHNA_MALE,
+    NHNA_FEMALE,
+    NHTOM_MALE,
+    NHTOM_FEMALE,
+    HWA_MALE,
+    HWA_FEMALE,
+    HBA_MALE,
+    HBA_FEMALE,
+    HIA_MALE,
+    HIA_FEMALE,
+    HAA_MALE,
+    HAA_FEMALE,
+    HNA_MALE,
+    HNA_FEMALE,
+    HTOM_MALE,
+    HTOM_FEMALE,
+    pop
+    ) %>%
+  reshape2::melt(
+    id.vars=c("pop","FIPS3")
+  ) %>%
+  dplyr::mutate(
+    variable=as.character(variable)
+  ) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    sex=
+      ifelse(
+        stringr::str_detect(variable,"FEMALE"),
+        "F",
+        "M"
+      ),
+    race=
+      car::recode(variable,recode_colHeadHA),
+    hisp=
+      ifelse(
+        stringr::str_sub(variable,1,1)=="H",
+        TRUE,
+        FALSE
+      ),
+    source="A"
+  ) %>%
+  data.frame() %>%
+  dplyr::select(
+    pop,
+    source,
+    FIPS3,
+    sex,
+    race,
+    hisp,
+    value
+  )
+  #
+  #lst_colHead_HB_code <- list(
+  #  "NHWAC_"="W","HWAC_"="W","NHBAC_"="B","HBAC_"="B","NHIAC_"="I","HIAC_"="I","NHAAC_"="A","HAAC_"="A" 
+  #)
+  #lst_colHead_HB_code_names <- names(lst_colHead_HB_code)
+  recode_colHeadHB <- "'NHWAC_MALE'='W'; 'HWAC_MALE'='W'; 'NHBAC_MALE'='B'; 'HBAC_MALE'='B'; 'NHIAC_MALE'='I'; 'HIAC_MALE'='I'; 'NHAAC_MALE'='A'; 'HAAC_MALE'='A'; 'NHWAC_FEMALE'='W'; 'HWAC_FEMALE'='W'; 'NHBAC_FEMALE'='B'; 'HBAC_FEMALE'='B'; 'NHIAC_FEMALE'='I'; 'HIAC_FEMALE'='I'; 'NHAAC_FEMALE'='A'; 'HAAC_FEMALE'='A'; else='O'"
+  #
+  df_B <-
+  df_cc_est2016_tot %>%
+  dplyr::select( 
+    FIPS3,
+    NHWAC_MALE,
+    NHWAC_FEMALE,
+    NHBAC_MALE,
+    NHBAC_FEMALE,
+    NHIAC_MALE,
+    NHIAC_FEMALE,
+    NHAAC_MALE,
+    NHAAC_FEMALE,
+    NHNAC_MALE,
+    NHNAC_FEMALE,
+    HWAC_MALE,
+    HWAC_FEMALE,
+    HBAC_MALE,
+    HBAC_FEMALE,
+    HIAC_MALE,
+    HIAC_FEMALE,
+    HAAC_MALE,
+    HAAC_FEMALE,
+    HNAC_MALE,
+    HNAC_FEMALE,
+    pop
+    ) %>%
+  reshape2::melt(
+    id.vars=c("pop","FIPS3")
+  ) %>%
+  dplyr::mutate(
+    variable=as.character(variable)
+  ) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    sex=
+      ifelse(
+        stringr::str_detect(variable,"FEMALE"),
+        "F",
+        "M"
+      ),
+    race=
+      car::recode(variable,recode_colHeadHB),
+    hisp=
+      ifelse(
+        stringr::str_sub(variable,1,1)=="H",
+        TRUE,
+        FALSE
+      ),
+    source="B"
+  ) %>%
+  data.frame() %>%
+  dplyr::select(
+    pop,
+    source,
+    FIPS3,
+    sex,
+    race,
+    hisp,
+    value
+  ) 
+  # 
+  # summarize
+  #
+  df_ <-
+  rbind(
+    df_,
+    df_B
+  ) %>%
+  dplyr::group_by(
+    pop,
+    source,
+    FIPS3,
+    sex,
+    race,
+    hisp
+  ) %>%
+  dplyr::summarize(
+    N=sum(value)
+  ) %>%
+  dplyr::ungroup()
+  #
+  return(df_)  
+}
+```  
+
+```{r zurich}
+df_cc_est2016_compare_Hisp <- fn_df_cc_est2016_compare_Hisp()
+str(df_cc_est2016_compare_Hisp)
+```  
+
+Write as a csv file
+
+```{r pride}
+readr::write_csv(
+  df_cc_est2016_compare_Hisp,
+  paste0(output_dir,"df_cc_est2016_compare_Hisp.csv.gz")
+)
+```  
+
+## Problem in Counts  
+
+The data frames generated above share in a problem illustrated by these two tables:  
+
+Data not broken down into Hispanic:
+```{r oar}
+df_cc_est2016_compare %>% 
+  reshape2::dcast(pop+source~.,value.var = "N",sum)
+```  
+
+Data broken down into Hispanic:  
+```{r giant}
+df_cc_est2016_compare_Hisp %>% 
+  reshape2::dcast(pop+source~.,value.var = "N",sum)
+```  
+
+There are mismatches between the source A and B data for the total counts. The Source A figure for total population agrees with that explicitly in the Census Bureau cc_est2016 file. Source B (the WAC... etc.) are the larger, so it appears that there may be a double counting somewhere in Source B.  
+
+The sum for Source A for data not broken down into Hispanic (the first of the dcasts) matches the sum from df_cc_est2016_tot.  
+```{r trawl}
+df_cc_est2016_tot %>% reshape2::dcast(pop~.,value.var = "TOT_POP",sum)
+```  
+
+This matches the sum from df_cc_est2016_alldata_37  
+```{r lush}
+sum(df_cc_est2016_alldata_37 %>% 
+  dplyr::filter(YEAR==6 & AGEGRP==0) %>% 
+  dplyr::select(TOT_POP)
+)
+```  
+
+Looking at totals:
+
+```{r}
+df_cc_est2016_alldata_37 %>% 
+  dplyr::filter(YEAR==6 & AGEGRP==0) %>% 
+  dplyr::select(
+    TOT_POP,
+    TOT_MALE,
+    TOT_FEMALE,
+    NH_MALE,
+    NH_FEMALE,
+    H_MALE,
+    H_FEMALE
+  ) %>% 
+  apply(2,sum)
+```  
+
+and in more detail:
+
+```{r excel}
+count_cc_est2016_alldata_37 <-
+df_cc_est2016_alldata_37 %>% 
+  dplyr::filter(YEAR==6 & AGEGRP==0) %>% 
+  dplyr::select(
+    -SUMLEV,
+    -STATE,
+    -COUNTY,
+    -STNAME,
+    -CTYNAME,
+    -YEAR,
+    -AGEGRP
+  ) %>% 
+  apply(2,sum)
+#
+count_cc_est2016_alldata_37
+#
+df_count_cc_est2016_alldata_37 <-
+  data.frame(name=names(count_cc_est2016_alldata_37),N=count_cc_est2016_alldata_37)
+```  
+
+The problem with these talleys seems to be that the "HWA_..." (including HTOM_) sum equals H_MALE+H_FEMALE,  
+while the "HWAC_..." series sum is larger. Whatever the source of this, for our purposes the Hispanic counts  
+will be represented by the "HWA_..." series.  
+
+## Hispanic-based County Counts  
+
+NOTE that df_cc_est2016_compare_Hisp must be filtered to use source "A" only. 
+
+The NCSBE race categories are `r unique(df_merge_county_sex_race_20161108$race)`.  
+The Census Bureau race categories are `r t(unique(df_cc_est2016_compare_Hisp %>% dplyr::filter(source=="A") %>% dplyr::select(race)))[1,]`.  
+The view of NCSBE v_df_merge_county_sex_race_OMU_20161108() race categories are `r unique(v_df_merge_county_sex_race_OMU_20161108()$race)`.
+ 
+These data frame representations of the data WITHOUT ETHNICITY:  
+
+```{r edge}
+df_merge_county_sex_race_20161108 %>% reshape2::dcast(pop+sex+race~.,value.var = "N",sum)
+df_cc_est2016_compare_Hisp %>% dplyr::filter(source=="A") %>% reshape2::dcast(pop+sex+race~.,value.var = "N",sum)
+v_df_merge_county_sex_race_OMU_20161108() %>% reshape2::dcast(pop+sex+race~.,value.var = "N",sum)
+```  
+
+In a more compact display, not including sex WITHOUT ETHNICITY:
+
+```{r spate}
+df_merge_county_sex_race_20161108 %>% reshape2::dcast(pop~race,value.var = "N",sum)
+df_cc_est2016_compare_Hisp %>% dplyr::filter(source=="A") %>% reshape2::dcast(pop~race,value.var = "N",sum)
+v_df_merge_county_sex_race_OMU_20161108() %>% reshape2::dcast(pop~race,value.var = "N",sum)
+```  
+
+### The Problem With NCSBE Ethnicity  
+
+Reporting of ethnic_code in df_nc_voted:
+
+```{r }
+df_nc_voted %>% reshape2::dcast(ethnic_code~.)
+```  
+
+The non-responses outnumber the HL responses by a factor of nine. It does not appear reasonable to carry out any analysis of ethnicity of voters.  
 
 ## Finish  
 
