@@ -51,7 +51,7 @@ ij_race_eth <-  inner_join(voter_race, voter_eth, county_desc = "county_desc")
 nc_voter_demographics <- inner_join(ij_party_gender, ij_race_eth, county_desc = county_desc)
   
 #Write csv file 
-write.csv(nc_voter_demographics, "nc_voter_demographics2.csv")
+write.csv(nc_voter_demographics, "nc_voter_demographics.csv")
 
 
 
