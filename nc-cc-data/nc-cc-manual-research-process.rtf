@@ -1,0 +1,34 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf400
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red27\green31\blue34;\red255\green255\blue255;
+}
+{\*\expandedcolortbl;;\csgray\c0\c0;\cssrgb\c14118\c16078\c18039;\cssrgb\c100000\c100000\c100000;
+}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\margl1440\margr1440\vieww10800\viewh12000\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 My process:\
+\pard\tx220\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	1.	}I visited each county\'92s website and found the roster of commissioners\
+{\listtext	2.	}I copied each name to a text document. I double checked this by going back and counting the number of commissioners and comparing it to the count on my text document. If the numbers matched and there were no duplicate names on my text document, I proceeded.\
+{\listtext	3.	}I checked each name individually in the FOIA-ed candidate listing xls (FINAL-candidate_listing_by_election-1.xlsx)\
+{\listtext	4.	}I made sure the city associated with their address is in the county in which they are a commissioner to make sure I had the correct person (Some people have common names.)(Please note that some cities extend into counties where you wouldn\'92t expect. For example, New Bern is mostly in Craven County, but extends into Pamlico County as well.)\
+{\listtext	5.	}I created a column for County since that it wasn\'92t included in the FOIA\'92d candidate listing spreadsheet. Once I confirmed a candidate, I typed their county into either their most recent record since many have listings for multiple terms. If a candidate had a date outside of 11/4/14 or 11/8/16, this meant that they were appointed to a vacant seat after losing an election. I googled to confirm each case. (It\'92s possible that some of the 11/4/14 and 11/8/16 names actually lost those elections and were appointed later.)\cb2 \
+\ls1\ilvl0\cb1 {\listtext	6.	}If I couldn\'92t find a commissioner\'92s record in the xls document, I conducted a google search. Every time, it turned out that the commissioner had been appointed to a vacant spot, hence no candidate listing since they were not a candidate. I made a list of these names to add later.\
+{\listtext	7.	}After going through steps 1-6 for all counties, I went back and checked the spreadsheet against the text document. I had 7 errors out of 555 candidate listings, 2 were not marked in the county column and 5 were assigned to the wrong county. I fixed those errors.\
+{\listtext	8.	}Then I added the appointed commissioners to the database. Since most of them are now running for election for their seats, it was easy to find addresses for them via their candidate listing and/or voter registration. Also, many counties list commissioner addresses. The few that were harder to pin down simply took a little internet sleuthing, but a combination of news articles and voter registration lookup did the trick.\
+{\listtext	9.	}I checked my text document against my new spreadsheet one more time. No more errors.\
+{\listtext	10.	}I did a very simple inner join to contrast this spreadsheet against the state database. It did not yield the exact results. So I chose a join that gave 784 results.\
+{\listtext	11.	}I manually combed through the results. Most duplicates were fathers/sons sharing the same name. I had to figure out which one was in office.\
+{\listtext	12.	}I made a list of missing commissioners from the inner join. Most of the time, I had to learn their true legal name which was different from their name on the candidate listing, which is why it didn\'92t get paired up in the inner join. Once I had better info, I could run the inner join again to get their voter registration information. I researched/inner joined until I had a complete list.\
+{\listtext	13.	}
+\f1\fs28 \cf3 \cb4 \expnd0\expndtw0\kerning0
+I then went back and doublechecked (it's really more like triple or quadruple checking at this point) names and addresses to be 100% sure. Everything checked out including the total number of 583 county commissioners (I learned soon after that one had died in May, he's still listed on the site and has no replacement yet).
+\f0\fs24 \cf0 \cb1 \kerning1\expnd0\expndtw0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\
+\
+}

@@ -1,0 +1,741 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf400
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 ArialMT;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red243\green235\blue10;\red255\green255\blue51;
+\red0\green0\blue0;\red26\green26\blue26;\red255\green255\blue255;\red255\green255\blue51;}
+{\*\expandedcolortbl;;\csgray\c0\c0;\cssrgb\c96264\c92423\c0;\cssrgb\c99946\c98636\c25320;
+\cssrgb\c0\c0\c0;\cssrgb\c13333\c13333\c13333;\cssrgb\c100000\c100000\c100000;\cssrgb\c99946\c98636\c25320;}
+\margl1440\margr1440\vieww10800\viewh12340\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 CC - voter registration notes\
+\
+How I resolved reconciling the inner join of the county commissioner database to the voter registration database when there was a records discrepancy.\
+\
+
+\b \cb2 COMPARE ADDRESSES\
+COMPARE PARTIES\
+CHECK JRs AND SRs\
+GO BACK OVER ones selected by address only
+\b0 \cb1 \
+\
+
+\b \cb2 ALAMANCE
+\b0  - Eddie Boswell (R)\cb1  - missing from inner join, found a different address than candidate listing on https://www.alamance-nc.com/commissioners/home-1/our-commissioners-2/commissioner-eddie-boswell/ the address has a hyphen in it\'92s not always listed that way, so that\'92s probably why it didn\'92t show in inner join. First legal name is Eddie not Edward or Ed\
+\
+
+\b ALLEGHANY
+\b0  James Evans (R) (goes by Mark) double record - One is currently registered unaffiliated, one Republican. candidate listing for 2018 is Republican. Safe to assume that\'92s a re-election. Campaign FB page for current commissioner running for re-election promotes local GOP meeting on 3/31. Safe to select Rep over Una.\
+http://alleghanyelections.com/wp-content/uploads/2018/02/candidate-list-2018-5.pdf\
+\
+
+\b ANSON
+\b0  - Jarvis T. Woodburn (D) - double record -  for Jarvis Woodburn in Anson. Since this commissioner\'92s middle initial is T, it makes sense to choose the record with the middle name Thomas vs the one with middle name Devante.\
+\
+
+\b \cb2 ASHE
+\b0  - William Sands (R\cb1 ) - missing from inner join, there is only one William Sands registered in Ashe County. The candidate listing matches up with the voter registration so it is unclear why his record did not come up with the inner join.\
+\
+
+\b AVERY
+\b0  - Martha J. Hicks (R) - double record for Martha Hicks - chose the one with middle name Jaynes instead of Berneice\
+\
+
+\b \cb2 AVERY - 
+\b0 Wood Hall Young, Jr\'92s (R)\cb1  missing from inner join, candidate listing address is different from his voter registration mailing address, which is why it didn\'92t connect in the inner join\
+\
+
+\b BLADEN 
+\b0 - David R. Gooden (R) - 2 records with same first and last name but only one matches middle name \
+\
+
+\b BLADEN
+\b0  - Charles Ray Peterson (D) - 2 records popped up b/c I couldn\'92t do a middle name join - removed Charles Daniel Peterson\
+\
+
+\b BLADEN 
+\b0 - Russell Priest (D)- 2 records, both first name Daniel, middle name Leon-Russell, etc only difference is birth year. Manual lookup of voter registrations reveals a Jr and a III. candidate listing shows record for Jr http://bladennc.govoffice3.com/vertical/Sites/%7B3428E8B4-BA8D-4BCE-9B92-0A719CB4C4FB%7D/uploads/candidate_listing_for_may_2018_primary.pdf, safe to select older Priest\
+\
+
+\b \cb3 BLADEN
+\b0  Daniel Dowless - changed from D to R \cb2  current reg is R but this 2016 article shows he used to be Democrat https://www.bladenjournal.com/top-stories/9363/bladen-county-board-of-commissioners-gets-three-new-faces\
+\
+
+\b \cb3 BLADEN
+\b0  Charles Ray Peterson\cb2  - changed from D to R in 2015 https://bladenonline.com/a-note-from-charles-ray-peterson/\cb1 \
+\
+
+\b \cb4 BLADEN
+\b0  - 
+\fs26 \cf5 \expnd0\expndtw0\kerning0
+Dr. Ophelia Munn-Goins (D) \cb2 - missing from inner join, address the same. likely due to issue with hyphenated last name - not hyphenated in candidate listing but hyphenated in the voter record\
+\
+
+\b BRUNSWICK
+\b0  - Michael Forte (R) - 2 records, different birth years - this guy is definitely older than 26\
+\
+
+\b BUNCOMBE
+\b0  - Joseph Belcher (R) - 2 records, different middle names and birth years, this guy is definitely older than 33\
+\
+
+\b BURKE
+\b0  - Wayne F. Abele Sr.  (R) missing from inner join, possibly due to Sr on last name, addresses for candidate listing match voter registration\
+\
+
+\b BURKE
+\b0  - Jeffrey C. Brittain (R) - 2 records, middle initial C. corresponds with Coy, removed middle name Weldon\
+\
+
+\b BURKE
+\b0  - Scott Mulwee (R) - 2 records for legal first name Rondal - Scott is middle name, removed Teral middle name record\
+\
+
+\b CABARRUS
+\b0  - Elizabeth Poole (R) - two records, different middle names, only one matches address\
+\
+
+\b CALDWELL
+\b0  - Donnie Potter (R) - two records, different middle names, only one address matches\
+\
+
+\b CAMDEN
+\b0  - Tom White (R) - 3 results - all first name george, which is his first name, only one with the middle name Thomas, that same record - the residential address matches the candidate listing address\
+\
+
+\b CARTERET
+\b0  - Mark Mansfiseld (R) missing record inner join, 1 Mark Mansfield in voter search results for Carteret county, middle name Frazier, same as candidate listing for 2018 http://carteretcountync.gov/DocumentCenter/View/4599/candidate-list-2-20-18\
+\
+
+\b CARTERET
+\b0  - Jonathan Robinson (R), 2 records , birth years different, this guy is definitely older than 27\
+\
+
+\b CARTERET
+\b0  - Bill Smith (R) - 2 records, different addresses, only one matches candidate listing\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b \cf5 \cb2 CARTERET
+\b0  - George Ed Wheatly (R)  - 2 records, different addresses, only one matches candidate listing\
+\
+
+\b \cb3 CASWELL
+\b0  - David Owen switched from D to R\cb2 , currently an R article shows was a D http://www.caswellmessenger.com/news/article_ab7a5d80-4eea-11e4-b885-2fa94fdc0480.html\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 \cb2 CHEROKEE 
+\b0 - Cal Stiles (R) first name Calvin - first last  name matches voter reg as does address, not sure why it didn\'92t pop up in inner join\
+\
+
+\b CHEROKEE  - 
+\b0 C.B. McKinnon (R) first name David, missing from inner join, candidate listing address matches voter registration (so does first and last name) so not sure why missing from inner join\
+\
+
+\b CHOWAN
+\b0  Greg Bonner (D) 2 records, diff birth years, this grey bearded man seems a couple decades older than 41\
+\
+
+\b CHOWAN
+\b0  Don Faircloth (D) 2 records, diff birth years, this man doesn\'92t look 78 years old\
+\
+
+\b CLAY
+\b0  Robert Cline Penland (R) 2 records for first, last name but only one w/ correct middle, removed other\
+\
+
+\b COLUMBUS
+\b0  - Ricky Bullard (D) 2 records first name James, only one with middle Ricky\
+\
+
+\b CRAVEN
+\b0  Johnnie Sampson, Jr. (D) 2 records first name Johnnie, diff ages, found an article about commissioner sampson talking about civil rights in the 60s and meeting MLK, probably the 1933 record and not the record with the 1956 birth date, removed younger http://www.newbernsj.com/photogallery/NC/20180403/NEWS/403009986/PH/1\
+\
+
+\b CUMBERLAND
+\b0  Michael C. Boose (R) 2 records, diff birth years, this guy looks older than 34\
+\
+
+\b CUMBERLAND
+\b0  Charles Evans (D) , 6 records, found documentation that middle initial is E, which leaves one record with Edward as middle name - that record\'92s mailing address matches candidate listing address https://fayettevillenc.gov/Home/ShowDocument?id=2701\
+\
+
+\b CUMBERLAND
+\b0  W. Marshall Faircloth (D), 3 records matching William Faircloth, but only one with Marshall as the middle\
+\
+
+\b CUMBERLAND
+\b0  Mike D. Hall (R) - 2 records matching Michael Hall, but only one with middle name to match middle initial D = Dennis \
+\
+
+\b \cb4 CUMBERLAND
+\b0  - James \'93Jimmy\'94 Keefe switched from D to R\cb2  http://www.fayobserver.com/news/20170914/inside-politics-clerk-candidate-blackwell-joins-gop\
+\
+
+\b DARE
+\b0  Jack Shea (first name is John) (R) missing from inner join. first, last and address all match so not sure why not showing up in inner join\
+\
+
+\b DARE
+\b0  Steve House (first name is Markis), (R) missing from inner join. first, last and address all match so not sure why not showing up in inner join\
+\
+
+\b DAVIDSON
+\b0  Steve Jarvis (R) 2 records, diff addresses and birth years, this grandfather is older than 30 years old\
+\
+
+\b DAVIDSON
+\b0  Steve Shell  (R) re-election candidate listing has middle name as Franklin https://s3.amazonaws.com/dl.ncsbe.gov/Elections/2018/Candidate%20Filing/Candidate_Listing_2018_fullcounty.pdf\
+\
+
+\b DAVIE
+\b0  Mark Jones (Mark S. Jones) (R), 2 records matching first and last names, but only one with middle name that starts with S\
+\
+
+\b \cb4 DUPLIN
+\b0  - Kennedy Thompson\cb2  switched from UNA to R- candidate listing party Unaffiliated (double checked, he ran unaffiliated),  current voter registration Republican
+\fs24 \cf0 \cb1 \kerning1\expnd0\expndtw0 \
+\
+
+\b EDGECOMBE
+\b0  - Leonard Wiggins (D), 2 records, voter reg mailing address matches candidate listing address from 2016 http://www.edgecombecountync.gov/Departments/Board%20of%20Elections/candidate%20list%20grouped%20by%20contest%20092016.pdf, removed other record\
+\
+
+\b EDGECOMBE
+\b0  
+\fs26 \cf5 \cb2 \expnd0\expndtw0\kerning0
+William (Billy) Wooten (D), 2 records found record with his middle initial listed as B http://www.edgecombecountync.gov/Departments/Board%20of%20Elections/important%20notices/Elected%20Officials-JANUARY%2025%202017.pdf, one record matches that, removed other\
+\
+
+\b FORSYTH
+\b0  Richard V. Linville (R) , 2 records matching first and last names but only one matching middle initial V,\
+\
+
+\b FORSYTH
+\b0  Everette Witherspoon (D), 2 records, middle name L according to 2018 candidate listing, matches 1 record, removed other (Witherspoon lost primary, will be replaced 2019) https://s3.amazonaws.com/dl.ncsbe.gov/Elections/2018/Candidate%20Filing/Candidate_Listing_2018_fullcounty.pdf\
+\
+
+\b FORSYTH
+\b0  Fleming El-Amin (D), missing from inner join probably due to lowercase first name entered in the cc database - that was my fault. \
+\
+
+\b FRANKLIN
+\b0  Cedric K. Jones, Sr. (D), 2 records, diff birth years, older than 31, had a 30 year career as Cooperative Extension Director b4 becoming commissionerrecord https://www.thefranklintimes.com/mod/pubext/index.php?viewDay=2009-10-02\
+\
+
+\b FRANKLIN
+\b0  Michael Schriver (R) 2 records, diff birth years, this guy looks older than 19, https://www.linkedin.com/in/michael-schriver-13752630\
+\
+
+\b GASTON
+\b0  - Don Grant (R), 2 records matching first and last names, diff birth years, he looks older than 26 http://www.gastongazette.com/news/20170717/woman-makes-sexual-battery-allegation-against-commissioner\
+\
+
+\b GASTON
+\b0  Bob Hovis (W. R. (Bob) Hovis) (R) , 2 records matching first and last names, only one matches R middle initial\
+\
+
+\b GATES
+\b0  Billy F. Felton (D), 2 records matching first and last names, only one matches F middle initial\
+\
+
+\b GATES
+\b0  J. Ray Freeman III (J stands for Joseph) (D) 2 records matching first and last names, only one matches Ray middle name, removed other\
+\
+
+\b GATES
+\b0  Jack Owens (D) missing from inner join, candidate listing for 2018 lists legal name as Michael C Owens with nickname Jack Owens, https://s3.amazonaws.com/dl.ncsbe.gov/Elections/2018/Candidate%20Filing/Candidate_Listing_2018_fullcounty.pdf\
+\
+
+\b GRAHAM
+\b0  Raymond Williams (R), 3 records, 2018 candidate listing has legal name as Raymond David Williams Sr. , which still matches 2 records (Since the Sr was not included with the last name) with diff birth years. a manual voter reg lookup showed Sr reg date as 1969 and Jr. registration date as 2016, so it is reasonable to conclude that the older record is the correct one, younger removed https://s3.amazonaws.com/dl.ncsbe.gov/Elections/2018/Candidate%20Filing/Candidate_Listing_2018_fullcounty.pdf\
+\
+
+\b GRANVILLE
+\b0  David T Smith (D), 5 records matching first and last but only one matches middle initial\
+\
+
+\b GREENE
+\b0  Jerry R Jones (R) 2 records matching first and last but only one matches middle initial\
+\
+
+\b GUILFORD
+\b0  Jeff Phillips (6108 Mountain Brook Road, Greensboro, NC 27455), 2 records matching first and last but only one matching address, which was recorded putting the cc database together, to voter reg\
+\
+
+\b HALIFAX
+\b0  Vernon J. Bryant (D) , 2 records matching first and last but only one matches middle initial\
+\
+
+\b HARNETT
+\b0  William \'93Abe\'94 Elmore (R), 2 records matching first and last name, diff birth years, he looks more like 86 than 61 to me https://www.facebook.com/HarnettCounty/posts/10154616111885971:0, also mailing address on cc web page matches the older record: 
+\fs30 \cf6 \cb7 Contact Info: PO Box 668, Dunn, NC 28335\
+\
+
+\b\fs26 \cf5 \cb2 HARNETT
+\b0\fs30 \cf6 \cb7  
+\fs26 \cf5 \cb2 Barbara McKoy (D) , 2 records matching first and last name, diff birth years close in age, cc web page lists address as Contact Info: PO Box 553, Lillington, NC 27546, which matches one \
+
+\b \
+HARNETT 
+\b0  - Howard Penny (R), 2 records matching first and last name, cc web page lists address Contact Info: PO Box 736, Coats, NC 27521, which matches both records, lists name as Howard L. Penny, Jr. - but he does not look like the younger record which is 1969 or 49 years old, he looks like the 1947 / 71 years old record. a manual voter lookup shows the two records as being Howard Penny Jr (reg 1983) and Howard Penny III (reg 1992), so this confirms that the commissioner is the older record.
+\fs30 \cf6 \cb7 \
+
+\fs26 \cf5 \cb2 \
+
+\b HAYWOOD
+\b0  - J. W. (KIRK) KIRKPATRICK, Ill (D), 4 records, only 2 have middle name to match middle initial, a manual voter lookup revealed just one J. W. (KIRK) KIRKPATRICK, Ill, the address matched one record \
+\
+
+\b HENDERSON
+\b0  Charles Messer (R), 2 records matching first and last, close in birth year, according to cc website, Messer was born in 1954 https://www.hendersoncountync.gov/directory-listing/charles-messer, which matches one record\
+\
+
+\b HERTFORD
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Curtis Anthony Freeman, Sr., 2 records matching first and last name, manual voter lookup reveals Curtis Anthony Freeman and Curtis Anthony Freeman, Jr., safe to assume the one without the Jr is the Sr. and the older record\
+\
+
+\b \cb2 HERTFORD 
+\f0\b0\fs26 \cf5 \cb2 \outl0\strokewidth0 John D. Horton (D)missing from inner join, only one John Horton in voter manual look up search results, address matches candidate listing\
+\
+
+\b HOKE
+\b0  James A. Leach (D), 2 records same first and last name, only one middle name matches middle initial\
+\
+
+\b HOKE
+\b0  Robert A. (Bobby) Wright, (D) 3 records matching first and last names, 1 record middle name didn\'92t match, remaining 2 diff ages, diff addresses, candidate listing matches older record\
+\
+
+\b HOKE
+\b0  Tony Hunt (D)missing from inner join, cc website lists first name as Anthony, manual voter lookup yields 2 anthony hunts, both with middle names beginning with D (Dakota and Derek), Hunt was 51 in 2013 https://www.wral.com/hoke-commissioner-charged-in-domestic-dispute/13163099/, Dakota registered 2016, so likely not the commissioner who was in office prior to that date, Derek reg date is 1990 which works\
+\
+
+\b HYDE
+\b0  Earl D. Pugh, Jr. (R),  2 records matching first and last, manual voter lookup yields Pugh Jr and Pugh III\
+\
+
+\b HYDE
+\b0  Benjamin Simmons III (R),  2 records matching first and last, manual voter lookup yields Simmons Jr and Simmons III, the latter matches the residential address of one of the records\
+\
+
+\b \cb4 HYDE
+\b0  Barry Swindell switched from DEM to UNA \cb2  - article shows he was democrat in 2014 http://islandfreepress.org/2014Archives/11.05.2014-DemocratsBuckTheStatewideTrendInHydeCounty.html but his current registration shows him as unaffiliated\
+\
+
+\b IREDELL
+\b0  Marvin Norman (R), 2 records matching first and last name, one doesn\'92t match party affiliation or address so it\'92s removed\
+\
+
+\b JACKSON
+\b0  Ronald Mau (R), 2 records matching first and last name, guy looks older than 27, also younger record party affiliation didn\'92t match\
+\
+
+\b JACKSON 
+\b0 BRIAN T. MCMAHAN (D) missing from inner join, unsure why, only one record matching the name and county upon manual voter lookup, address matches candidate listing\
+\
+
+\b JONES
+\b0  Joseph F. Wiggins , 2 records matching first name, last name and middle name to middle initial, only one record matches party affiliation or candidate listing address \
+\
+
+\b JONES
+\b0  Frank Emory (R) missing from inner join, 2018 candidate listing shows name as Charlie Franklin Emory Jr https://www.jonescountync.gov/vertical/sites/%7B9E2432B0-642B-4C2F-A31B-CDE7082E88E9%7D/uploads/candidate_list_as_of_june_11.pdf, my cc database had first name as Charles, which is why it wasn\'92t matched in inner join\
+\
+
+\b JACKSON
+\b0  Charles R. Elders (R) - missing from inner join, somehow the inner join pulled in the wrong Charles Elders. The middle name does not match the middle initial, caught by double checking address matches\
+\
+
+\b LEE
+\b0  Amy M. Dalrymple (D), 2 records matching first and last names, but only one matches middle initial to middle name  or party affiliation \
+\
+
+\b \cb4 LEE
+\b0  Kevin Craig Dodson\cb2  (R), 2 records matching first and last names, but only one matches middle name, he also \cb4 switched from REP to DEM\cb2  http://www.sanfordherald.com/news/election-democratic-county-commissioner-kevin-dodson-announces-run-for-lee/article_c0b83d12-05ca-11e8-aad5-8fb3a26dbaca.html\
+\
+
+\b LENOIR
+\b0  Linda Rouse Sutton (D) , 6 records matching first and last names, but only one matching middle name\
+\
+
+\b LENOIR
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Eric S. Rouse
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0  (R), 2 records matching first and last names, but only one matching middle initial to middle name  and party affiliation\
+\
+
+\b LENOIR
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Reuben J. Davis , 
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 2 records matching first and last names and both match middle name to middle initial but they are diff mid names Jeffery and Joshua. cc web site lists address as 2141 Oakridge Rd, Kinston, NC 28504, which means Joshua is the correct middle name\
+\
+
+\b \cb4 LENOIR
+\b0  J. Mac Daughety ran as UNA in 2014 but is registered REP\cb2  - he may have run unaffiliated by petition and been a REP all along, or he may have switched\
+\
+
+\b MACON
+\b0  James P. Tate (R), 2 records matching first and last names, only one matches middle name to middle initial and party affiliation\
+\
+
+\b MADISON
+\b0  William Briggs (C. William (Bill) Briggs) (R) 2 records matching first and last names, diff birth years, Briggs has served for two terms, so unlikely that he is the 30 year old, https://www.citizen-times.com/story/news/madison/2018/04/16/madison-county-primary-election-guide/514608002/\
+\
+
+\b \cb4 MARTIN
+\b0  Elmo Butch Lilley \cf5 \cb8 ran as UNA in 2014 but is registered DEM\cf5 \cb2  - he may have run unaffiliated by petition and been a DEM all along, or he may have switched\
+\
+
+\b MCDOWELL
+\b0  Tony G. Brown  (R), missing from inner join, 2018 candidate listing shows G stands for Garrett and Tony is not short for Anthony, which matches a Tony Garrett Brown in a manual voter lookup https://s3.amazonaws.com/dl.ncsbe.gov/Elections/2018/Candidate%20Filing/Candidate_Listing_2018_fullcounty.pdf, voter reg address doesn\'92t match candidate listing address which is probably why he didn\'92t turn up in inner join\
+\
+
+\b MECKLENBURG
+\b0  Bill James (R) - 5 records matching first and last names, 2 are 31 year olds which seems to young for this man; one is 89 which seems to old; of the 2 remaining, only one voter reg address matches the candidate listing address\
+\
+
+\b MECKLENBURG  
+\b0 George Dunlap (D) 2 records matching first and last names, diff middle names and birth years; according to campaign website, he retired from the police dept in 2005 after a 27 year career so unlikely he is the 42 year old, since that would have required him to become a police officer at 17 http://www.vote4dunlap.com/about-george/\
+\
+
+\b MECKLENBURG
+\b0  Ella Scarborough (D), her voting record is listed as inactive? but she just won her primary May 2018. missing a vote record for that day but has voted 70 times otherwise - perhaps she got married or changed her name?\
+\
+
+\b MITCHELL
+\b0  Danny Ray Burleson (R), 2 records matching first, last and middle names, 10 years apart. only 1 matches voter reg address to candidate listing\
+\
+
+\b MITCHELL
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Ken W. Hollifield (R) 2 records matching first and last names, only one matches middle name to middle initial plus voter reg address to candidate listing address\
+\
+
+\b MITCHELL
+\b0  Matthew \'93Vern\'94 Grindstaff - his middle initial is A according to his 2018 candidate listing. 
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 \
+\
+
+\b MOORE
+\b0  Louis Gregory (first name Samuel) (R), missing from inner join, probably b/c his full name is Samuel Louis Gregory III - maybe the voter reg includes III as part of the last name\
+\
+
+\b NEW HANOVER
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Jonathan Barfield, Jr. (D) 2 records matching first and last names but only one record matched voter reg address to candidate listing address\
+\
+
+\b NEW HANOVER
+\b0  Brian Calvin \'93Skip\'94 Watkins (R), 2 records matching first and last name and address but this guy\'92s profile says he\'92s lived in Wilmington for over 35 years so he\'92s not the 25 year old https://commissioners.nhcgov.com/commissioners/vice-chair/\
+\
+
+\b NEW HANOVER 
+\b0 Haywood Edwin \'93Woody\'94 White (R), 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 2 records matching first and last name and address, but this guy\'92s profile says he received a law degree in 1994 so he\'92s not the one born in 2000 https://commissioners.nhcgov.com/commissioners/chair/\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 NEW HANOVER
+\b0  
+\f0\fs26 \cf5 \cb2 Patricia Kusek missing from inner join\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 NORTHAMPTON
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Chester Johnell Deloatch, Sr. (D), 2 records matching first and last name and address, manual voter lookup shows a Jr and Sr. Sr\'92s voter reg is 1966 Jr\'92s birth year is 1966 so that one is removed\
+\
+
+\b NORTHAMPTON
+\b0  Charles R. Tyner, Sr. (D) 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 2 records matching first and last name but only one matches voter reg address to candidate listing address \
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 \cb4 PAMLICO
+\b0  
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 \strokec5 Paul J. Delamar\cb1  (R) - 2 records matching first and last name and middle name to middle initial. Manual voter lookup reveals Delamar Jr and Delamar III - both are involved in local politics. Delamar Jr is a Democrat on the Board of Education, Delamar III is the county commissioner who apparently has \cb4 switched from Dem to Rep\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb1 \
+
+\b \cb2 PAMLICO
+\b0  
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 Edward Riggs, Jr (R), missing from inner join\
+\
+
+\b PAMLICO
+\b0  Carl J. Ollison (D), missing from inner join \
+\
+
+\b PASQUOTANK
+\b0  Joe Winslow (D) 2 records matching first and last name and address, Winslow is 70, selected record that matched that age http://www.dailyadvance.com/News/2018/01/17/Winslow-to-seek-re-election.html\
+\
+
+\b PASQUOTANK 
+\b0 Cecil Perry (D), 2 records matching first and last name, but only one matched on address\
+\
+
+\b PENDER
+\b0  George Brown (R) 2 records matching first and last name and address,  birth year diff - looks older than 26\
+\
+
+\b PENDER
+\b0  James 
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 David Williams (R) 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 2 records matching first and last name but only one matches voter reg address to candidate listing address \
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 PERQUIMANS
+\b0  Thomas Kyle Jones (R) - 3 records matching first and last name but only one matching middle name\
+\
+
+\b PERQUIMANS
+\b0  Charles Woodard (D) , 
+\f0\fs26 \cf5 \cb2 2 records matching first and last name, but only one matched on address\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 \cb3 PERQUIMANS
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 \strokec5 Ed Muzzulin switched from DEM to UNA, \cb2 article shows he used to be Democrat
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 \
+\
+
+\b PITT
+\b0  Elizabeth \'93
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Beth\'94 Baker Ward (D) , 5 records matching first and last name, but only one matched address\
+\
+
+\b PITT
+\b0  Mary Perkins Williams 
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 (listed as middle name Perkins, last name Williams) (D) 
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 , 14 records match first and last name, only one matched middle name, addresses weren\'92t the same, but voter reg mailing address matches the addresses given on her county profile https://www.pittcountync.gov/directory.aspx?EID=45\
+\
+
+\b PITT
+\b0  Glen T Webb II (R), voter registration address already outdated, perhaps he moved or simply finally updated his address, his old address is his father\'92s address, left old address in residential section, updated address in mail address section\
+\
+
+\b \cb2 POLK
+\b0  
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 Myron Yoder (R) missing from inner join \
+\
+
+\b ROBESON
+\b0  Berlister Campbell (D) 2 records, same first and last name, diff birth dates, Campbell has 14 non-consecutive years as commissioner and 3 years of service in the U.S. army, so likely not the 38 year old. not impossible but not likely. https://www.robesonian.com/news/108291/campbell-seeks-re-election-as-district-2-commissioner\
+\
+
+\b ROBESON  
+\f1\b0\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Raymond Cummings (D) 
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 2 records, same first and last name, diff birth dates, this guy looks older than 31\
+\
+
+\b ROBESON
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 David Edge (R)  
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 2 records, same first and last name, diff birth dates, this guy looks older than 37\
+\
+
+\b ROBESON
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Jerry L. Stephens, Sr. (D) 
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 2 records, same first and last name (minus the Sr), diff birth years, manual voter lookup reveals there is a Sr and Jr , selected older record since Jr just registered to vote in 2018\
+\
+
+\b RUTHERFORD
+\b0  James Gregory (R) Lovelace  2 records, same first and last name but not middle\
+\
+
+\b RUTHERFORD
+\b0  Alan Toney (R) , 2 records, same first, last and middle name and address, one guy is 24 doesn\'92t seem old enough to have teenage kids in campaign photo on FB https://www.facebook.com/AlanToneyCCD5/\
+\
+
+\b SAMPSON
+\b0  Robert Jerol Kivett (R) , missing from inner join\
+\
+
+\b SAMPSON
+\b0  Clark Wooten missing from inner join, weirdly there are two Clark Wootens in Sampson county so even stranger it didn\'92t get included in inner join, Wooten III registered to vote in 2014, the same year Wooten was first elected as commissioner, safe to assume the commissioner was registered well before that. the older Wooten registered in 1980, that makes more sense https://www.clintonnc.com/top-stories/15495/wooten-selected-as-new-chairman-of-county-board\
+\
+
+\b SCOTLAND
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 John T. Alford , 3 records matching first and last name but only one matching middle name to middle initial\
+\
+
+\b SCOTLAND
+\b0  Robert Craig Davis, 2 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 records matching first and last name and middle but only one matching address (double checked voter registration for both)
+\f0\fs26 \cf5 \cb2 \
+\
+
+\b SCOTLAND
+\b0  Guy McCook 
+\f1\fs26\fsmilli13333 \cf5 \cb1 2 records matching first and last name but only one address matches one on county commissioner profile https://www.scotlandcounty.org/directory.aspx?EID=103
+\f0\fs26 \cf5 \cb2 \
+\
+
+\b STANLY
+\b0  Joseph L. Burleson (R) missing from inner join, weirdly two Joseph Burleson\'92s did show up in the inner join but neither has the correct middle name\
+\
+
+\b SURRY
+\b0  Larry Phillips  (R) 3 
+\f1\fs26\fsmilli13333 \cf5 \cb1 records matching first and last name, 
+\f0\fs26 \cf5 \cb2 2018 candidate listing has his full legal name as Larry Ray Phillips which matches one record \
+\
+
+\b SURRY
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Larry D. Johnson (R) 
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 3 
+\f1\fs26\fsmilli13333 \cf5 \cb1 records matching first and last name and middle initial, matched the voter reg address to the address on county commissioner page http://www.co.surry.nc.us/departments/(a_through_j)/commissioners/board_members.php\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 SWAIN
+\b0  
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 \strokec5 Phil Carson (R) 2 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 records matching first and last name and middle name and address, diff ages, he looks older than 27 https://mountainx.com/blogwire/swain-gets-4-million-in-partial-fulfillment-of-fontana-settlement/\
+\
+
+\b \cb2 SWAIN
+\b0  
+\f0\fs26 \cf5 \cb2 Ben Bushyhead (D) missing from inner join, probably because his full name was not in the cc db. Benjamin Lee Bushyhead\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 TRANSYLVANIA
+\b0  KELVIN PHILLIPS (first name James) 2 records first and last name match but not middle\
+\
+
+\b TRANSYLVANIA 
+\b0 JASON CHAPPELL (
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Jason Robert Chappell) (R) 
+\f0\fs26 \cf5 \cb2 \outl0\strokewidth0 missing from inner join \
+\
+
+\b VANCE
+\b0  Robert 
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 Dan Brummitt (R) 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 2 records matching first and last name  but only one matching middle initial to middle name\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 VANCE
+\b0  Carolyn Faines (D) \cf5 2 records matching first and last name, only one matches address on county commissioner page http://www.vancecounty.org/departments/board-of-commissioners/\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 VANCE
+\b0  
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 \strokec5 Thomas S. Hester, Jr. (R) 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 2 records matching first and last name, only one matches middle initial to middle name\
+\
+
+\b VANCE
+\b0  
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 \strokec5 Archie B. Taylor, Jr. (D) 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 2 records matching first and last name, only one matches address on county commissioner page 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 \strokec5  http://www.vancecounty.org/departments/board-of-commissioners/
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 \
+\
+
+\b \cb2 VANCE
+\b0  
+\f0\fs26 \cf5 \cb2 Gordon Wilder (D) missing from inner join, didn\'92t have his legal first name which is William https://homeinhenderson.com/2009/12/14/wilder-to-run-for-county-commission-district-3/\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 WAKE
+\b0  John Burns (D) 
+\f1\fs26\fsmilli13333 \cf5 \cb1 2 records matching first and last name, only one matches  middle name; 
+\f0\fs26 \cf5 \cb2 according to candidate listing full name John David Burns https://s3.amazonaws.com/dl.ncsbe.gov/Elections/2018/Candidate%20Filing/Candidate_Listing_2018_fullcounty.pdf\
+\
+
+\b WAKE
+\b0  Jessica Holmes (D) 
+\f1\fs26\fsmilli13333 \cf5 \cb1 2 records matching first and last name, diff birth years. In December 2014 she was 30, making the 1984 the correct record. Holmes is also black and the 1984 record is black while the 1971 record is white\
+
+\f0\fs26 \cf5 \cb2 \
+
+\b WAKE
+\b0  James West (D) 8 records same first and last name, only one matches the address on his county profile http://www.wakegov.com/commissioners/districts/Pages/district5.aspx\
+\
+
+\b WARREN
+\b0  Victor Hunt (D), missing from inner join, there are two Victor Hunts, one Jr and one Sr, both have the same address which matches the one on the county profile http://www.warrencountync.com/469/Victor-Hunt Sr registered in 1978 and has been farming in Warren County since 1978 http://www.warrenrecord.com/news/article_15face9c-4083-11e7-a24b-7b8b53f00c3a.html Jr didn\'92t vote in the 2014 general when the commissioner was elected. and has only voted 3 times since 2008 that seems very unlikely for an elected official.\
+\
+
+\b WASHINGTON
+\b0  
+\f1\fs26\fsmilli13333 \cf5 \cb1 \outl0\strokewidth0 \strokec5 David Cole Phelps (D) - 
+\fs26\fsmilli13333 \cf5 \outl0\strokewidth0 2 records matching first and last name, but only one matching middle\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 WATAUGA
+\b0  James Hodges, 3 records matching first and last name, only one matching address on county page http://www.wataugacounty.org/App_Pages/Dept/BOC/members.aspx\
+\
+
+\b WATAUGA
+\b0  Henry Perry Yates (R), 2 records matching first and last name, only one matching address on county page http://www.wataugacounty.org/App_Pages/Dept/BOC/members.aspx\
+\
+
+\b WAYNE
+\b0  Edward Cromartie (D) 2 records matching first and last name, only one matching address on county page http://nc-waynecounty.civicplus.com/655/Edward-Cromartie
+\f0\fs26 \cf5 \cb2 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 WAYNE
+\b0  William \'93Bill\'94 Pate (R) 4 
+\f1\fs26\fsmilli13333 \cf5 \cb1 records matching first and last name  only one matching address on county page http://nc-waynecounty.civicplus.com/659/Bill-Pate\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 WAYNE
+\b0  John Bell , 2 records matching first and last name only one matching middle initial to middle name and address on county page http://nc-waynecounty.civicplus.com/654/John-M-Bell   - I had the wrong John Bell in the county commissioners - the other john bell is a white republican who is in the state house. so it looked like he had been a Republican that switched to a Democrat. But he\'92s been a Democrat all along.\
+\
+
+\b WILKES
+\b0  David Gambill (R) , 3 records matching first and last name, 2018 candidate listing shows full legal name as David Duane Gambill Jr, which removes the record with middle name Paul, manual voter lookup confirms address, other record removed https://s3.amazonaws.com/dl.ncsbe.gov/Elections/2018/Candidate%20Filing/Candidate_Listing_2018_fullcounty.pdf\
+\
+
+\b WILKES
+\b0  Gary D. Blevins 2 records matching first and last name but only one matching middle initial to middle name\
+\
+
+\b \cb4 WILKES
+\b0  Gregory A. Minton \cb2 (R)\cb1  - missing from inner join, inner join pulled just one of the Gregory Minton records from Wilkes County.  Minton\'92s middle initial is officially A according to 2018 candidate listing. but inner join pulled the record with the middle name Van and not the one with Alan. This was caught during voter reg/candidate listing address comparison.\
+\
+
+\b \cb2 WILSON
+\b0  
+\f0\fs26 \cf5 \cb2 JoAnne Daniels  (D), missing from inner join, her name was not capitalized which is probably why it didn\'92t get included in the inner join - my fault when creating cc db\
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 YADKIN
+\b0  David Moxley (R), 
+\f1\fs26\fsmilli13333 \cf5 \cb1 2 records matching first and last name, only one matching address on county page 
+\f0\fs26 \cf5 \cb2 http://www.yadkincountync.gov/Directory.aspx?EID=19\
+\
+
+\b YANCEY
+\b0  Jerry Mark Ledford 
+\f1\fs26\fsmilli13333 \cf5 \cb1 2 records matching first and last name only one matching middle name \
+\
+\pard\pardeftab720\partightenfactor0
+
+\b \cf5 YANCEY
+\b0  John \'93Johnny\'94 Riddle (D), 2018 candidate listing shows full legal name as John Ransom Riddle, matching one of the records for middle name \
+\
+
+\b \cb4 YANCEY
+\b0  Lesa \'93Jill\'94 Austin\cb1  (D), missing from inner join, her full legal name is Lesa Jill McIntosh Austin according to 2018 candidate listing - i misspelled her first name as Lisa in cc db 
+\f0\fs26 \cf5 \cb2 \
+ }
