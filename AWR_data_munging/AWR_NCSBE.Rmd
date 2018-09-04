@@ -1,10 +1,22 @@
 ---
-title: "AreWeRepresented NCSBE Data"
+title: "AreWeRepresented NCSBE Data V2"
 output: 
   html_document: default
 author: "D. Hopp"
-date: "April 14, 2018"
+date: "August 22, 2018"
 --- 
+
+Original version stable June 10, 2018.  
+
+### Note on the Voter Registration Form  
+
+The form is at https://www.ncsbe.gov/Portals/0/Forms/NCVoterRegForm06W.pdf 
+
+Gender: Male, Female  
+Ethnicity: Hispanic/Latino, Not ...  
+Race: African American/Black, American Indian/Alaskan Native, Asian, Multiracial, Native Hawaiian/Pacific Islander, White, Other  
+
+### R packages; Input/Output files etc.  
 
 R requires packages plyr, dplyr, reshape2, lubridate, data.table, readr  
 
@@ -46,6 +58,7 @@ as_of <- "2018-04-07"
 #
 ncvhis_file <- "ncvhis_Statewide_20180407_11082016.txt"
 ncvoter_file <- "ncvoter_Statewide_20180407.txt" 
+ncvoter_stats_file <- "voter_stats_20161108.txt"
 ```  
 Check for existence  
 
@@ -57,6 +70,12 @@ if (!file.exists(tmp_)) {
 }
 #
 tmp_ <- paste0(data_ncvoter_dir,ncvoter_file)
+if (!file.exists(tmp_)) {
+  print(paste(tmp_,"does not exist."))
+  knitr::knit_exit()
+}
+#
+tmp_ <- paste0(data_dir,ncvoter_stats_file)
 if (!file.exists(tmp_)) {
   print(paste(tmp_,"does not exist."))
   knitr::knit_exit()
@@ -103,7 +122,214 @@ readr::write_csv(
 )
 ```  
 
-## B. ncvhis  
+## B. REGISTERED VOTERS, NOT ACTUAL VOTES.  
+
+This file rolls up voter characteristics into county/precinct/race/ethnicity/sex/age counts. There are four age groups:  
+18-25, 26-40, 41-65, and over 66  
+
+Further below are counts of various categories.  
+
+Source: https://dl.ncsbe.gov/index.html?prefix=ENRS/2016_11_08/  
+
+See https://vt.ncsbe.gov/RegStat/Results/?date=11%2F08%2F2016 for one-line county rollup.  
+
+```{r slow}
+df_regis_stats_20161108 <- read.csv(  
+  paste0(data_dir,"voter_stats_20161108.txt"),
+  sep="\t",
+  header=TRUE,
+  stringsAsFactors=FALSE
+)
+```  
+
+```{r loud}
+str(df_regis_stats_20161108)
+```  
+
+stat_type: `r unique(df_regis_stats_20161108$stats_type)`
+
+voter_type is "voter" only  
+update_date has no content  
+replace any missing character-type with NA   
+
+```{r hefty}
+df_regis_stats_20161108 %<>%
+  dplyr::select(
+    -stats_type,
+    -update_date
+  )  %>%
+  mutate_if(
+    is.character, funs(trimws(.)) 
+  ) %>%
+  base::replace(., .=="", NA)
+```  
+
+```{r lisp}
+str(df_regis_stats_20161108)
+```  
+
+Number of records with race_code NA: `r nrow(df_regis_stats_20161108 %>% dplyr::filter(is.na(race_code)))`  
+
+Replace race_code NA with "U"
+
+```{r fda}
+df_regis_stats_20161108 %<>%
+  dplyr::mutate(
+    race_code=ifelse(is.na(race_code),"U",race_code)
+  )
+```  
+
+```{r knee}
+str(df_regis_stats_20161108)
+```  
+
+add FIPS3 and remove county_desc 
+
+```{r isle}
+df_regis_stats_20161108 %<>%
+  dplyr::inner_join(
+    df_FIPS %>% 
+      dplyr::select(
+        County,
+        FIPS3
+      ) %>%
+      dplyr::mutate(
+        County=toupper(County)
+      ),
+    by=c("county_desc"="County")
+  ) %>%
+  dplyr::select(
+    -county_desc
+  )
+```  
+
+```{r kazoo}
+str(df_regis_stats_20161108)
+```  
+
+Note here that precinct_abbrv is missing in some records (WHY?!):  
+The number of rows with missing data: `r sum(!complete.cases(df_regis_stats_20161108))`    
+The number of rows with misssing precinct_abbrv: `r nrow(df_regis_stats_20161108[is.na(df_regis_stats_20161108$precinct_abbrv),])`  
+  
+Party codes: `r unique(df_regis_stats_20161108$party_cd)`  
+Race codes: `r unique(df_regis_stats_20161108$race_code)`  
+Ethnic codes: `r unique(df_regis_stats_20161108$ethnic_code)`  
+Sex codes: `r unique(df_regis_stats_20161108$sex_code)`  
+
+Create codelists:
+
+```{r bah}
+dfcl_regis_party_cd <- df_regis_stats_20161108 %>% dplyr::distinct(party_cd)
+dfcl_regis_race_code <- df_regis_stats_20161108 %>% dplyr::distinct(race_code)
+dfcl_regis_ethnic_code <- df_regis_stats_20161108 %>% dplyr::distinct(ethnic_code)
+dfcl_regis_sex_code <- df_regis_stats_20161108 %>% dplyr::distinct(sex_code)
+```  
+
+```{r doubt}
+str(dfcl_regis_party_cd)
+str(dfcl_regis_race_code)
+str(dfcl_regis_ethnic_code)
+str(dfcl_regis_sex_code)
+#
+persons_df_regis_stats_20161108 <- sum(df_regis_stats_20161108$total_voters)
+```  
+
+Total number of registered persons: `r persons_df_regis_stats_20161108`  
+
+Number of voters in age groups:
+
+```{r brace}
+df_regis_age_dcast <-
+reshape2::dcast(
+  df_regis_stats_20161108,
+  age~.,
+  value.var="total_voters",
+  function(x) sum(x),
+  margins=TRUE
+)
+```  
+
+```{r sorry}
+str(df_regis_age_dcast)
+```  
+
+### County rollup  
+Ignore age.  
+This dataframe facilitates summaries for party, sex, race, etc.  
+
+```{r dixie}
+df_regis_stats_20161108_county_rollup <-
+  df_regis_stats_20161108 %>%
+  dplyr::select(
+    -precinct_abbrv,
+    -election_date,
+    -vtd_abbrv
+  ) %>%
+  dplyr::group_by(
+    FIPS3,
+    party_cd,
+    race_code,
+    ethnic_code,
+    sex_code
+  ) %>%
+  dplyr::summarize(
+    tot_voters=sum(total_voters)
+  ) %>%
+  dplyr::ungroup()
+```  
+
+Check on race categories:  
+
+```{r warren}
+(df_regis_stats_20161108_county_rollup %>% 
+  reshape2::dcast(
+    race_code~.,
+    value.var="tot_voters",
+    sum,
+    margins=TRUE
+  )
+)
+```  
+
+A note on how to roll this up even tighter.  
+This will create a data frame without party_cd or ethnic_code, 
+and with totals adjusted accordingly.   
+
+```{r alive}
+fn_df_regis_stats_20161108_county_rollup_narrow <- function(){
+  df_  <-
+  df_regis_stats_20161108_county_rollup %>%
+  dplyr::select(
+    FIPS3,
+    race_code,
+    sex_code,
+    tot_voters
+  ) %>%
+  dplyr::group_by(
+    FIPS3,
+    race_code,
+    sex_code
+  ) %>% 
+  dplyr::summarise(
+    N=sum(tot_voters)
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(
+    FIPS3,
+    N,
+    sex_code,
+    race_code
+  )
+  #
+  return(df_)
+}
+```  
+
+```{r banal}
+str(fn_df_regis_stats_20161108_county_rollup_narrow())
+```  
+
+## C. ncvhis  
 
 ### Read ncvhis files and move selected data to postgreSQL data base.   
 
@@ -227,7 +453,7 @@ if (exists("df_ncvhis_dups")) {
 str(df_ncvhis_in)
 ```  
 
-## C. ncvoter  
+## D. ncvoter  
 
 ### Read ncvoter file   
 
@@ -245,7 +471,6 @@ election_lbl is a 10 char field that seems to hold a date mm/dd/yyyy
 but without any guarantees that it will always be a date.  
 For our purposes, treat as a character field and convert to date  
 as required.  
-
 
 ### Postgres table def:  
 
@@ -288,14 +513,16 @@ FILE COLS:
 "fire_dist_abbrv"	"fire_dist_desc"	"water_dist_abbrv"	"water_dist_desc"	"sewer_dist_abbrv"	"sewer_dist_desc"	"sanit_dist_abbrv"	"sanit_dist_desc"	"rescue_dist_abbrv"	"rescue_dist_desc"	
 "munic_dist_abbrv"	"munic_dist_desc"	"dist_1_abbrv"	"dist_1_desc"	"dist_2_abbrv"	"dist_2_desc"	"confidential_ind"	"birth_year"	"ncid"	"vtd_abbrv"	"vtd_desc"  
 
-This is how to unzip from a script if desired:  
+This is how to unzip from a script if desired (using the utility 7-Zip):  
 system(paste0('"c:/program files/7-zip/7z.exe" x ', data_dir ,files, ' -o', data_dir,' -y -r'))  
+
+8/22/18 add ncid  
 
 ```{r gray}
 #
 # HEADER IS IN FILE SINCE THERE WAS NO GREPPING
 #
-# keep these columns:
+# keep these columns (drops precinct among others):
 #
 file_cols_keep <- c(
   "county_id",
@@ -304,11 +531,13 @@ file_cols_keep <- c(
   "voter_status_desc",
   "reason_cd",
   "voter_status_reason_desc",
+  "party_cd",
   "race_code",
   "ethnic_code",
   "gender_code",
   "registr_dt",
-  "birth_year"
+  "birth_year",
+  "ncid"
 )
 #
 # fast read using data.table
@@ -323,8 +552,24 @@ as.data.frame()
 
 Clarify codes and keep on hand  
 ```{r bitter}
-df_ncvoter_codes_dcast <- df_ncvoter_in %>% reshape2::dcast(race_code+gender_code+ethnic_code~.)
-df_ncvoter_reason_dcast <- df_ncvoter_in %>% reshape2::dcast(status_cd+voter_status_desc+reason_cd+voter_status_reason_desc~.)
+df_ncvoter_codes_dcast <- 
+  df_ncvoter_in %>% 
+  reshape2::dcast(
+    race_code+gender_code+ethnic_code~.
+  ) %>%
+  plyr::rename(
+    c("."="N")
+  )
+#
+df_ncvoter_reason_dcast <- 
+  df_ncvoter_in %>% 
+  reshape2::dcast(
+    status_cd+voter_status_desc+reason_cd+voter_status_reason_desc~.
+  ) %>%
+  plyr::rename(
+    c("."="N")
+  )
+#
 ```  
 Heal ncvoter data frame  
 
@@ -338,10 +583,13 @@ dplyr::select(
   -voter_status_desc,
   -voter_status_reason_desc
 ) %>%
-  mutate_if(
-    is.character, funs(trimws(.)) 
-  ) %>%
-  base::replace(., .=="", NA)
+dplyr::mutate_if(
+  is.character, funs(ifelse(trimws(.)=="",NA,.)) 
+)  %>%
+dplyr::mutate(
+  gender_code=ifelse(is.na(gender_code),"U",gender_code),
+  race_code=ifelse(is.na(race_code),"U",race_code)
+)
 ``` 
 
 Coerce to dates  
@@ -356,9 +604,27 @@ dplyr::mutate(
 
 ```{r sybil}
 str(df_ncvoter_in)
+```
+
+Counts by status_cd:   
+
+```{r ruby}
+(df_ncvoter_in_status_cd_dcast <-
+df_ncvoter_in %>% 
+  reshape2::dcast(
+    status_cd~.,
+    value.var="as_of_date",
+    margins=TRUE
+  ) %>%
+  plyr::rename(
+    c("."="N")
+  )
+)
+#
+persons_df_ncvoter_in_all <- nrow(df_ncvoter_in)
 ```  
 
-## D. df_nc_voted
+## E. df_nc_voted
 
 ### Data frame of those who voted  
 
@@ -366,10 +632,15 @@ str(df_ncvoter_in)
 df_nc_voted <- 
   dplyr::inner_join(
     df_ncvoter_in %>% 
-    dplyr::select(-registr_dt),
-  df_ncvhis_in %>% 
-    dplyr::select(county_id,voter_reg_num),
-  by=c("county_id","voter_reg_num")
+      dplyr::select(
+        -registr_dt
+    ),
+    df_ncvhis_in %>% 
+      dplyr::select(
+        county_id,
+        voter_reg_num
+    ),
+    by=c("county_id","voter_reg_num")
   )
 ```  
 
@@ -377,7 +648,24 @@ df_nc_voted <-
 str(df_nc_voted)
 ```  
 
-## E. Finish  
+This shows that `r nrow(df_nc_voted)` persons voted.  
+The status_cd count shows that about 10% of the Inactive voters (as per df_nc_voter_in
+
+```{r yoke}
+(df_ncvoted_status_dcast <- 
+  df_nc_voted %>% 
+  reshape2::dcast(
+    status_cd~.,
+    value.var="as_of_date",
+    margins=TRUE
+  ) %>%
+  plyr::rename(
+    c("."="N")
+  )
+)
+```  
+
+## F. Finish  
 
 Save large data frames to pare down size of image  
 
@@ -385,6 +673,7 @@ Save large data frames to pare down size of image
 save(df_ncvoter_in,file="df_ncvoter_in.RData")
 save(df_ncvhis_in,file="df_ncvhis_in.RData")
 save(df_nc_voted,file="df_nc_voted.RData")
+save(df_regis_stats_20161108,file="df_regis_stats_20161108.RData")
 ```  
 
 ```{r tiger}
@@ -412,12 +701,13 @@ readr::write_csv(
 rm(
   df_ncvoter_in,
   df_ncvhis_in,
-  df_nc_voted
+  df_nc_voted,
+  df_regis_stats_20161108
 )
 ```  
 
 ```{r arrow}
-save.image("AWR_NCSBE.RData")
+save.image("AWR_NCSBE.v2.RData")
 ```  
 
 ```{r lucia}

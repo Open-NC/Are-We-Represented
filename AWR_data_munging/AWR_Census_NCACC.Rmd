@@ -1,9 +1,9 @@
 ---
-title: "AreWeRepresented Census and NCACC Data Munging"
+title: "AreWeRepresented Census and NCACC Data Munging V2"
 output: 
   html_document: default
 author: "D. Hopp"
-date: "April 23, 2018"
+date: "May 11, 2018"
 ---
 
 R requires packages plyr, dplyr, reshape2, readr  
@@ -625,202 +625,7 @@ df_results_pct_20161108_subset <-
 str(df_results_pct_20161108_subset)
 ```  
 
-## D. Registered voters, not actual votes.  
-
-See https://vt.ncsbe.gov/RegStat/Results/?date=11%2F08%2F2016 for rollup.  
-
-```{r slow}
-df_regis_stats_20161108 <- read.csv(  
-  paste0(data_dir,"voter_stats_20161108.txt"),
-  sep="\t",
-  header=TRUE,
-  stringsAsFactors=FALSE
-)
-```  
-
-```{r loud}
-str(df_regis_stats_20161108)
-```  
-
-stat_type: `r unique(df_regis_stats_20161108$stats_type)`
-
-voter_type is "voter" only  
-update_date has no content  
-replace any missing character-type with NA   
-
-```{r hefty}
-df_regis_stats_20161108 %<>%
-  dplyr::select(
-    -stats_type,
-    -update_date
-  )  %>%
-  mutate_if(
-    is.character, funs(trimws(.)) 
-  ) %>%
-  base::replace(., .=="", NA)
-```  
-
-```{r lisp}
-str(df_regis_stats_20161108)
-```  
-
-Number of records with race_code NA: `r nrow(df_regis_stats_20161108 %>% dplyr::filter(is.na(race_code)))`  
-
-Replace race_code NA with "U"
-
-```{r fda}
-df_regis_stats_20161108 %<>%
-  dplyr::mutate(
-    race_code=ifelse(is.na(race_code),"U",race_code)
-  )
-```  
-
-```{r knee}
-str(df_regis_stats_20161108)
-```  
-
-add FIPS3 and remove county_desc 
-
-```{r isle}
-df_regis_stats_20161108 %<>%
-  dplyr::inner_join(
-    df_FIPS %>% 
-      dplyr::select(
-        County,
-        FIPS3
-      ) %>%
-      dplyr::mutate(
-        County=toupper(County)
-      ),
-    by=c("county_desc"="County")
-  ) %>%
-  dplyr::select(
-    -county_desc
-  )
-```  
-
-```{r kazoo}
-str(df_regis_stats_20161108)
-```  
-
-Note here that precinct_abbrv is missing in some records (WHY?!):  
-The number of rows with missing data: `r sum(!complete.cases(df_regis_stats_20161108))`    
-The number of rows with misssing precinct_abbrv: `r nrow(df_regis_stats_20161108[is.na(df_regis_stats_20161108$precinct_abbrv),])`  
-  
-Party codes: `r unique(df_regis_stats_20161108$party_cd)`  
-Race codes: `r unique(df_regis_stats_20161108$race_code)`  
-Ethnic codes: `r unique(df_regis_stats_20161108$ethnic_code)`  
-Sex codes: `r unique(df_regis_stats_20161108$sex_code)`  
-
-Create codelists:
-
-```{r bah}
-dfcl_regis_party_cd <- df_regis_stats_20161108 %>% dplyr::distinct(party_cd)
-dfcl_regis_race_code <- df_regis_stats_20161108 %>% dplyr::distinct(race_code)
-dfcl_regis_ethnic_code <- df_regis_stats_20161108 %>% dplyr::distinct(ethnic_code)
-dfcl_regis_sex_code <- df_regis_stats_20161108 %>% dplyr::distinct(sex_code)
-```  
-
-```{r doubt}
-str(dfcl_regis_party_cd)
-str(dfcl_regis_race_code)
-str(dfcl_regis_ethnic_code)
-str(dfcl_regis_sex_code)
-```  
-
-Number of voters in age groups:
-
-```{r brace}
-df_regis_age_dcast <-
-reshape2::dcast(
-  df_regis_stats_20161108,
-  age~.,
-  value.var="total_voters",
-  function(x) sum(x),
-  margins=TRUE
-)
-```  
-
-```{r sorry}
-str(df_regis_age_dcast)
-```  
-
-### County rollup  
-Ignore age.  
-This dataframe facilitates summaries for party, sex, race, etc.  
-
-```{r dixie}
-df_regis_stats_20161108_county_rollup <-
-  df_regis_stats_20161108 %>%
-  dplyr::select(
-    -precinct_abbrv,
-    -election_date,
-    -vtd_abbrv
-  ) %>%
-  dplyr::group_by(
-    FIPS3,
-    party_cd,
-    race_code,
-    ethnic_code,
-    sex_code
-  ) %>%
-  dplyr::summarize(
-    tot_voters=sum(total_voters)
-  ) %>%
-  dplyr::ungroup()
-```  
-
-Check on race categories:  
-
-```{r warren}
-df_regis_stats_20161108_county_rollup %>% 
-reshape2::dcast(
-  race_code~.,
-  value.var="tot_voters",
-  sum,
-  margins=TRUE
-)
-```  
-
-A note on how to roll this up even tighter.  
-This will create a data frame without party_cd or ethnic_code, 
-and with totals adjusted accordingly.   
-
-```{r alive}
-fn_df_regis_stats_20161108_county_rollup_narrow <- function(){
-  df_  <-
-  df_regis_stats_20161108_county_rollup %>%
-  dplyr::select(
-    FIPS3,
-    race_code,
-    sex_code,
-    tot_voters
-  ) %>%
-  dplyr::group_by(
-    FIPS3,
-    race_code,
-    sex_code
-  ) %>% 
-  dplyr::summarise(
-    N=sum(tot_voters)
-  ) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(
-    FIPS3,
-    N,
-    sex_code,
-    race_code
-  )
-  #
-  return(df_)
-}
-```  
-
-```{r banal}
-str(fn_df_regis_stats_20161108_county_rollup_narrow())
-```  
-
-## E. NCACC Elections spreadsheet  
+## D. NCACC Elections spreadsheet  
 Source is https://www.ncacc.org/409/County-Elections  
 File is "2016 Election Demographics for Website_1_extract.csv"  
 Skip row 1, which holds text for columns.  
@@ -885,7 +690,7 @@ ls()
 ```  
 
 ```{r dose}
-save.image("AWR_Census_NCACC.RData")
+save.image("AWR_Census_NCACC.v2.RData")
 ```  
 
 ### END

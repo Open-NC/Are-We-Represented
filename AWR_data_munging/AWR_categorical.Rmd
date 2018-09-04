@@ -1,9 +1,9 @@
 ---
-title: "AreWeRepresented Census and NCACC Categorical Data"
+title: "AreWeRepresented Census and NCACC Categorical Data V2"
 output:  
   html_document: default
 author: "D. Hopp"
-date: "April 25, 2018"
+date: "May 14, 2018"
 ---
 
 INPUT:  
@@ -19,28 +19,26 @@ df_cc_est2016_compare_Hisp.csv.gz
 df_merge_county_sex_race_OMU_20161108.csv.gz - this is a view, see v_df_merge_county_sex_race_OMU_20161108()  
 AWR_Census_NCACC_cat.RData an amalgamation of AWR_Census_NCACC.RData and objects created in this script  
 
-## Who is Using Which Codes for What  
+## A. Who is Using Which Codes for What  
 
 ```{r garb}
-load("AWR_Census_NCACC.RData")
+load("AWR_NCSBE.v2.RData")
 load("df_nc_voted.RData")
+load("df_ncvoter_in.RData")
+load("df_regis_stats_20161108.RData")
 ```  
 
-## NCSBE  
+## B. NCSBE  
 ### Registration Data Race and Ethnicity   
 
 results_pct_20161108.txt via  
 https://dl.ncsbe.gov/index.html?prefix=ENRS/2016_11_08/    
 
-Defined as:  
-dfcl_regis_party_cd <- df_regis_stats_20161108 %>% dplyr::distinct(party_cd)
-dfcl_regis_race_code <- df_regis_stats_20161108 %>% dplyr::distinct(race_code)  
-dfcl_regis_ethnic_code <- df_regis_stats_20161108 %>% dplyr::distinct(ethnic_code)  
-dfcl_regis_sex_code <- df_regis_stats_20161108 %>% dplyr::distinct(sex_code)  
+Codelists:  
 
-```{r rsvp}
+```{r rsvp}  
 dfcl_regis_party_cd
-dfcl_regis_race_code
+dfcl_regis_race_code 
 dfcl_regis_ethnic_code
 dfcl_regis_sex_code
 ```  
@@ -125,7 +123,7 @@ fn_df_regis_stats_20161108_county_sex_race <- function(){
 str(fn_df_regis_stats_20161108_county_sex_race())
 ```  
 
-## Census Bureau  
+## C. Census Bureau  
 ### Race and Ethnicity  
 
 cc-est2016-alldata-37.csv via  
@@ -177,7 +175,7 @@ This is by county (by FIPS3): df_cc_est2016_county_race_dcast
 str(df_cc_est2016_county_race_dcast)
 ```  
 
-## Reasonable Mappings  
+### Reasonable Mappings  
 
 Gender:  
 NCSBE sex_code: M, F, U
@@ -258,7 +256,7 @@ str(fn_df_cc_est2016_county_sex_race_long_recoded())
 df_cc_est2016_county_sex_race_long_recoded <- fn_df_cc_est2016_county_sex_race_long_recoded()
 ```  
 
-## NCACC    
+## D. NCACC    
 
 Notice that categories do NOT provide sex vs. race, just totals.  
 In that sense, NCACC data is not compatible with census or NCSBE.  
@@ -333,7 +331,7 @@ dplyr::arrange(
 str(df_nc_voted_subset_long)
 ```  
 
-## Bring Together  
+## E. Bring Together  
 
 Create one data frame to hold all of above (long shape)  
 * Columns:  
@@ -507,7 +505,7 @@ readr::write_csv(
   paste0(output_dir,"df_merge_county_sex_race_OMU_20161108.csv.gz")
 )
 ```  
-## How do the Census Bureau race classification sets compare?  
+## F. How do the Census Bureau race classification sets compare?  
 
 ### Discussion  
 
@@ -545,7 +543,7 @@ The problem with these talleys seems to be that the "HWA_..." (including HTOM_) 
 while the "HWAC_..." series sum is larger. Whatever the source of this, for our purposes the Hispanic counts  
 will be represented by the "HWA_..." series.  
 
-### Create R Objects  
+## G. Create R Objects  
 
 Utility data frame
 
@@ -872,7 +870,7 @@ df_cc_est2016_compare_N_source %>%
   )
 ```  
 
-## Considering the Hispanic Census Bureau Categories  
+## H. Considering the Hispanic Census Bureau Categories  
 
 ```{r crab}
 fn_df_cc_est2016_compare_Hisp <- function(){
@@ -1055,7 +1053,7 @@ readr::write_csv(
 )
 ```  
 
-## Problem in Counts  
+### Problem in Counts  
 
 The data frames generated above share in a problem illustrated by these two tables:  
 
@@ -1158,23 +1156,253 @@ v_df_merge_county_sex_race_OMU_20161108() %>% reshape2::dcast(pop~race,value.var
 
 Reporting of ethnic_code in df_nc_voted:
 
-```{r }
+```{r onion}
 df_nc_voted %>% reshape2::dcast(ethnic_code~.)
 ```  
 
 The non-responses outnumber the HL responses by a factor of nine. It does not appear reasonable to carry out any analysis of ethnicity of voters.  
 
-## Finish  
+## I. COMMENTS ON nc_voter.csv AND voter_stats_20161108.txt  
 
-Do not resave df_nc_voted  
+It is not evident how to compare these two files with confidence. The summary-by-category file, voter_stats_20161108.txt, has `r persons_df_regis_stats_20161108` persons. On the other hand, nc_voter.csv has `r persons_df_ncvoter_in` persons. The difference is `r persons_df_ncvoter_in-persons_df_regis_stats_20161108`. This is close to being accounted for by the sum of categories A (Active) and I (Inactive) in df_ncvoter_in, namely `r df_ncvoter_in_status_cd_dast[1,2] + df_ncvoter_in_status_cd_dast[3,2]`.  
+
+
+We will be referring to this [NCSBE table](https://vt.ncsbe.gov/RegStat/Results/?date=11%2F08%2F2016)   
+
+This R function uses df_regis_stats_20161108 to attempt to replicate the NCSBE 11/08/2016 table.  
+The R code is rather inelegant - any suggestions for improvement would be appreciated.  
+
+```{r illume}
+fn_summary_df_regis_stats_20161108 <- function(){
+  #
+  df1_ <-
+  df_regis_stats_20161108 %>%
+    dplyr::select(
+      FIPS3,
+      party_cd,
+      total_voters
+    ) %>%
+    reshape2::dcast(
+      FIPS3~party_cd,
+      value.var="total_voters",
+      sum
+    )
+  #
+  df2_ <-
+  df_regis_stats_20161108 %>%
+    dplyr::select(
+      FIPS3,
+      race_code,
+      total_voters
+    ) %>%
+    reshape2::dcast(
+      FIPS3~race_code,
+      value.var="total_voters",
+      sum
+    )
+  #  
+  df3_ <-
+  df_regis_stats_20161108 %>%
+    dplyr::select(
+      FIPS3,
+      ethnic_code,
+      total_voters
+    ) %>%
+    reshape2::dcast(
+      FIPS3~ethnic_code,
+      value.var="total_voters",
+      sum
+    )
+  #  
+  df4_ <-
+  df_regis_stats_20161108 %>%
+    dplyr::select(
+      FIPS3,
+      sex_code,
+      total_voters
+    ) %>%
+    reshape2::dcast(
+      FIPS3~sex_code,
+      value.var="total_voters",
+      sum
+    )
+  #  
+  df_ <-
+  dplyr::inner_join(
+    dplyr::inner_join(
+      df1_,
+      df2_,
+      by="FIPS3"
+    ),
+    dplyr::inner_join(
+      df3_,
+      df4_,
+      by="FIPS3"
+    ),
+    by="FIPS3"
+  ) %>%
+  dplyr::rename(
+    Asian=A,
+    Black=B,
+    AmInd=I,
+    Multi=M.x,
+    Other=O,
+    R_UN=U.x,
+    White=W,
+    E_UN=UN,
+    Female=F,
+    Male=M.y,
+    S_UN=U.y
+  ) %>%
+  dplyr::mutate(
+    Total=Female+Male+S_UN
+  )
+  #
+  return(df_)
+}
+```  
+
+The results are close to what the NCSBE table shows:  
+
+```{r veal}
+fn_summary_df_regis_stats_20161108()
+```  
+
+This is the same function as above but tailored to use df_ncvoter_in.  
+
+```{r percy}
+fn_summary_df_ncvoter <- function(I=FALSE,D=FALSE,R=FALSE,S=FALSE){
+  # for_df_ is df_ncvoter_in subset on status_cd
+  # A Active, I Inactive, D Denied, R Removed, S Temporary
+  #
+  cond_ <- "A"
+  if (I) {
+    cond_[length(cond_)+1] <- "I"
+  }
+  if (D) {
+    cond_[length(cond_)+1] <- "D"
+  }
+  if (R) {
+    cond_[length(cond_)+1] <- "R"
+  }
+  if (S) {
+    cond_[length(cond_)+1] <- "S"
+  }
+  for_df_ <- 
+  df_ncvoter_in %>%
+    dplyr::filter(
+      status_cd %in% cond_
+    )
+  # 
+  df1_ <-
+  for_df_ %>%
+  reshape2::dcast(
+    county_id~party_cd
+  )
+  #
+  df2_ <-
+  for_df_ %>%
+  reshape2::dcast(
+    county_id~race_code
+  )
+  #
+  df3_ <-
+  for_df_ %>%
+  reshape2::dcast(
+    county_id~ethnic_code
+  )
+  #
+  df4_ <-
+  for_df_ %>%
+  reshape2::dcast(
+    county_id~gender_code
+  ) %>%
+  dplyr::rename(
+    Female=F,
+    Male=M,
+    S_UN=U
+  )
+  # 
+  df_ <-
+  dplyr::inner_join(
+    dplyr::inner_join(
+      df1_,
+      df2_,
+      by="county_id"
+    ),
+    dplyr::inner_join(
+      df3_,
+      df4_,
+      by="county_id"
+    ),
+    by="county_id"
+  ) %>%
+  dplyr::inner_join(
+    df_FIPS %>% 
+      dplyr::select(
+        county_id,
+        County
+      ),
+    by="county_id"
+  ) %>%
+  dplyr::mutate(
+    R_other=A+M+O+U,
+    Total=Female+Male+S_UN
+  )  %>%
+  dplyr::select(
+    County,
+    DEM,
+    REP,
+    GRE,
+    LIB,
+    UNA,
+    W,
+    B,
+    I,
+    R_other,
+    HL,
+    Male,
+    Female,
+    Total
+  )
+  #
+  return(df_)
+}
+```  
+
+Including status_cd Active and Inactive gives results close to what the NCSBE table shows:  
+
+```{r rabbit}
+fn_summary_df_ncvoter(I=TRUE)
+```  
+
+## J. An Important Observation  
+
+As mentioned earlier and throughout this analysis, there is what amounts to a mismatch of the number of Active voters (in df_ncvoter_in) with the number of votes cast (df_ncvhis_in) in the 2016 general election. This is by first considering the status of those voters:
+
+```{r soapy}
+df_ncvoted_status_dcast
+```  
+
+The above should be compared with the status of all the registered persons:
+
+```{r nonce}
+df_ncvoter_in_status_cd_dast
+```
+
+Evidently, about 10% of the Inactive persons actually voted.  
+
+## K. Finish  
+
+Do not resave df_nc_voted or df_regis_stats_20161108
 
 ```{r moose}
-rm(df_nc_voted)
+rm(df_nc_voted,df_regis_stats_20161108)
 ls()
 ```
 
 ```{r flop}
-save.image("AWR_Census_NCACC_cat.RData")
+save.image("AWR_Census_NCACC_cat.v2.RData")
 ```  
 
 ### END  

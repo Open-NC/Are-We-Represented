@@ -1,0 +1,92 @@
+---
+title: "AreWeRepresented Local Postgres"
+output: 
+  html_document: default
+author: "D. Hopp"
+date: "April 2018"
+---
+
+## Load ncvoter and ncvhis tables  
+
+You must be sure that the postgres tables ncvoter and ncvhis are empty or  
+that you actually mean to append to them.  
+
+### A. Connect to postgres:  
+
+```{r}
+require(RPostgreSQL)
+
+drv <- DBI::dbDriver("PostgreSQL")
+pw <- "tintinTIN9"
+
+con <- DBI::dbConnect(
+  drv, 
+  dbname = "postgres",
+  host = "localhost", 
+  port = 5432,
+  user = "postgres", 
+  password = pw
+)
+
+DBI::dbExistsTable(con, "ncvhis")
+DBI::dbExistsTable(con, "ncvoter")
+DBI::dbExistsTable(con, "county_fips")
+```  
+
+## Handle RData files saved in AWR_in_mem.Rmd:  
+
+### B. ncvoter data:  
+
+```{r ncvoter}
+if (!exists("df_ncvoter_in")){
+  load("df_ncvoter_in.RData")
+}
+```  
+
+```{r pg_ncvoter}
+    DBI::dbWriteTable(
+      con, 
+      "ncvoter", 
+      value = df_ncvoter_in, 
+      append = TRUE, 
+      row.names = FALSE
+    )
+```  
+
+See what we have  
+
+```{r}
+DBI::dbGetQuery(con,"select count(*) from ncvoter")
+#
+DBI::dbGetQuery(con,"select status_cd,count(*) from ncvoter group by status_cd")
+```  
+
+### C. ncvhis data:  
+
+```{r ncvhis}
+if (!exists("df_ncvhis_in")) {
+  load("df_ncvhis_in.RData")
+}
+```  
+
+```{r pg_ncvhis}    
+    DBI::dbWriteTable(
+      con, 
+      "ncvhis", 
+      value = df_ncvhis_in, 
+      append = TRUE, 
+      row.names = FALSE
+    )
+```  
+
+```{r}
+DBI::dbGetQuery(con,"select count(*) from ncvhis")   
+```  
+ 
+### D. Disconnect  
+
+```{r}
+DBI::dbDisconnect(con)
+DBI::dbUnloadDriver(drv)
+```  
+### END  
