@@ -1402,7 +1402,7 @@ ls()
 ```
 
 ```{r flop}
-save.image("AWR_Census_NCACC_cat.v2.RData")
+save.image("AWR_Census_NCACC_cat.RData")
 ```  
 
 ### END  

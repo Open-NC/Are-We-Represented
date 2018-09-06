@@ -690,7 +690,7 @@ ls()
 ```  
 
 ```{r dose}
-save.image("AWR_Census_NCACC.v2.RData")
+save.image("AWR_Census_NCACC.RData")
 ```  
 
 ### END

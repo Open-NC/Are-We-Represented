@@ -707,7 +707,7 @@ rm(
 ```  
 
 ```{r arrow}
-save.image("AWR_NCSBE.v2.RData")
+save.image("AWR_NCSBE.RData")
 ```  
 
 ```{r lucia}
