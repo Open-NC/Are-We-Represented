@@ -1,0 +1,8 @@
+30 October 2018
+David Hopp
+
+This folder holds data for the AWR project. The root has a collection of files of various kinds. 
+data_source/ has zip files that may be of interest. 
+RData/ has .RData files. 
+ncvoter/ is the place to put the NCSBE voter files, if you want to. 
+Similarly, ncvhis/ would hold the NCSBE voter history files.
