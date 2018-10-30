@@ -1,0 +1,901 @@
+Year.id,Year.display-label,Sex.id,Sex.display-label,Hisp.id,Hisp.display-label,GEO.id,GEO.id2,GEO.display-label,totpop,wa,ba,ia,aa,na,tom
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37001,37001,"Alamance County, North Carolina",9854,7997,533,832,93,39,360
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37001,37001,"Alamance County, North Carolina",73945,54194,16736,341,1281,30,1363
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37001,37001,"Alamance County, North Carolina",83799,62191,17269,1173,1374,69,1723
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37001,37001,"Alamance County, North Carolina",10215,8303,572,847,82,34,377
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37001,37001,"Alamance County, North Carolina",65674,48953,14057,258,1088,37,1281
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37001,37001,"Alamance County, North Carolina",75889,57256,14629,1105,1170,71,1658
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37001,37001,"Alamance County, North Carolina",20069,16300,1105,1679,175,73,737
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37001,37001,"Alamance County, North Carolina",139619,103147,30793,599,2369,67,2644
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37001,37001,"Alamance County, North Carolina",159688,119447,31898,2278,2544,140,3381
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37003,37003,"Alexander County, North Carolina",822,723,26,41,7,1,24
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37003,37003,"Alexander County, North Carolina",17592,16290,762,49,207,9,275
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37003,37003,"Alexander County, North Carolina",18414,17013,788,90,214,10,299
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37003,37003,"Alexander County, North Carolina",918,800,43,50,7,2,16
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37003,37003,"Alexander County, North Carolina",18096,16251,1333,57,203,4,248
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37003,37003,"Alexander County, North Carolina",19014,17051,1376,107,210,6,264
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37003,37003,"Alexander County, North Carolina",1740,1523,69,91,14,3,40
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37003,37003,"Alexander County, North Carolina",35688,32541,2095,106,410,13,523
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37003,37003,"Alexander County, North Carolina",37428,34064,2164,197,424,16,563
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37005,37005,"Alleghany County, North Carolina",418,363,17,10,13,1,14
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37005,37005,"Alleghany County, North Carolina",5034,4862,80,11,23,1,57
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37005,37005,"Alleghany County, North Carolina",5452,5225,97,21,36,2,71
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37005,37005,"Alleghany County, North Carolina",622,551,19,26,6,0,20
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37005,37005,"Alleghany County, North Carolina",4774,4577,84,15,36,2,60
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37005,37005,"Alleghany County, North Carolina",5396,5128,103,41,42,2,80
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37005,37005,"Alleghany County, North Carolina",1040,914,36,36,19,1,34
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37005,37005,"Alleghany County, North Carolina",9808,9439,164,26,59,3,117
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37005,37005,"Alleghany County, North Carolina",10848,10353,200,62,78,4,151
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37007,37007,"Anson County, North Carolina",338,236,37,28,8,3,26
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37007,37007,"Anson County, North Carolina",11721,5543,5842,56,127,3,150
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37007,37007,"Anson County, North Carolina",12059,5779,5879,84,135,6,176
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37007,37007,"Anson County, North Carolina",696,569,41,34,14,10,28
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37007,37007,"Anson County, North Carolina",12693,5824,6484,103,128,1,153
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37007,37007,"Anson County, North Carolina",13389,6393,6525,137,142,11,181
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37007,37007,"Anson County, North Carolina",1034,805,78,62,22,13,54
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37007,37007,"Anson County, North Carolina",24414,11367,12326,159,255,4,303
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37007,37007,"Anson County, North Carolina",25448,12172,12404,221,277,17,357
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37009,37009,"Ashe County, North Carolina",502,454,23,12,1,1,11
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37009,37009,"Ashe County, North Carolina",13131,12828,76,26,70,1,130
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37009,37009,"Ashe County, North Carolina",13633,13282,99,38,71,2,141
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37009,37009,"Ashe County, North Carolina",920,836,37,17,5,6,19
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37009,37009,"Ashe County, North Carolina",12371,12021,106,32,75,4,133
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37009,37009,"Ashe County, North Carolina",13291,12857,143,49,80,10,152
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37009,37009,"Ashe County, North Carolina",1422,1290,60,29,6,7,30
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37009,37009,"Ashe County, North Carolina",25502,24849,182,58,145,5,263
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37009,37009,"Ashe County, North Carolina",26924,26139,242,87,151,12,293
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37011,37011,"Avery County, North Carolina",318,289,7,6,7,1,8
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37011,37011,"Avery County, North Carolina",7682,7426,85,30,54,4,83
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37011,37011,"Avery County, North Carolina",8000,7715,92,36,61,5,91
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37011,37011,"Avery County, North Carolina",601,537,17,28,7,2,10
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37011,37011,"Avery County, North Carolina",8915,8134,639,38,36,3,65
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37011,37011,"Avery County, North Carolina",9516,8671,656,66,43,5,75
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37011,37011,"Avery County, North Carolina",919,826,24,34,14,3,18
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37011,37011,"Avery County, North Carolina",16597,15560,724,68,90,7,148
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37011,37011,"Avery County, North Carolina",17516,16386,748,102,104,10,166
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37013,37013,"Beaufort County, North Carolina",1783,1356,173,151,28,12,63
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37013,37013,"Beaufort County, North Carolina",23013,16210,6361,73,104,3,262
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37013,37013,"Beaufort County, North Carolina",24796,17566,6534,224,132,15,325
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37013,37013,"Beaufort County, North Carolina",1945,1482,157,193,30,12,71
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37013,37013,"Beaufort County, North Carolina",20785,15096,5249,73,81,4,282
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37013,37013,"Beaufort County, North Carolina",22730,16578,5406,266,111,16,353
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37013,37013,"Beaufort County, North Carolina",3728,2838,330,344,58,24,134
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37013,37013,"Beaufort County, North Carolina",43798,31306,11610,146,185,7,544
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37013,37013,"Beaufort County, North Carolina",47526,34144,11940,490,243,31,678
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37015,37015,"Bertie County, North Carolina",149,79,32,14,7,5,12
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37015,37015,"Bertie County, North Carolina",9550,3429,5925,33,60,2,101
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37015,37015,"Bertie County, North Carolina",9699,3508,5957,47,67,7,113
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37015,37015,"Bertie County, North Carolina",265,175,48,7,7,13,15
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37015,37015,"Bertie County, North Carolina",9890,3455,6218,77,49,0,91
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37015,37015,"Bertie County, North Carolina",10155,3630,6266,84,56,13,106
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37015,37015,"Bertie County, North Carolina",414,254,80,21,14,18,27
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37015,37015,"Bertie County, North Carolina",19440,6884,12143,110,109,2,192
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37015,37015,"Bertie County, North Carolina",19854,7138,12223,131,123,20,219
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37017,37017,"Bladen County, North Carolina",1165,863,106,141,8,2,45
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37017,37017,"Bladen County, North Carolina",16480,9557,6203,420,55,4,241
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37017,37017,"Bladen County, North Carolina",17645,10420,6309,561,63,6,286
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37017,37017,"Bladen County, North Carolina",1440,1171,108,122,8,2,29
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37017,37017,"Bladen County, North Carolina",14656,8926,5128,343,41,3,215
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37017,37017,"Bladen County, North Carolina",16096,10097,5236,465,49,5,244
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37017,37017,"Bladen County, North Carolina",2605,2034,214,263,16,4,74
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37017,37017,"Bladen County, North Carolina",31136,18483,11331,763,96,7,456
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37017,37017,"Bladen County, North Carolina",33741,20517,11545,1026,112,11,530
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37019,37019,"Brunswick County, North Carolina",2792,2374,193,103,33,24,65
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37019,37019,"Brunswick County, North Carolina",62910,54042,6881,407,493,26,1061
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37019,37019,"Brunswick County, North Carolina",65702,56416,7074,510,526,50,1126
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37019,37019,"Brunswick County, North Carolina",3188,2663,215,148,41,22,99
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37019,37019,"Brunswick County, North Carolina",58063,49993,6263,398,348,86,975
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37019,37019,"Brunswick County, North Carolina",61251,52656,6478,546,389,108,1074
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37019,37019,"Brunswick County, North Carolina",5980,5037,408,251,74,46,164
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37019,37019,"Brunswick County, North Carolina",120973,104035,13144,805,841,112,2036
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37019,37019,"Brunswick County, North Carolina",126953,109072,13552,1056,915,158,2200
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37021,37021,"Buncombe County, North Carolina",8127,7241,310,215,87,35,239
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37021,37021,"Buncombe County, North Carolina",125225,112304,8061,431,1814,161,2454
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37021,37021,"Buncombe County, North Carolina",133352,119545,8371,646,1901,196,2693
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37021,37021,"Buncombe County, North Carolina",8294,7476,301,222,76,29,190
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37021,37021,"Buncombe County, North Carolina",114442,102303,7816,413,1463,164,2283
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37021,37021,"Buncombe County, North Carolina",122736,109779,8117,635,1539,193,2473
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37021,37021,"Buncombe County, North Carolina",16421,14717,611,437,163,64,429
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37021,37021,"Buncombe County, North Carolina",239667,214607,15877,844,3277,325,4737
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37021,37021,"Buncombe County, North Carolina",256088,229324,16488,1281,3440,389,5166
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37023,37023,"Burke County, North Carolina",2386,1727,87,248,42,212,70
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37023,37023,"Burke County, North Carolina",42367,37444,2484,117,1590,79,653
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37023,37023,"Burke County, North Carolina",44753,39171,2571,365,1632,291,723
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37023,37023,"Burke County, North Carolina",3096,2296,95,316,74,236,79
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37023,37023,"Burke County, North Carolina",41002,35490,2905,137,1635,109,726
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37023,37023,"Burke County, North Carolina",44098,37786,3000,453,1709,345,805
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37023,37023,"Burke County, North Carolina",5482,4023,182,564,116,448,149
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37023,37023,"Burke County, North Carolina",83369,72934,5389,254,3225,188,1379
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37023,37023,"Burke County, North Carolina",88851,76957,5571,818,3341,636,1528
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37025,37025,"Cabarrus County, North Carolina",10138,8319,930,404,118,47,320
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37025,37025,"Cabarrus County, North Carolina",93411,69114,18383,310,3604,54,1946
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37025,37025,"Cabarrus County, North Carolina",103549,77433,19313,714,3722,101,2266
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37025,37025,"Cabarrus County, North Carolina",10251,8499,945,339,134,33,301
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37025,37025,"Cabarrus County, North Carolina",87790,66320,15934,298,3444,40,1754
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37025,37025,"Cabarrus County, North Carolina",98041,74819,16879,637,3578,73,2055
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37025,37025,"Cabarrus County, North Carolina",20389,16818,1875,743,252,80,621
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37025,37025,"Cabarrus County, North Carolina",181201,135434,34317,608,7048,94,3700
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37025,37025,"Cabarrus County, North Carolina",201590,152252,36192,1351,7300,174,4321
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37027,37027,"Caldwell County, North Carolina",1934,1593,89,141,23,22,66
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37027,37027,"Caldwell County, North Carolina",39155,36361,1887,89,230,12,576
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37027,37027,"Caldwell County, North Carolina",41089,37954,1976,230,253,34,642
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37027,37027,"Caldwell County, North Carolina",2251,1875,103,143,27,35,68
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37027,37027,"Caldwell County, North Carolina",38109,35269,1947,81,244,5,563
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37027,37027,"Caldwell County, North Carolina",40360,37144,2050,224,271,40,631
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37027,37027,"Caldwell County, North Carolina",4185,3468,192,284,50,57,134
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37027,37027,"Caldwell County, North Carolina",77264,71630,3834,170,474,17,1139
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37027,37027,"Caldwell County, North Carolina",81449,75098,4026,454,524,74,1273
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37029,37029,"Camden County, North Carolina",152,117,16,7,5,1,6
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37029,37029,"Camden County, North Carolina",5041,4161,628,21,117,3,111
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37029,37029,"Camden County, North Carolina",5193,4278,644,28,122,4,117
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37029,37029,"Camden County, North Carolina",166,124,21,6,5,0,10
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37029,37029,"Camden County, North Carolina",5059,4170,610,16,124,6,133
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37029,37029,"Camden County, North Carolina",5225,4294,631,22,129,6,143
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37029,37029,"Camden County, North Carolina",318,241,37,13,10,1,16
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37029,37029,"Camden County, North Carolina",10100,8331,1238,37,241,9,244
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37029,37029,"Camden County, North Carolina",10418,8572,1275,50,251,10,260
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37031,37031,"Carteret County, North Carolina",1346,1128,87,40,18,10,63
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37031,37031,"Carteret County, North Carolina",33715,30463,1835,172,528,43,674
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37031,37031,"Carteret County, North Carolina",35061,31591,1922,212,546,53,737
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37031,37031,"Carteret County, North Carolina",1676,1365,108,71,24,17,91
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37031,37031,"Carteret County, North Carolina",32153,28918,2006,137,372,39,681
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37031,37031,"Carteret County, North Carolina",33829,30283,2114,208,396,56,772
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37031,37031,"Carteret County, North Carolina",3022,2493,195,111,42,27,154
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37031,37031,"Carteret County, North Carolina",65868,59381,3841,309,900,82,1355
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37031,37031,"Carteret County, North Carolina",68890,61874,4036,420,942,109,1509
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37033,37033,"Caswell County, North Carolina",366,287,38,34,0,1,6
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37033,37033,"Caswell County, North Carolina",10906,6994,3613,37,54,2,206
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37033,37033,"Caswell County, North Carolina",11272,7281,3651,71,54,3,212
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37033,37033,"Caswell County, North Carolina",512,414,42,38,4,0,14
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37033,37033,"Caswell County, North Carolina",11126,7041,3794,40,57,3,191
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37033,37033,"Caswell County, North Carolina",11638,7455,3836,78,61,3,205
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37033,37033,"Caswell County, North Carolina",878,701,80,72,4,1,20
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37033,37033,"Caswell County, North Carolina",22032,14035,7407,77,111,5,397
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37033,37033,"Caswell County, North Carolina",22910,14736,7487,149,115,6,417
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37035,37035,"Catawba County, North Carolina",7081,6281,295,230,94,42,139
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37035,37035,"Catawba County, North Carolina",72790,61172,6819,189,3292,26,1292
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37035,37035,"Catawba County, North Carolina",79871,67453,7114,419,3386,68,1431
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37035,37035,"Catawba County, North Carolina",7718,6867,301,272,91,45,142
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37035,37035,"Catawba County, North Carolina",68870,57804,6476,191,3153,32,1214
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37035,37035,"Catawba County, North Carolina",76588,64671,6777,463,3244,77,1356
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37035,37035,"Catawba County, North Carolina",14799,13148,596,502,185,87,281
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37035,37035,"Catawba County, North Carolina",141660,118976,13295,380,6445,58,2506
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37035,37035,"Catawba County, North Carolina",156459,132124,13891,882,6630,145,2787
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37037,37037,"Chatham County, North Carolina",4139,3452,231,321,44,23,68
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37037,37037,"Chatham County, North Carolina",33600,27422,4727,119,760,12,560
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37037,37037,"Chatham County, North Carolina",37739,30874,4958,440,804,35,628
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37037,37037,"Chatham County, North Carolina",4487,3760,226,345,41,30,85
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37037,37037,"Chatham County, North Carolina",30017,24799,4048,108,563,12,487
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37037,37037,"Chatham County, North Carolina",34504,28559,4274,453,604,42,572
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37037,37037,"Chatham County, North Carolina",8626,7212,457,666,85,53,153
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37037,37037,"Chatham County, North Carolina",63617,52221,8775,227,1323,24,1047
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37037,37037,"Chatham County, North Carolina",72243,59433,9232,893,1408,77,1200
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37039,37039,"Cherokee County, North Carolina",449,342,29,32,11,2,33
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37039,37039,"Cherokee County, North Carolina",13895,13106,219,182,89,5,294
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37039,37039,"Cherokee County, North Carolina",14344,13448,248,214,100,7,327
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37039,37039,"Cherokee County, North Carolina",434,336,23,28,9,5,33
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37039,37039,"Cherokee County, North Carolina",13127,12343,183,183,93,9,316
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37039,37039,"Cherokee County, North Carolina",13561,12679,206,211,102,14,349
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37039,37039,"Cherokee County, North Carolina",883,678,52,60,20,7,66
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37039,37039,"Cherokee County, North Carolina",27022,25449,402,365,182,14,610
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37039,37039,"Cherokee County, North Carolina",27905,26127,454,425,202,21,676
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37041,37041,"Chowan County, North Carolina",242,195,22,3,2,10,10
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37041,37041,"Chowan County, North Carolina",7319,4460,2651,19,101,1,87
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37041,37041,"Chowan County, North Carolina",7561,4655,2673,22,103,11,97
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37041,37041,"Chowan County, North Carolina",298,221,30,15,0,18,14
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37041,37041,"Chowan County, North Carolina",6524,4123,2170,30,115,2,84
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37041,37041,"Chowan County, North Carolina",6822,4344,2200,45,115,20,98
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37041,37041,"Chowan County, North Carolina",540,416,52,18,2,28,24
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37041,37041,"Chowan County, North Carolina",13843,8583,4821,49,216,3,171
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37041,37041,"Chowan County, North Carolina",14383,8999,4873,67,218,31,195
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37043,37043,"Clay County, North Carolina",176,166,9,0,1,0,0
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37043,37043,"Clay County, North Carolina",5397,5230,52,17,22,1,75
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37043,37043,"Clay County, North Carolina",5573,5396,61,17,23,1,75
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37043,37043,"Clay County, North Carolina",190,169,7,3,2,0,9
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37043,37043,"Clay County, North Carolina",5152,4965,65,27,9,2,84
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37043,37043,"Clay County, North Carolina",5342,5134,72,30,11,2,93
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37043,37043,"Clay County, North Carolina",366,335,16,3,3,0,9
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37043,37043,"Clay County, North Carolina",10549,10195,117,44,31,3,159
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37043,37043,"Clay County, North Carolina",10915,10530,133,47,34,3,168
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37045,37045,"Cleveland County, North Carolina",1619,1303,110,85,44,2,75
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37045,37045,"Cleveland County, North Carolina",48876,36706,10737,98,581,13,741
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37045,37045,"Cleveland County, North Carolina",50495,38009,10847,183,625,15,816
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37045,37045,"Cleveland County, North Carolina",1739,1430,113,82,36,3,75
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37045,37045,"Cleveland County, North Carolina",44910,34404,9249,101,451,9,696
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37045,37045,"Cleveland County, North Carolina",46649,35834,9362,183,487,12,771
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37045,37045,"Cleveland County, North Carolina",3358,2733,223,167,80,5,150
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37045,37045,"Cleveland County, North Carolina",93786,71110,19986,199,1032,22,1437
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37045,37045,"Cleveland County, North Carolina",97144,73843,20209,366,1112,27,1587
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37047,37047,"Columbus County, North Carolina",1385,1003,146,100,38,9,89
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37047,37047,"Columbus County, North Carolina",27112,17178,8419,913,155,8,439
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37047,37047,"Columbus County, North Carolina",28497,18181,8565,1013,193,17,528
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37047,37047,"Columbus County, North Carolina",1626,1206,159,122,45,8,86
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37047,37047,"Columbus County, North Carolina",26382,16305,8732,846,90,19,390
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37047,37047,"Columbus County, North Carolina",28008,17511,8891,968,135,27,476
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37047,37047,"Columbus County, North Carolina",3011,2209,305,222,83,17,175
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37047,37047,"Columbus County, North Carolina",53494,33483,17151,1759,245,27,829
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37047,37047,"Columbus County, North Carolina",56505,35692,17456,1981,328,44,1004
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37049,37049,"Craven County, North Carolina",3227,2614,264,99,58,21,171
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37049,37049,"Craven County, North Carolina",47886,33553,11287,202,1525,54,1265
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37049,37049,"Craven County, North Carolina",51113,36167,11551,301,1583,75,1436
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37049,37049,"Craven County, North Carolina",4102,3353,354,117,56,32,190
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37049,37049,"Craven County, North Carolina",48230,34662,10637,244,1361,64,1262
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37049,37049,"Craven County, North Carolina",52332,38015,10991,361,1417,96,1452
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37049,37049,"Craven County, North Carolina",7329,5967,618,216,114,53,361
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37049,37049,"Craven County, North Carolina",96116,68215,21924,446,2886,118,2527
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37049,37049,"Craven County, North Carolina",103445,74182,22542,662,3000,171,2888
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37051,37051,"Cumberland County, North Carolina",18128,12670,3118,592,192,129,1427
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37051,37051,"Cumberland County, North Carolina",148696,70641,63770,2507,5070,490,6218
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37051,37051,"Cumberland County, North Carolina",166824,83311,66888,3099,5262,619,7645
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37051,37051,"Cumberland County, North Carolina",18950,13879,2778,601,185,126,1381
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37051,37051,"Cumberland County, North Carolina",141353,72406,56920,2153,3509,502,5863
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37051,37051,"Cumberland County, North Carolina",160303,86285,59698,2754,3694,628,7244
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37051,37051,"Cumberland County, North Carolina",37078,26549,5896,1193,377,255,2808
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37051,37051,"Cumberland County, North Carolina",290049,143047,120690,4660,8579,992,12081
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37051,37051,"Cumberland County, North Carolina",327127,169596,126586,5853,8956,1247,14889
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37053,37053,"Currituck County, North Carolina",514,418,35,15,11,1,34
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37053,37053,"Currituck County, North Carolina",12502,11336,750,62,110,8,236
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37053,37053,"Currituck County, North Carolina",13016,11754,785,77,121,9,270
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37053,37053,"Currituck County, North Carolina",475,393,32,14,7,2,27
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37053,37053,"Currituck County, North Carolina",12318,11231,714,77,57,3,236
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37053,37053,"Currituck County, North Carolina",12793,11624,746,91,64,5,263
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37053,37053,"Currituck County, North Carolina",989,811,67,29,18,3,61
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37053,37053,"Currituck County, North Carolina",24820,22567,1464,139,167,11,472
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37053,37053,"Currituck County, North Carolina",25809,23378,1531,168,185,14,533
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37055,37055,"Dare County, North Carolina",1187,1069,23,55,6,2,32
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37055,37055,"Dare County, North Carolina",17043,16086,433,62,176,5,281
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37055,37055,"Dare County, North Carolina",18230,17155,456,117,182,7,313
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37055,37055,"Dare County, North Carolina",1363,1217,62,37,10,1,36
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37055,37055,"Dare County, North Carolina",16371,15475,464,43,83,9,297
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37055,37055,"Dare County, North Carolina",17734,16692,526,80,93,10,333
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37055,37055,"Dare County, North Carolina",2550,2286,85,92,16,3,68
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37055,37055,"Dare County, North Carolina",33414,31561,897,105,259,14,578
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37055,37055,"Dare County, North Carolina",35964,33847,982,197,275,17,646
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37057,37057,"Davidson County, North Carolina",5545,4720,293,277,80,16,159
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37057,37057,"Davidson County, North Carolina",78859,67956,8096,366,1259,25,1157
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37057,37057,"Davidson County, North Carolina",84404,72676,8389,643,1339,41,1316
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37057,37057,"Davidson County, North Carolina",6026,5127,285,306,113,30,165
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37057,37057,"Davidson County, North Carolina",74496,64825,7203,327,1017,21,1103
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37057,37057,"Davidson County, North Carolina",80522,69952,7488,633,1130,51,1268
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37057,37057,"Davidson County, North Carolina",11571,9847,578,583,193,46,324
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37057,37057,"Davidson County, North Carolina",153355,132781,15299,693,2276,46,2260
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37057,37057,"Davidson County, North Carolina",164926,142628,15877,1276,2469,92,2584
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37059,37059,"Davie County, North Carolina",1319,1120,51,73,26,1,48
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37059,37059,"Davie County, North Carolina",20241,18226,1368,72,229,4,342
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37059,37059,"Davie County, North Carolina",21560,19346,1419,145,255,5,390
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37059,37059,"Davie County, North Carolina",1445,1222,61,94,19,2,47
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37059,37059,"Davie County, North Carolina",19008,17335,1199,53,113,3,305
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37059,37059,"Davie County, North Carolina",20453,18557,1260,147,132,5,352
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37059,37059,"Davie County, North Carolina",2764,2342,112,167,45,3,95
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37059,37059,"Davie County, North Carolina",39249,35561,2567,125,342,7,647
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37059,37059,"Davie County, North Carolina",42013,37903,2679,292,387,10,742
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37061,37061,"Duplin County, North Carolina",5920,4992,321,275,71,99,162
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37061,37061,"Duplin County, North Carolina",24161,15680,7926,113,131,15,296
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37061,37061,"Duplin County, North Carolina",30081,20672,8247,388,202,114,458
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37061,37061,"Duplin County, North Carolina",6967,5841,404,344,109,118,151
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37061,37061,"Duplin County, North Carolina",21921,14800,6608,86,101,22,304
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37061,37061,"Duplin County, North Carolina",28888,20641,7012,430,210,140,455
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37061,37061,"Duplin County, North Carolina",12887,10833,725,619,180,217,313
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37061,37061,"Duplin County, North Carolina",46082,30480,14534,199,232,37,600
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37061,37061,"Duplin County, North Carolina",58969,41313,15259,818,412,254,913
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37063,37063,"Durham County, North Carolina",19341,15422,1907,878,290,83,761
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37063,37063,"Durham County, North Carolina",140883,67655,61947,456,7660,85,3080
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37063,37063,"Durham County, North Carolina",160224,83077,63854,1334,7950,168,3841
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37063,37063,"Durham County, North Carolina",21590,17464,1974,1066,252,113,721
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37063,37063,"Durham County, North Carolina",124398,62081,51560,422,7364,61,2910
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37063,37063,"Durham County, North Carolina",145988,79545,53534,1488,7616,174,3631
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37063,37063,"Durham County, North Carolina",40931,32886,3881,1944,542,196,1482
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37063,37063,"Durham County, North Carolina",265281,129736,113507,878,15024,146,5990
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37063,37063,"Durham County, North Carolina",306212,162622,117388,2822,15566,342,7472
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37065,37065,"Edgecombe County, North Carolina",1080,781,140,95,12,4,48
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37065,37065,"Edgecombe County, North Carolina",27578,10165,16887,86,73,92,275
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37065,37065,"Edgecombe County, North Carolina",28658,10946,17027,181,85,96,323
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37065,37065,"Edgecombe County, North Carolina",1205,879,135,107,15,13,56
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37065,37065,"Edgecombe County, North Carolina",23455,9233,13806,94,54,6,262
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37065,37065,"Edgecombe County, North Carolina",24660,10112,13941,201,69,19,318
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37065,37065,"Edgecombe County, North Carolina",2285,1660,275,202,27,17,104
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37065,37065,"Edgecombe County, North Carolina",51033,19398,30693,180,127,98,537
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37065,37065,"Edgecombe County, North Carolina",53318,21058,30968,382,154,115,641
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37067,37067,"Forsyth County, North Carolina",23140,17891,2998,1011,181,128,931
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37067,37067,"Forsyth County, North Carolina",171939,110969,52270,543,4742,77,3338
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37067,37067,"Forsyth County, North Carolina",195079,128860,55268,1554,4923,205,4269
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37067,37067,"Forsyth County, North Carolina",24071,18773,3007,1068,173,134,916
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37067,37067,"Forsyth County, North Carolina",152361,101264,43366,466,4062,135,3068
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37067,37067,"Forsyth County, North Carolina",176432,120037,46373,1534,4235,269,3984
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37067,37067,"Forsyth County, North Carolina",47211,36664,6005,2079,354,262,1847
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37067,37067,"Forsyth County, North Carolina",324300,212233,95636,1009,8804,212,6406
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37067,37067,"Forsyth County, North Carolina",371511,248897,101641,3088,9158,474,8253
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37069,37069,"Franklin County, North Carolina",2392,1892,233,125,30,18,94
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37069,37069,"Franklin County, North Carolina",30159,20666,8631,170,194,7,491
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37069,37069,"Franklin County, North Carolina",32551,22558,8864,295,224,25,585
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37069,37069,"Franklin County, North Carolina",2837,2214,300,175,41,16,91
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37069,37069,"Franklin County, North Carolina",29317,20583,7935,146,123,4,526
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37069,37069,"Franklin County, North Carolina",32154,22797,8235,321,164,20,617
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37069,37069,"Franklin County, North Carolina",5229,4106,533,300,71,34,185
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37069,37069,"Franklin County, North Carolina",59476,41249,16566,316,317,11,1017
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37069,37069,"Franklin County, North Carolina",64705,45355,17099,616,388,45,1202
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37071,37071,"Gaston County, North Carolina",7296,6270,582,201,36,29,178
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37071,37071,"Gaston County, North Carolina",104891,82002,18864,375,1713,34,1903
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37071,37071,"Gaston County, North Carolina",112187,88272,19446,576,1749,63,2081
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37071,37071,"Gaston County, North Carolina",7394,6460,508,198,46,36,146
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37071,37071,"Gaston County, North Carolina",97384,77206,16290,413,1542,29,1904
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37071,37071,"Gaston County, North Carolina",104778,83666,16798,611,1588,65,2050
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37071,37071,"Gaston County, North Carolina",14690,12730,1090,399,82,65,324
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37071,37071,"Gaston County, North Carolina",202275,159208,35154,788,3255,63,3807
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37071,37071,"Gaston County, North Carolina",216965,171938,36244,1187,3337,128,4131
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37073,37073,"Gates County, North Carolina",109,82,12,3,1,2,9
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37073,37073,"Gates County, North Carolina",5739,3642,1909,34,18,4,132
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37073,37073,"Gates County, North Carolina",5848,3724,1921,37,19,6,141
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37073,37073,"Gates County, North Carolina",125,97,14,2,0,4,8
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37073,37073,"Gates County, North Carolina",5505,3588,1749,32,13,3,120
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37073,37073,"Gates County, North Carolina",5630,3685,1763,34,13,7,128
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37073,37073,"Gates County, North Carolina",234,179,26,5,1,6,17
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37073,37073,"Gates County, North Carolina",11244,7230,3658,66,31,7,252
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37073,37073,"Gates County, North Carolina",11478,7409,3684,71,32,13,269
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37075,37075,"Graham County, North Carolina",114,81,0,29,0,0,4
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37075,37075,"Graham County, North Carolina",4191,3769,9,314,25,2,72
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37075,37075,"Graham County, North Carolina",4305,3850,9,343,25,2,76
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37075,37075,"Graham County, North Carolina",156,111,0,30,4,5,6
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37075,37075,"Graham County, North Carolina",4097,3696,27,264,16,0,94
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37075,37075,"Graham County, North Carolina",4253,3807,27,294,20,5,100
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37075,37075,"Graham County, North Carolina",270,192,0,59,4,5,10
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37075,37075,"Graham County, North Carolina",8288,7465,36,578,41,2,166
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37075,37075,"Graham County, North Carolina",8558,7657,36,637,45,7,176
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37077,37077,"Granville County, North Carolina",2127,1698,193,136,17,6,77
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37077,37077,"Granville County, North Carolina",26845,16990,9118,78,213,15,431
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37077,37077,"Granville County, North Carolina",28972,18688,9311,214,230,21,508
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37077,37077,"Granville County, North Carolina",2467,1961,237,133,20,15,101
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37077,37077,"Granville County, North Carolina",27592,17369,9489,138,158,16,422
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37077,37077,"Granville County, North Carolina",30059,19330,9726,271,178,31,523
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37077,37077,"Granville County, North Carolina",4594,3659,430,269,37,21,178
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37077,37077,"Granville County, North Carolina",54437,34359,18607,216,371,31,853
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37077,37077,"Granville County, North Carolina",59031,38018,19037,485,408,52,1031
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37079,37079,"Greene County, North Carolina",1353,1015,99,169,13,25,32
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37079,37079,"Greene County, North Carolina",8240,4668,3371,38,56,5,102
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37079,37079,"Greene County, North Carolina",9593,5683,3470,207,69,30,134
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37079,37079,"Greene County, North Carolina",1793,1404,124,192,13,27,33
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37079,37079,"Greene County, North Carolina",9782,5272,4293,75,41,4,97
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37079,37079,"Greene County, North Carolina",11575,6676,4417,267,54,31,130
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37079,37079,"Greene County, North Carolina",3146,2419,223,361,26,52,65
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37079,37079,"Greene County, North Carolina",18022,9940,7664,113,97,9,199
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37079,37079,"Greene County, North Carolina",21168,12359,7887,474,123,61,264
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37081,37081,"Guilford County, North Carolina",20148,15709,2452,764,206,102,915
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37081,37081,"Guilford County, North Carolina",253933,138810,95530,1197,12804,147,5445
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37081,37081,"Guilford County, North Carolina",274081,154519,97982,1961,13010,249,6360
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37081,37081,"Guilford County, North Carolina",20843,16630,2220,864,230,118,781
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37081,37081,"Guilford County, North Carolina",226406,127879,79978,1091,12417,137,4904
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37081,37081,"Guilford County, North Carolina",247249,144509,82198,1955,12647,255,5685
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37081,37081,"Guilford County, North Carolina",40991,32339,4672,1628,436,220,1696
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37081,37081,"Guilford County, North Carolina",480339,266689,175508,2288,25221,284,10349
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37081,37081,"Guilford County, North Carolina",521330,299028,180180,3916,25657,504,12045
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37083,37083,"Halifax County, North Carolina",647,407,122,65,13,13,27
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37083,37083,"Halifax County, North Carolina",26313,10289,14529,940,219,6,330
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37083,37083,"Halifax County, North Carolina",26960,10696,14651,1005,232,19,357
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37083,37083,"Halifax County, North Carolina",751,432,168,90,21,14,26
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37083,37083,"Halifax County, North Carolina",24055,9705,12868,972,183,4,323
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37083,37083,"Halifax County, North Carolina",24806,10137,13036,1062,204,18,349
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37083,37083,"Halifax County, North Carolina",1398,839,290,155,34,27,53
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37083,37083,"Halifax County, North Carolina",50368,19994,27397,1912,402,10,653
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37083,37083,"Halifax County, North Carolina",51766,20833,27687,2067,436,37,706
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37085,37085,"Harnett County, North Carolina",7666,6014,659,464,68,45,416
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37085,37085,"Harnett County, North Carolina",58318,41056,13836,601,927,85,1813
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37085,37085,"Harnett County, North Carolina",65984,47070,14495,1065,995,130,2229
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37085,37085,"Harnett County, North Carolina",8625,6750,767,569,95,44,400
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37085,37085,"Harnett County, North Carolina",56272,40021,13248,556,561,112,1774
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37085,37085,"Harnett County, North Carolina",64897,46771,14015,1125,656,156,2174
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37085,37085,"Harnett County, North Carolina",16291,12764,1426,1033,163,89,816
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37085,37085,"Harnett County, North Carolina",114590,81077,27084,1157,1488,197,3587
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37085,37085,"Harnett County, North Carolina",130881,93841,28510,2190,1651,286,4403
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37087,37087,"Haywood County, North Carolina",1107,998,26,32,6,6,39
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37087,37087,"Haywood County, North Carolina",30399,29379,322,152,179,9,358
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37087,37087,"Haywood County, North Carolina",31506,30377,348,184,185,15,397
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37087,37087,"Haywood County, North Carolina",1205,1053,31,61,13,3,44
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37087,37087,"Haywood County, North Carolina",27971,26985,372,160,128,7,319
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37087,37087,"Haywood County, North Carolina",29176,28038,403,221,141,10,363
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37087,37087,"Haywood County, North Carolina",2312,2051,57,93,19,9,83
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37087,37087,"Haywood County, North Carolina",58370,56364,694,312,307,16,677
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37087,37087,"Haywood County, North Carolina",60682,58415,751,405,326,25,760
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37089,37089,"Henderson County, North Carolina",5331,4892,112,165,29,19,114
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37089,37089,"Henderson County, North Carolina",53950,50095,1881,186,763,92,933
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37089,37089,"Henderson County, North Carolina",59281,54987,1993,351,792,111,1047
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37089,37089,"Henderson County, North Carolina",5970,5429,124,231,28,36,122
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37089,37089,"Henderson County, North Carolina",48958,45579,1727,173,561,98,820
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37089,37089,"Henderson County, North Carolina",54928,51008,1851,404,589,134,942
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37089,37089,"Henderson County, North Carolina",11301,10321,236,396,57,55,236
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37089,37089,"Henderson County, North Carolina",102908,95674,3608,359,1324,190,1753
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37089,37089,"Henderson County, North Carolina",114209,105995,3844,755,1381,245,1989
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37091,37091,"Hertford County, North Carolina",283,170,53,23,10,5,22
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37091,37091,"Hertford County, North Carolina",11904,4006,7513,150,67,2,166
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37091,37091,"Hertford County, North Carolina",12187,4176,7566,173,77,7,188
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37091,37091,"Hertford County, North Carolina",557,388,90,35,24,10,10
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37091,37091,"Hertford County, North Carolina",11392,4114,6942,94,130,0,112
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37091,37091,"Hertford County, North Carolina",11949,4502,7032,129,154,10,122
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37091,37091,"Hertford County, North Carolina",840,558,143,58,34,15,32
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37091,37091,"Hertford County, North Carolina",23296,8120,14455,244,197,2,278
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37091,37091,"Hertford County, North Carolina",24136,8678,14598,302,231,17,310
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37093,37093,"Hoke County, North Carolina",3363,2504,407,208,39,36,169
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37093,37093,"Hoke County, North Carolina",23516,10601,8990,2380,449,71,1025
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37093,37093,"Hoke County, North Carolina",26879,13105,9397,2588,488,107,1194
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37093,37093,"Hoke County, North Carolina",3650,2683,443,248,52,49,175
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37093,37093,"Hoke County, North Carolina",22733,10940,8548,2045,261,77,862
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37093,37093,"Hoke County, North Carolina",26383,13623,8991,2293,313,126,1037
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37093,37093,"Hoke County, North Carolina",7013,5187,850,456,91,85,344
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37093,37093,"Hoke County, North Carolina",46249,21541,17538,4425,710,148,1887
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37093,37093,"Hoke County, North Carolina",53262,26728,18388,4881,801,233,2231
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37095,37095,"Hyde County, North Carolina",207,187,11,7,0,0,2
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37095,37095,"Hyde County, North Carolina",2259,1576,606,5,38,1,33
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37095,37095,"Hyde County, North Carolina",2466,1763,617,12,38,1,35
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37095,37095,"Hyde County, North Carolina",282,231,10,13,4,0,24
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37095,37095,"Hyde County, North Carolina",2769,1730,982,17,8,0,32
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37095,37095,"Hyde County, North Carolina",3051,1961,992,30,12,0,56
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37095,37095,"Hyde County, North Carolina",489,418,21,20,4,0,26
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37095,37095,"Hyde County, North Carolina",5028,3306,1588,22,46,1,65
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37095,37095,"Hyde County, North Carolina",5517,3724,1609,42,50,1,91
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37097,37097,"Iredell County, North Carolina",6346,5423,394,220,87,28,194
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37097,37097,"Iredell County, North Carolina",81429,66720,10759,236,2251,20,1443
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37097,37097,"Iredell County, North Carolina",87775,72143,11153,456,2338,48,1637
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37097,37097,"Iredell County, North Carolina",6662,5683,390,279,57,26,227
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37097,37097,"Iredell County, North Carolina",78479,65233,9497,225,2109,37,1378
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37097,37097,"Iredell County, North Carolina",85141,70916,9887,504,2166,63,1605
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37097,37097,"Iredell County, North Carolina",13008,11106,784,499,144,54,421
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37097,37097,"Iredell County, North Carolina",159908,131953,20256,461,4360,57,2821
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37097,37097,"Iredell County, North Carolina",172916,143059,21040,960,4504,111,3242
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37099,37099,"Jackson County, North Carolina",1078,784,32,196,16,0,50
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37099,37099,"Jackson County, North Carolina",20421,17564,404,1841,204,5,403
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37099,37099,"Jackson County, North Carolina",21499,18348,436,2037,220,5,453
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37099,37099,"Jackson County, North Carolina",1257,879,96,208,13,2,59
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37099,37099,"Jackson County, North Carolina",19485,16643,526,1709,209,11,387
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37099,37099,"Jackson County, North Carolina",20742,17522,622,1917,222,13,446
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37099,37099,"Jackson County, North Carolina",2335,1663,128,404,29,2,109
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37099,37099,"Jackson County, North Carolina",39906,34207,930,3550,413,16,790
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37099,37099,"Jackson County, North Carolina",42241,35870,1058,3954,442,18,899
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37101,37101,"Johnston County, North Carolina",12042,10273,822,452,107,63,325
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37101,37101,"Johnston County, North Carolina",85617,67560,15348,377,785,20,1527
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37101,37101,"Johnston County, North Carolina",97659,77833,16170,829,892,83,1852
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37101,37101,"Johnston County, North Carolina",13380,11471,869,454,137,80,369
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37101,37101,"Johnston County, North Carolina",80411,63761,14051,414,582,36,1567
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37101,37101,"Johnston County, North Carolina",93791,75232,14920,868,719,116,1936
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37101,37101,"Johnston County, North Carolina",25422,21744,1691,906,244,143,694
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37101,37101,"Johnston County, North Carolina",166028,131321,29399,791,1367,56,3094
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37101,37101,"Johnston County, North Carolina",191450,153065,31090,1697,1611,199,3788
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37103,37103,"Jones County, North Carolina",197,172,11,5,0,1,8
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37103,37103,"Jones County, North Carolina",4873,3117,1608,28,26,3,91
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37103,37103,"Jones County, North Carolina",5070,3289,1619,33,26,4,99
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37103,37103,"Jones County, North Carolina",246,204,12,17,0,0,13
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37103,37103,"Jones County, North Carolina",4529,3038,1356,37,17,0,81
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37103,37103,"Jones County, North Carolina",4775,3242,1368,54,17,0,94
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37103,37103,"Jones County, North Carolina",443,376,23,22,0,1,21
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37103,37103,"Jones County, North Carolina",9402,6155,2964,65,43,3,172
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37103,37103,"Jones County, North Carolina",9845,6531,2987,87,43,4,193
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37105,37105,"Lee County, North Carolina",5354,4611,276,227,51,40,149
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37105,37105,"Lee County, North Carolina",25203,18033,6123,130,383,8,526
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37105,37105,"Lee County, North Carolina",30557,22644,6399,357,434,48,675
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37105,37105,"Lee County, North Carolina",5707,4964,253,250,74,31,135
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37105,37105,"Lee County, North Carolina",23352,16996,5470,170,255,20,441
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37105,37105,"Lee County, North Carolina",29059,21960,5723,420,329,51,576
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37105,37105,"Lee County, North Carolina",11061,9575,529,477,125,71,284
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37105,37105,"Lee County, North Carolina",48555,35029,11593,300,638,28,967
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37105,37105,"Lee County, North Carolina",59616,44604,12122,777,763,99,1251
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37107,37107,"Lenoir County, North Carolina",1875,1537,164,76,38,29,31
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37107,37107,"Lenoir County, North Carolina",28077,14740,12651,98,218,16,354
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37107,37107,"Lenoir County, North Carolina",29952,16277,12815,174,256,45,385
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37107,37107,"Lenoir County, North Carolina",2565,2132,174,128,34,44,53
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37107,37107,"Lenoir County, North Carolina",24790,13528,10656,74,162,15,355
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37107,37107,"Lenoir County, North Carolina",27355,15660,10830,202,196,59,408
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37107,37107,"Lenoir County, North Carolina",4440,3669,338,204,72,73,84
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37107,37107,"Lenoir County, North Carolina",52867,28268,23307,172,380,31,709
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37107,37107,"Lenoir County, North Carolina",57307,31937,23645,376,452,104,793
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37109,37109,"Lincoln County, North Carolina",2801,2533,135,50,12,14,57
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37109,37109,"Lincoln County, North Carolina",38029,34882,2193,111,307,9,527
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37109,37109,"Lincoln County, North Carolina",40830,37415,2328,161,319,23,584
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37109,37109,"Lincoln County, North Carolina",3043,2688,179,64,19,8,85
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37109,37109,"Lincoln County, North Carolina",37295,34229,2198,133,222,6,507
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37109,37109,"Lincoln County, North Carolina",40338,36917,2377,197,241,14,592
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37109,37109,"Lincoln County, North Carolina",5844,5221,314,114,31,22,142
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37109,37109,"Lincoln County, North Carolina",75324,69111,4391,244,529,15,1034
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37109,37109,"Lincoln County, North Carolina",81168,74332,4705,358,560,37,1176
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37111,37111,"McDowell County, North Carolina",1273,1049,71,89,23,8,33
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37111,37111,"McDowell County, North Carolina",21248,19984,690,81,195,0,298
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37111,37111,"McDowell County, North Carolina",22521,21033,761,170,218,8,331
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37111,37111,"McDowell County, North Carolina",1482,1183,93,110,48,16,32
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37111,37111,"McDowell County, North Carolina",21072,19560,979,79,190,1,263
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37111,37111,"McDowell County, North Carolina",22554,20743,1072,189,238,17,295
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37111,37111,"McDowell County, North Carolina",2755,2232,164,199,71,24,65
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37111,37111,"McDowell County, North Carolina",42320,39544,1669,160,385,1,561
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37111,37111,"McDowell County, North Carolina",45075,41776,1833,359,456,25,626
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37113,37113,"Macon County, North Carolina",1118,1006,40,34,9,2,27
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37113,37113,"Macon County, North Carolina",16564,15971,178,100,126,3,186
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37113,37113,"Macon County, North Carolina",17682,16977,218,134,135,5,213
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37113,37113,"Macon County, North Carolina",1216,1050,51,71,9,10,25
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37113,37113,"Macon County, North Carolina",15478,14784,305,79,146,2,162
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37113,37113,"Macon County, North Carolina",16694,15834,356,150,155,12,187
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37113,37113,"Macon County, North Carolina",2334,2056,91,105,18,12,52
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37113,37113,"Macon County, North Carolina",32042,30755,483,179,272,5,348
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37113,37113,"Macon County, North Carolina",34376,32811,574,284,290,17,400
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37115,37115,"Madison County, North Carolina",231,192,16,14,1,1,7
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37115,37115,"Madison County, North Carolina",10533,10190,96,37,63,6,141
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37115,37115,"Madison County, North Carolina",10764,10382,112,51,64,7,148
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37115,37115,"Madison County, North Carolina",318,286,9,11,2,0,10
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37115,37115,"Madison County, North Carolina",10258,9838,232,39,23,4,122
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37115,37115,"Madison County, North Carolina",10576,10124,241,50,25,4,132
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37115,37115,"Madison County, North Carolina",549,478,25,25,3,1,17
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37115,37115,"Madison County, North Carolina",20791,20028,328,76,86,10,263
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37115,37115,"Madison County, North Carolina",21340,20506,353,101,89,11,280
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37117,37117,"Martin County, North Carolina",378,269,63,16,5,16,9
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37117,37117,"Martin County, North Carolina",11901,6303,5364,40,64,3,127
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37117,37117,"Martin County, North Carolina",12279,6572,5427,56,69,19,136
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37117,37117,"Martin County, North Carolina",493,397,50,17,6,17,6
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37117,37117,"Martin County, North Carolina",10400,5781,4415,29,53,2,120
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37117,37117,"Martin County, North Carolina",10893,6178,4465,46,59,19,126
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37117,37117,"Martin County, North Carolina",871,666,113,33,11,33,15
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37117,37117,"Martin County, North Carolina",22301,12084,9779,69,117,5,247
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37117,37117,"Martin County, North Carolina",23172,12750,9892,102,128,38,262
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37119,37119,"Mecklenburg County, North Carolina",67101,54555,7208,2370,522,279,2167
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37119,37119,"Mecklenburg County, North Carolina",481302,257455,180762,1633,30074,488,10890
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37119,37119,"Mecklenburg County, North Carolina",548403,312010,187970,4003,30596,767,13057
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37119,37119,"Mecklenburg County, North Carolina",69613,57191,6846,2616,576,310,2074
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37119,37119,"Mecklenburg County, North Carolina",436819,245188,149811,1538,30502,234,9546
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37119,37119,"Mecklenburg County, North Carolina",506432,302379,156657,4154,31078,544,11620
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37119,37119,"Mecklenburg County, North Carolina",136714,111746,14054,4986,1098,589,4241
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37119,37119,"Mecklenburg County, North Carolina",918121,502643,330573,3171,60576,722,20436
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37119,37119,"Mecklenburg County, North Carolina",1054835,614389,344627,8157,61674,1311,24677
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37121,37121,"Mitchell County, North Carolina",372,289,17,33,8,13,12
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37121,37121,"Mitchell County, North Carolina",7336,7146,30,25,48,0,87
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37121,37121,"Mitchell County, North Carolina",7708,7435,47,58,56,13,99
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37121,37121,"Mitchell County, North Carolina",415,317,12,58,4,12,12
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37121,37121,"Mitchell County, North Carolina",7003,6846,38,25,30,0,64
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37121,37121,"Mitchell County, North Carolina",7418,7163,50,83,34,12,76
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37121,37121,"Mitchell County, North Carolina",787,606,29,91,12,25,24
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37121,37121,"Mitchell County, North Carolina",14339,13992,68,50,78,0,151
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37121,37121,"Mitchell County, North Carolina",15126,14598,97,141,90,25,175
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37123,37123,"Montgomery County, North Carolina",2029,1782,98,65,22,4,58
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37123,37123,"Montgomery County, North Carolina",12057,8911,2738,77,184,3,144
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37123,37123,"Montgomery County, North Carolina",14086,10693,2836,142,206,7,202
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37123,37123,"Montgomery County, North Carolina",2231,1975,95,72,21,4,64
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37123,37123,"Montgomery County, North Carolina",11101,8404,2260,63,198,1,175
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37123,37123,"Montgomery County, North Carolina",13332,10379,2355,135,219,5,239
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37123,37123,"Montgomery County, North Carolina",4260,3757,193,137,43,8,122
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37123,37123,"Montgomery County, North Carolina",23158,17315,4998,140,382,4,319
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37123,37123,"Montgomery County, North Carolina",27418,21072,5191,277,425,12,441
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37125,37125,"Moore County, North Carolina",2989,2579,123,66,43,58,120
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37125,37125,"Moore County, North Carolina",46773,38343,6406,376,775,21,852
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37125,37125,"Moore County, North Carolina",49762,40922,6529,442,818,79,972
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37125,37125,"Moore County, North Carolina",3177,2777,125,87,26,55,107
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37125,37125,"Moore County, North Carolina",42837,35734,5340,384,562,21,796
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37125,37125,"Moore County, North Carolina",46014,38511,5465,471,588,76,903
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37125,37125,"Moore County, North Carolina",6166,5356,248,153,69,113,227
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37125,37125,"Moore County, North Carolina",89610,74077,11746,760,1337,42,1648
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37125,37125,"Moore County, North Carolina",95776,79433,11994,913,1406,155,1875
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37127,37127,"Nash County, North Carolina",3024,2403,273,145,69,13,121
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37127,37127,"Nash County, North Carolina",45877,24339,20063,328,429,7,711
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37127,37127,"Nash County, North Carolina",48901,26742,20336,473,498,20,832
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37127,37127,"Nash County, North Carolina",3337,2663,262,163,104,11,134
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37127,37127,"Nash County, North Carolina",41767,23073,17364,283,390,14,643
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37127,37127,"Nash County, North Carolina",45104,25736,17626,446,494,25,777
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37127,37127,"Nash County, North Carolina",6361,5066,535,308,173,24,255
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37127,37127,"Nash County, North Carolina",87644,47412,37427,611,819,21,1354
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37127,37127,"Nash County, North Carolina",94005,52478,37962,919,992,45,1609
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37129,37129,"New Hanover County, North Carolina",5851,4637,545,223,73,66,307
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37129,37129,"New Hanover County, North Carolina",110750,89875,16434,453,1888,56,2044
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37129,37129,"New Hanover County, North Carolina",116601,94512,16979,676,1961,122,2351
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37129,37129,"New Hanover County, North Carolina",6159,5118,461,170,75,42,293
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37129,37129,"New Hanover County, North Carolina",100723,82622,14199,384,1527,79,1912
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37129,37129,"New Hanover County, North Carolina",106882,87740,14660,554,1602,121,2205
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37129,37129,"New Hanover County, North Carolina",12010,9755,1006,393,148,108,600
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37129,37129,"New Hanover County, North Carolina",211473,172497,30633,837,3415,135,3956
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37129,37129,"New Hanover County, North Carolina",223483,182252,31639,1230,3563,243,4556
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37131,37131,"Northampton County, North Carolina",205,125,48,14,5,3,10
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37131,37131,"Northampton County, North Carolina",10075,3876,6000,50,22,0,127
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37131,37131,"Northampton County, North Carolina",10280,4001,6048,64,27,3,137
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37131,37131,"Northampton County, North Carolina",245,155,62,19,5,2,2
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37131,37131,"Northampton County, North Carolina",9475,3808,5505,47,23,1,91
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37131,37131,"Northampton County, North Carolina",9720,3963,5567,66,28,3,93
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37131,37131,"Northampton County, North Carolina",450,280,110,33,10,5,12
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37131,37131,"Northampton County, North Carolina",19550,7684,11505,97,45,1,218
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37131,37131,"Northampton County, North Carolina",20000,7964,11615,130,55,6,230
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37133,37133,"Onslow County, North Carolina",9809,7814,955,249,168,48,575
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37133,37133,"Onslow County, North Carolina",75917,56568,13175,511,2111,213,3339
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37133,37133,"Onslow County, North Carolina",85726,64382,14130,760,2279,261,3914
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37133,37133,"Onslow County, North Carolina",12954,10501,1154,296,229,65,709
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37133,37133,"Onslow County, North Carolina",88456,68021,14539,676,1521,237,3462
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37133,37133,"Onslow County, North Carolina",101410,78522,15693,972,1750,302,4171
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37133,37133,"Onslow County, North Carolina",22763,18315,2109,545,397,113,1284
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37133,37133,"Onslow County, North Carolina",164373,124589,27714,1187,3632,450,6801
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37133,37133,"Onslow County, North Carolina",187136,142904,29823,1732,4029,563,8085
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37135,37135,"Orange County, North Carolina",5872,5013,335,217,50,21,236
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37135,37135,"Orange County, North Carolina",68267,51357,8952,241,6029,31,1657
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37135,37135,"Orange County, North Carolina",74139,56370,9287,458,6079,52,1893
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37135,37135,"Orange County, North Carolina",5998,5151,292,223,64,22,246
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37135,37135,"Orange County, North Carolina",61659,46895,7673,177,5380,20,1514
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37135,37135,"Orange County, North Carolina",67657,52046,7965,400,5444,42,1760
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37135,37135,"Orange County, North Carolina",11870,10164,627,440,114,43,482
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37135,37135,"Orange County, North Carolina",129926,98252,16625,418,11409,51,3171
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37135,37135,"Orange County, North Carolina",141796,108416,17252,858,11523,94,3653
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37137,37137,"Pamlico County, North Carolina",213,168,22,9,1,0,13
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37137,37137,"Pamlico County, North Carolina",6057,4792,1096,35,44,5,85
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37137,37137,"Pamlico County, North Carolina",6270,4960,1118,44,45,5,98
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37137,37137,"Pamlico County, North Carolina",260,218,26,5,1,3,7
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37137,37137,"Pamlico County, North Carolina",6291,4786,1344,44,26,16,75
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37137,37137,"Pamlico County, North Carolina",6551,5004,1370,49,27,19,82
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37137,37137,"Pamlico County, North Carolina",473,386,48,14,2,3,20
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37137,37137,"Pamlico County, North Carolina",12348,9578,2440,79,70,21,160
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37137,37137,"Pamlico County, North Carolina",12821,9964,2488,93,72,24,180
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37139,37139,"Pasquotank County, North Carolina",1019,774,135,24,21,2,63
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37139,37139,"Pasquotank County, North Carolina",19379,11083,7457,67,339,15,418
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37139,37139,"Pasquotank County, North Carolina",20398,11857,7592,91,360,17,481
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37139,37139,"Pasquotank County, North Carolina",999,724,141,46,17,6,65
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37139,37139,"Pasquotank County, North Carolina",18467,10791,6925,77,243,11,420
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37139,37139,"Pasquotank County, North Carolina",19466,11515,7066,123,260,17,485
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37139,37139,"Pasquotank County, North Carolina",2018,1498,276,70,38,8,128
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37139,37139,"Pasquotank County, North Carolina",37846,21874,14382,144,582,26,838
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37139,37139,"Pasquotank County, North Carolina",39864,23372,14658,214,620,34,966
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37141,37141,"Pender County, North Carolina",1885,1531,93,133,46,6,76
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37141,37141,"Pender County, North Carolina",27709,22217,4701,110,176,14,491
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37141,37141,"Pender County, North Carolina",29594,23748,4794,243,222,20,567
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37141,37141,"Pender County, North Carolina",2207,1777,132,154,39,12,93
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37141,37141,"Pender County, North Carolina",27289,22050,4472,153,106,11,497
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37141,37141,"Pender County, North Carolina",29496,23827,4604,307,145,23,590
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37141,37141,"Pender County, North Carolina",4092,3308,225,287,85,18,169
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37141,37141,"Pender County, North Carolina",54998,44267,9173,263,282,25,988
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37141,37141,"Pender County, North Carolina",59090,47575,9398,550,367,43,1157
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37143,37143,"Perquimans County, North Carolina",175,126,19,7,5,0,18
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37143,37143,"Perquimans County, North Carolina",6756,4972,1625,30,36,2,91
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37143,37143,"Perquimans County, North Carolina",6931,5098,1644,37,41,2,109
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37143,37143,"Perquimans County, North Carolina",184,146,15,2,10,0,11
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37143,37143,"Perquimans County, North Carolina",6220,4657,1433,28,16,0,86
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37143,37143,"Perquimans County, North Carolina",6404,4803,1448,30,26,0,97
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37143,37143,"Perquimans County, North Carolina",359,272,34,9,15,0,29
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37143,37143,"Perquimans County, North Carolina",12976,9629,3058,58,52,2,177
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37143,37143,"Perquimans County, North Carolina",13335,9901,3092,67,67,2,206
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37145,37145,"Person County, North Carolina",744,612,60,43,14,1,14
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37145,37145,"Person County, North Carolina",19502,13474,5487,105,77,5,354
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37145,37145,"Person County, North Carolina",20246,14086,5547,148,91,6,368
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37145,37145,"Person County, North Carolina",892,752,62,43,17,3,15
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37145,37145,"Person County, North Carolina",18146,12692,4966,140,78,1,269
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37145,37145,"Person County, North Carolina",19038,13444,5028,183,95,4,284
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37145,37145,"Person County, North Carolina",1636,1364,122,86,31,4,29
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37145,37145,"Person County, North Carolina",37648,26166,10453,245,155,6,623
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37145,37145,"Person County, North Carolina",39284,27530,10575,331,186,10,652
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37147,37147,"Pitt County, North Carolina",5392,4158,626,167,110,75,256
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37147,37147,"Pitt County, North Carolina",88430,50725,33815,275,1970,43,1602
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37147,37147,"Pitt County, North Carolina",93822,54883,34441,442,2080,118,1858
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37147,37147,"Pitt County, North Carolina",5618,4343,604,239,102,75,255
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37147,37147,"Pitt County, North Carolina",77780,46824,27457,240,1711,57,1491
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37147,37147,"Pitt County, North Carolina",83398,51167,28061,479,1813,132,1746
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37147,37147,"Pitt County, North Carolina",11010,8501,1230,406,212,150,511
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37147,37147,"Pitt County, North Carolina",166210,97549,61272,515,3681,100,3093
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37147,37147,"Pitt County, North Carolina",177220,106050,62502,921,3893,250,3604
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37149,37149,"Polk County, North Carolina",540,468,17,24,11,0,20
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37149,37149,"Polk County, North Carolina",10065,9387,443,33,60,0,142
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37149,37149,"Polk County, North Carolina",10605,9855,460,57,71,0,162
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37149,37149,"Polk County, North Carolina",617,523,20,29,19,1,25
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37149,37149,"Polk County, North Carolina",9112,8484,433,37,39,1,118
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37149,37149,"Polk County, North Carolina",9729,9007,453,66,58,2,143
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37149,37149,"Polk County, North Carolina",1157,991,37,53,30,1,45
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37149,37149,"Polk County, North Carolina",19177,17871,876,70,99,1,260
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37149,37149,"Polk County, North Carolina",20334,18862,913,123,129,2,305
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37151,37151,"Randolph County, North Carolina",7622,6610,284,383,70,42,233
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37151,37151,"Randolph County, North Carolina",65077,58404,4318,350,1020,18,967
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37151,37151,"Randolph County, North Carolina",72699,65014,4602,733,1090,60,1200
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37151,37151,"Randolph County, North Carolina",8344,7242,271,471,71,47,242
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37151,37151,"Randolph County, North Carolina",62373,55859,4345,349,833,18,969
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37151,37151,"Randolph County, North Carolina",70717,63101,4616,820,904,65,1211
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37151,37151,"Randolph County, North Carolina",15966,13852,555,854,141,89,475
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37151,37151,"Randolph County, North Carolina",127450,114263,8663,699,1853,36,1936
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37151,37151,"Randolph County, North Carolina",143416,128115,9218,1553,1994,125,2411
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37153,37153,"Richmond County, North Carolina",1320,922,138,147,24,21,68
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37153,37153,"Richmond County, North Carolina",21685,13249,7218,532,233,9,444
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37153,37153,"Richmond County, North Carolina",23005,14171,7356,679,257,30,512
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37153,37153,"Richmond County, North Carolina",1516,1100,156,162,15,27,56
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37153,37153,"Richmond County, North Carolina",20418,12521,6770,525,170,5,427
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37153,37153,"Richmond County, North Carolina",21934,13621,6926,687,185,32,483
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37153,37153,"Richmond County, North Carolina",2836,2022,294,309,39,48,124
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37153,37153,"Richmond County, North Carolina",42103,25770,13988,1057,403,14,871
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37153,37153,"Richmond County, North Carolina",44939,27792,14282,1366,442,62,995
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37155,37155,"Robeson County, North Carolina",5461,3639,341,1112,60,43,266
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37155,37155,"Robeson County, North Carolina",63667,17706,16540,27377,408,57,1579
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37155,37155,"Robeson County, North Carolina",69128,21345,16881,28489,468,100,1845
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37155,37155,"Robeson County, North Carolina",5991,4067,348,1169,71,60,276
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37155,37155,"Robeson County, North Carolina",58116,16305,14971,24911,390,45,1494
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37155,37155,"Robeson County, North Carolina",64107,20372,15319,26080,461,105,1770
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37155,37155,"Robeson County, North Carolina",11452,7706,689,2281,131,103,542
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37155,37155,"Robeson County, North Carolina",121783,34011,31511,52288,798,102,3073
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37155,37155,"Robeson County, North Carolina",133235,41717,32200,54569,929,205,3615
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37157,37157,"Rockingham County, North Carolina",2636,2232,175,100,17,22,90
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37157,37157,"Rockingham County, North Carolina",44738,34395,9031,147,308,31,826
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37157,37157,"Rockingham County, North Carolina",47374,36627,9206,247,325,53,916
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37157,37157,"Rockingham County, North Carolina",3027,2583,209,118,22,20,75
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37157,37157,"Rockingham County, North Carolina",40992,31962,7896,168,206,22,738
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37157,37157,"Rockingham County, North Carolina",44019,34545,8105,286,228,42,813
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37157,37157,"Rockingham County, North Carolina",5663,4815,384,218,39,42,165
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37157,37157,"Rockingham County, North Carolina",85730,66357,16927,315,514,53,1564
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37157,37157,"Rockingham County, North Carolina",91393,71172,17311,533,553,95,1729
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37159,37159,"Rowan County, North Carolina",5529,4830,364,148,64,18,105
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37159,37159,"Rowan County, North Carolina",65411,51756,11637,223,719,34,1042
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37159,37159,"Rowan County, North Carolina",70940,56586,12001,371,783,52,1147
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37159,37159,"Rowan County, North Carolina",6271,5383,454,246,54,20,114
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37159,37159,"Rowan County, North Carolina",62722,49960,10821,207,701,25,1008
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37159,37159,"Rowan County, North Carolina",68993,55343,11275,453,755,45,1122
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37159,37159,"Rowan County, North Carolina",11800,10213,818,394,118,38,219
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37159,37159,"Rowan County, North Carolina",128133,101716,22458,430,1420,59,2050
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37159,37159,"Rowan County, North Carolina",139933,111929,23276,824,1538,97,2269
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37161,37161,"Rutherford County, North Carolina",1372,1212,67,21,9,12,51
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37161,37161,"Rutherford County, North Carolina",32987,28730,3278,154,210,8,607
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37161,37161,"Rutherford County, North Carolina",34359,29942,3345,175,219,20,658
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37161,37161,"Rutherford County, North Carolina",1437,1214,94,50,15,17,47
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37161,37161,"Rutherford County, North Carolina",30625,26717,3083,88,181,6,550
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37161,37161,"Rutherford County, North Carolina",32062,27931,3177,138,196,23,597
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37161,37161,"Rutherford County, North Carolina",2809,2426,161,71,24,29,98
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37161,37161,"Rutherford County, North Carolina",63612,55447,6361,242,391,14,1157
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37161,37161,"Rutherford County, North Carolina",66421,57873,6522,313,415,43,1255
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37163,37163,"Sampson County, North Carolina",5559,4448,424,407,73,55,152
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37163,37163,"Sampson County, North Carolina",26562,16737,8583,598,147,26,471
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37163,37163,"Sampson County, North Carolina",32121,21185,9007,1005,220,81,623
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37163,37163,"Sampson County, North Carolina",6395,5179,425,505,48,67,171
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37163,37163,"Sampson County, North Carolina",24608,15792,7679,563,119,30,425
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37163,37163,"Sampson County, North Carolina",31003,20971,8104,1068,167,97,596
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37163,37163,"Sampson County, North Carolina",11954,9627,849,912,121,122,323
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37163,37163,"Sampson County, North Carolina",51170,32529,16262,1161,266,56,896
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37163,37163,"Sampson County, North Carolina",63124,42156,17111,2073,387,178,1219
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37165,37165,"Scotland County, North Carolina",434,236,67,110,1,2,18
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37165,37165,"Scotland County, North Carolina",17301,7894,6806,2022,156,4,419
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37165,37165,"Scotland County, North Carolina",17735,8130,6873,2132,157,6,437
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37165,37165,"Scotland County, North Carolina",586,391,61,100,4,5,25
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37165,37165,"Scotland County, North Carolina",16923,7579,6836,1921,166,7,414
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37165,37165,"Scotland County, North Carolina",17509,7970,6897,2021,170,12,439
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37165,37165,"Scotland County, North Carolina",1020,627,128,210,5,7,43
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37165,37165,"Scotland County, North Carolina",34224,15473,13642,3943,322,11,833
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37165,37165,"Scotland County, North Carolina",35244,16100,13770,4153,327,18,876
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37167,37167,"Stanly County, North Carolina",1164,945,72,21,29,66,31
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37167,37167,"Stanly County, North Carolina",29394,24950,3347,100,597,7,393
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37167,37167,"Stanly County, North Carolina",30558,25895,3419,121,626,73,424
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37167,37167,"Stanly County, North Carolina",1318,1056,93,24,20,86,39
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37167,37167,"Stanly County, North Carolina",28915,24347,3462,126,588,6,386
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37167,37167,"Stanly County, North Carolina",30233,25403,3555,150,608,92,425
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37167,37167,"Stanly County, North Carolina",2482,2001,165,45,49,152,70
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37167,37167,"Stanly County, North Carolina",58309,49297,6809,226,1185,13,779
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37167,37167,"Stanly County, North Carolina",60791,51298,6974,271,1234,165,849
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37169,37169,"Stokes County, North Carolina",649,562,42,18,5,1,21
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37169,37169,"Stokes County, North Carolina",22787,21495,900,59,90,6,237
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37169,37169,"Stokes County, North Carolina",23436,22057,942,77,95,7,258
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37169,37169,"Stokes County, North Carolina",704,578,35,71,6,1,13
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37169,37169,"Stokes County, North Carolina",21957,20579,974,78,59,5,262
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37169,37169,"Stokes County, North Carolina",22661,21157,1009,149,65,6,275
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37169,37169,"Stokes County, North Carolina",1353,1140,77,89,11,2,34
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37169,37169,"Stokes County, North Carolina",44744,42074,1874,137,149,11,499
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37169,37169,"Stokes County, North Carolina",46097,43214,1951,226,160,13,533
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37171,37171,"Surry County, North Carolina",3541,3140,152,100,48,26,75
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37171,37171,"Surry County, North Carolina",33459,31441,1330,90,235,11,352
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37171,37171,"Surry County, North Carolina",37000,34581,1482,190,283,37,427
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37171,37171,"Surry County, North Carolina",3887,3433,185,145,45,19,60
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37171,37171,"Surry County, North Carolina",31226,29316,1273,98,172,5,362
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37171,37171,"Surry County, North Carolina",35113,32749,1458,243,217,24,422
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37171,37171,"Surry County, North Carolina",7428,6573,337,245,93,45,135
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37171,37171,"Surry County, North Carolina",64685,60757,2603,188,407,16,714
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37171,37171,"Surry County, North Carolina",72113,67330,2940,433,500,61,849
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37173,37173,"Swain County, North Carolina",333,118,5,186,1,0,23
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37173,37173,"Swain County, North Carolina",7087,4637,65,2022,47,1,315
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37173,37173,"Swain County, North Carolina",7420,4755,70,2208,48,1,338
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37173,37173,"Swain County, North Carolina",370,153,7,174,5,0,31
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37173,37173,"Swain County, North Carolina",6556,4305,95,1800,38,4,314
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37173,37173,"Swain County, North Carolina",6926,4458,102,1974,43,4,345
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37173,37173,"Swain County, North Carolina",703,271,12,360,6,0,54
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37173,37173,"Swain County, North Carolina",13643,8942,160,3822,85,5,629
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37173,37173,"Swain County, North Carolina",14346,9213,172,4182,91,5,683
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37175,37175,"Transylvania County, North Carolina",471,432,8,4,3,2,22
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37175,37175,"Transylvania County, North Carolina",16802,15792,541,59,116,6,288
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37175,37175,"Transylvania County, North Carolina",17273,16224,549,63,119,8,310
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37175,37175,"Transylvania County, North Carolina",620,567,15,18,3,2,15
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37175,37175,"Transylvania County, North Carolina",15589,14471,691,65,95,3,264
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37175,37175,"Transylvania County, North Carolina",16209,15038,706,83,98,5,279
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37175,37175,"Transylvania County, North Carolina",1091,999,23,22,6,4,37
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37175,37175,"Transylvania County, North Carolina",32391,30263,1232,124,211,9,552
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37175,37175,"Transylvania County, North Carolina",33482,31262,1255,146,217,13,589
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37177,37177,"Tyrrell County, North Carolina",201,176,12,12,1,0,0
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37177,37177,"Tyrrell County, North Carolina",1686,1011,573,4,49,0,49
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37177,37177,"Tyrrell County, North Carolina",1887,1187,585,16,50,0,49
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37177,37177,"Tyrrell County, North Carolina",143,105,18,18,1,0,1
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37177,37177,"Tyrrell County, North Carolina",2111,1091,940,5,44,1,30
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37177,37177,"Tyrrell County, North Carolina",2254,1196,958,23,45,1,31
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37177,37177,"Tyrrell County, North Carolina",344,281,30,30,2,0,1
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37177,37177,"Tyrrell County, North Carolina",3797,2102,1513,9,93,1,79
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37177,37177,"Tyrrell County, North Carolina",4141,2383,1543,39,95,1,80
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37179,37179,"Union County, North Carolina",12290,10748,725,338,116,27,336
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37179,37179,"Union County, North Carolina",102796,83697,13793,341,3156,53,1756
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37179,37179,"Union County, North Carolina",115086,94445,14518,679,3272,80,2092
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37179,37179,"Union County, North Carolina",12627,11123,638,397,95,40,334
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37179,37179,"Union County, North Carolina",98893,81275,12695,336,2739,42,1806
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37179,37179,"Union County, North Carolina",111520,92398,13333,733,2834,82,2140
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37179,37179,"Union County, North Carolina",24917,21871,1363,735,211,67,670
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37179,37179,"Union County, North Carolina",201689,164972,26488,677,5895,95,3562
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37179,37179,"Union County, North Carolina",226606,186843,27851,1412,6106,162,4232
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37181,37181,"Vance County, North Carolina",1644,1206,218,128,17,4,71
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37181,37181,"Vance County, North Carolina",21963,9315,12232,45,110,12,249
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37181,37181,"Vance County, North Carolina",23607,10521,12450,173,127,16,320
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37181,37181,"Vance County, North Carolina",1689,1260,222,130,13,2,62
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37181,37181,"Vance County, North Carolina",18948,8460,10100,47,89,5,247
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37181,37181,"Vance County, North Carolina",20637,9720,10322,177,102,7,309
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37181,37181,"Vance County, North Carolina",3333,2466,440,258,30,6,133
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37181,37181,"Vance County, North Carolina",40911,17775,22332,92,199,17,496
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37181,37181,"Vance County, North Carolina",44244,20241,22772,350,229,23,629
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37183,37183,"Wake County, North Carolina",52129,41347,5311,2567,553,180,2171
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37183,37183,"Wake County, North Carolina",486112,322783,114183,1535,36086,266,11259
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37183,37183,"Wake County, North Carolina",538241,364130,119494,4102,36639,446,13430
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37183,37183,"Wake County, North Carolina",52998,42724,4769,2765,514,179,2047
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37183,37183,"Wake County, North Carolina",455552,310714,97408,1417,35517,226,10270
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37183,37183,"Wake County, North Carolina",508550,353438,102177,4182,36031,405,12317
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37183,37183,"Wake County, North Carolina",105127,84071,10080,5332,1067,359,4218
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37183,37183,"Wake County, North Carolina",941664,633497,211591,2952,71603,492,21529
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37183,37183,"Wake County, North Carolina",1046791,717568,221671,8284,72670,851,25747
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37185,37185,"Warren County, North Carolina",300,197,59,32,5,0,7
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37185,37185,"Warren County, North Carolina",9665,3751,5149,557,38,2,168
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37185,37185,"Warren County, North Carolina",9965,3948,5208,589,43,2,175
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37185,37185,"Warren County, North Carolina",482,315,84,62,3,1,17
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37185,37185,"Warren County, North Carolina",9460,3829,4964,469,25,2,171
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37185,37185,"Warren County, North Carolina",9942,4144,5048,531,28,3,188
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37185,37185,"Warren County, North Carolina",782,512,143,94,8,1,24
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37185,37185,"Warren County, North Carolina",19125,7580,10113,1026,63,4,339
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37185,37185,"Warren County, North Carolina",19907,8092,10256,1120,71,5,363
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37187,37187,"Washington County, North Carolina",337,155,47,108,0,0,27
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37187,37187,"Washington County, North Carolina",6160,2885,3171,14,28,0,62
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37187,37187,"Washington County, North Carolina",6497,3040,3218,122,28,0,89
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37187,37187,"Washington County, North Carolina",357,225,60,27,4,0,41
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37187,37187,"Washington County, North Carolina",5341,2598,2635,11,16,1,80
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37187,37187,"Washington County, North Carolina",5698,2823,2695,38,20,1,121
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37187,37187,"Washington County, North Carolina",694,380,107,135,4,0,68
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37187,37187,"Washington County, North Carolina",11501,5483,5806,25,44,1,142
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37187,37187,"Washington County, North Carolina",12195,5863,5913,160,48,1,210
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37189,37189,"Watauga County, North Carolina",834,721,31,23,15,1,43
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37189,37189,"Watauga County, North Carolina",26084,24875,402,54,335,7,411
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37189,37189,"Watauga County, North Carolina",26918,25596,433,77,350,8,454
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37189,37189,"Watauga County, North Carolina",1016,865,53,21,15,2,60
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37189,37189,"Watauga County, North Carolina",25988,24779,508,89,277,6,329
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37189,37189,"Watauga County, North Carolina",27004,25644,561,110,292,8,389
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37189,37189,"Watauga County, North Carolina",1850,1586,84,44,30,3,103
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37189,37189,"Watauga County, North Carolina",52072,49654,910,143,612,13,740
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37189,37189,"Watauga County, North Carolina",53922,51240,994,187,642,16,843
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37191,37191,"Wayne County, North Carolina",6751,5363,755,261,106,46,220
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37191,37191,"Wayne County, North Carolina",56504,33434,20837,221,843,25,1144
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37191,37191,"Wayne County, North Carolina",63255,38797,21592,482,949,71,1364
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37191,37191,"Wayne County, North Carolina",7529,6109,683,312,146,68,211
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37191,37191,"Wayne County, North Carolina",53366,33316,18043,207,589,35,1176
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37191,37191,"Wayne County, North Carolina",60895,39425,18726,519,735,103,1387
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37191,37191,"Wayne County, North Carolina",14280,11472,1438,573,252,114,431
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37191,37191,"Wayne County, North Carolina",109870,66750,38880,428,1432,60,2320
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37191,37191,"Wayne County, North Carolina",124150,78222,40318,1001,1684,174,2751
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37193,37193,"Wilkes County, North Carolina",2049,1813,77,68,18,10,63
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37193,37193,"Wilkes County, North Carolina",32812,30759,1355,69,206,5,418
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37193,37193,"Wilkes County, North Carolina",34861,32572,1432,137,224,15,481
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37193,37193,"Wilkes County, North Carolina",2234,1938,116,70,16,17,77
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37193,37193,"Wilkes County, North Carolina",31645,29472,1532,63,152,12,414
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37193,37193,"Wilkes County, North Carolina",33879,31410,1648,133,168,29,491
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37193,37193,"Wilkes County, North Carolina",4283,3751,193,138,34,27,140
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37193,37193,"Wilkes County, North Carolina",64457,60231,2887,132,358,17,832
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37193,37193,"Wilkes County, North Carolina",68740,63982,3080,270,392,44,972
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37195,37195,"Wilson County, North Carolina",3855,3279,315,103,37,18,103
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37195,37195,"Wilson County, North Carolina",39094,20223,17679,123,416,89,564
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37195,37195,"Wilson County, North Carolina",42949,23502,17994,226,453,107,667
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37195,37195,"Wilson County, North Carolina",4347,3643,373,158,53,16,104
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37195,37195,"Wilson County, North Carolina",34365,18558,14802,98,416,14,477
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37195,37195,"Wilson County, North Carolina",38712,22201,15175,256,469,30,581
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37195,37195,"Wilson County, North Carolina",8202,6922,688,261,90,34,207
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37195,37195,"Wilson County, North Carolina",73459,38781,32481,221,832,103,1041
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37195,37195,"Wilson County, North Carolina",81661,45703,33169,482,922,137,1248
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37197,37197,"Yadkin County, North Carolina",1936,1732,57,72,25,19,31
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37197,37197,"Yadkin County, North Carolina",16992,16113,569,45,66,2,197
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37197,37197,"Yadkin County, North Carolina",18928,17845,626,117,91,21,228
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37197,37197,"Yadkin County, North Carolina",2196,1946,70,92,31,19,38
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37197,37197,"Yadkin County, North Carolina",16408,15532,591,39,43,3,200
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37197,37197,"Yadkin County, North Carolina",18604,17478,661,131,74,22,238
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37197,37197,"Yadkin County, North Carolina",4132,3678,127,164,56,38,69
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37197,37197,"Yadkin County, North Carolina",33400,31645,1160,84,109,5,397
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37197,37197,"Yadkin County, North Carolina",37532,35323,1287,248,165,43,466
+est72016,"July 1, 2016",female,Female,hisp,Hispanic,0500000US37199,37199,"Yancey County, North Carolina",403,317,14,40,2,19,11
+est72016,"July 1, 2016",female,Female,nhisp,Not Hispanic,0500000US37199,37199,"Yancey County, North Carolina",8594,8379,73,25,34,0,83
+est72016,"July 1, 2016",female,Female,tothisp,Total,0500000US37199,37199,"Yancey County, North Carolina",8997,8696,87,65,36,19,94
+est72016,"July 1, 2016",male,Male,hisp,Hispanic,0500000US37199,37199,"Yancey County, North Carolina",507,386,24,50,4,30,13
+est72016,"July 1, 2016",male,Male,nhisp,Not Hispanic,0500000US37199,37199,"Yancey County, North Carolina",8174,7962,85,35,18,0,74
+est72016,"July 1, 2016",male,Male,tothisp,Total,0500000US37199,37199,"Yancey County, North Carolina",8681,8348,109,85,22,30,87
+est72016,"July 1, 2016",totsex,Both Sexes,hisp,Hispanic,0500000US37199,37199,"Yancey County, North Carolina",910,703,38,90,6,49,24
+est72016,"July 1, 2016",totsex,Both Sexes,nhisp,Not Hispanic,0500000US37199,37199,"Yancey County, North Carolina",16768,16341,158,60,52,0,157
+est72016,"July 1, 2016",totsex,Both Sexes,tothisp,Total,0500000US37199,37199,"Yancey County, North Carolina",17678,17044,196,150,58,49,181
