@@ -1,0 +1,703 @@
+---
+title: "AreWeRepresented Candidate Pool"
+output:
+  html_document: default
+author: "D. Hopp"
+date: "October 28, 2018"
+---
+
+```{r echo=FALSE}
+load("prep.RData")
+load("compact_updates.RData")
+#
+# load df_ncvoter_subset_distinct_demog
+#
+load(paste0(AWR_data_RData_dir,"df_ncvoter_subset_distinct_demog_20180407.RData"))
+```
+
+## Remarks on the County Commissioner Candidate Slates  
+## or What You See is What You Get  
+
+### Project Overview  
+
+The [CodeForDurham](www.codefordurham.com) Are We Represented (AWR) project intends to investigate the representativeness of the North Carolina boards of county commissioners in relation to the demographics of county residents. The foundation for Are We Represented lies in the belief that representative elected boards will act in ways that better respond to public preferences than would boards less reflective of the racial and gender composition of their citizenry. This has been addressed, at least in a broad sense, in past times by writers such as James Madison in Federalist Number 10, and Alexis de Tocqueville in "Democracy in America", discussed [here](https://edsitement.neh.gov/curriculum-unit/alexis-de-tocqueville-tyranny-majority). A contemporary treatment can be found in Bangia, et al., ["Redistricting: Drawing the Line"](https://arxiv.org/abs/1704.03360). An important consideration for this project is "compared to what?" Should it be the county population for all ages, for voting age, for registered voters, for people who voted? If the first two then should it be restricted to people qualified to vote? If so, how can reliable estimates be achieved?  
+
+There are one hundred counties in North Carolina, and all have a board. The number of members of each board is small, most commonly five or seven with a few of nine. This report will attempt to identify the candidate slates, that is, the persons who registered as candidates for a board seat. Determining the race and gender of candidates should foster greater insight into the opportunity to elect representative boards. There has been some discussion of considering age, but that will be for a future analysis. Political party is also shown but is not part of this present analysis.  
+
+Information about boards can be found at the North Carolina Association of County Commissioners (NCACC)[web site](http://www.ncacc.org), particularly under County Research. The NCACC data provides counts of county commissioners by race and gender, tallied for general election years going back to 2002. This self-reported race includes only African American, White, and American Indian. The counts are aggregated so that each category is a separate column. There are no board members of Hispanic ethnicity.  
+
+The North Carolina State Board of Elections (NCSBE) makes available detailed voter registration and voting history [files](https://s3.amazonaws.com/dl.ncsbe.gov/list.html) by following the 'data' link. These data files are updated about once a week, the older data not being preserved by the NCSBE, although summary data is available for past elections.  
+
+County composition can be most conveniently determined from Census Bureau data. We will use the American Community Survey data except for various summaries provided in other Census Bureau documents. Census Bureau race definitions and recordings have changed over time. In light of that, our investigation extends only as far back as 2008. Reporting of race by the Census Bureau has a long history of changes and discussions regarding interpretation. See for instance, [here](https://www.census.gov/library/working-papers/2015/adrm/carra-wp-2015-08.html). The Census Bureau also has advice on how to compare data across years. See for instance, [here](https://www.census.gov/programs-surveys/acs/guidance/comparing-acs-data.html). Considering that the ACS and NCSBE race categories are somewhat different, any use of race numbers will have to be done with care.  
+
+### The Realities of Acquiring Reliable Data  
+
+The [NCACC](http://www.ncacc.org/195/County-Election-Methods) enumerates the various election methods and terms of office for board members by county. This shows that there is substantial complexity in discussing some things as elementary as term length and who the voters are, since in some cases members are elected at large, in other cases by district, and so on. Initially, the AWR project will ignore these complexities but at some time consideration should be given to them. The NCACC does not update its data on the death and replacement of board members, although one would expect this event would not happen often. We are, then, always looking at the NCACC data published every two years. The NCACC does not publish any data dealing with the candidate slate, so information about slates must be acquired from other sources. NCACC data tells us about who won, but not who competed.  
+
+In addition to the voter registration and voter history files, the NCSBE publishes several other files that tally votes by candidate, such as the 'results_pct' (precinct results) files that can be found via the ENRS link on [this page](https://s3.amazonaws.com/dl.ncsbe.gov/list.html). These files are challenging to use because candidates can provide their names in a variety of ways - even the same person using somewhat different names in different elections. The NCSBE voter registration file does contain a unique identifier, the ncid, however, it is not used anywhere else so it is of little value to this project. Evidently, the way persons identify themselves on candidate filing documents is rather free form. This means that the task of determining the demographics for candidates is not just a straightforward lookup in the voter registration files.  
+
+Fortunately, the NCSBE publishes a candidate listing at least for general elections. I was able to gain access to these through a data request to the NCSBE. These are pdf reports that do not use tables, but are reasonably consistent in their formats. I used an R program to parse these files, isolating the names of the board candidates. Those names were in some cases identical to names in the voter registration files, and in other cases they could be matched by an inferential process. I was not able to determine if such files existed for primary elections. For those elections I used the precinct results files, but the rate of matching against the voter registration files was considerably less than that for the general elections. The [State Library of North Carolina](https://statelibrary.ncdcr.gov/) does appear to have some candidate lists, and I am in the process of exploring this resource. However, whatever exists is a docubase, not a database, and the effort to access it would be substantial.   
+
+### A Look At Voter Registration Files  
+
+The contents of NCSBE voter registration file is described in the 'ncvhis_ncvoter_data_format.txt' file at the NCSBE data link mentioned above. The race categories are African American (B), American Indian (I), Other (O), White (W), Undesignated (U), Asian (A), and Two or More Races (M). People self-report this when they register to vote. Ethnicity can be entered as Hispanic or Non-Hispanic, but is frequently not responded to. Birth year is self-reported.  
+
+For a 2018 voter registration file the race breakdown was  
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+df_ncvoter_subset_distinct_demog %>% 
+  reshape2::dcast(
+    race_code~.
+  ) %>%
+  plyr::rename(
+    c("."="N")
+  )
+```
+
+The ethnicity categories were Hispanic (HL), non-Hispanic (NL) and Unreported (UN). The voter registration counts were    
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+df_ncvoter_subset_distinct_demog %>% 
+  reshape2::dcast(
+    ethnic_code~.
+  ) %>%
+  plyr::rename(
+    c("."="N")
+  )
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+ratioUtoH <- round(
+  nrow(
+    df_ncvoter_subset_distinct_demog %>% 
+    dplyr::filter(
+      ethnic_code=="UN"
+    )
+  ) /
+  nrow(
+    df_ncvoter_subset_distinct_demog %>% 
+    dplyr::filter(
+      ethnic_code=="HL"
+    )
+  ),
+  digits=1
+)
+```
+
+Since the unreported exceed the Hispanic by about `r ratioUtoH` to 1, the data is not at all useful regarding ethnicity.  
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+npct <- round(
+  nrow(
+    df_ncvoter_subset_distinct_demog %>%
+    dplyr::filter(
+      race_code %in% c("O","U","M")
+    )
+  ) * 100 / 
+  nrow(
+    df_ncvoter_subset_distinct_demog
+  ),
+  digits=1
+)
+#
+npctA <- round(
+  nrow(
+    df_ncvoter_subset_distinct_demog %>%
+    dplyr::filter(
+      race_code=="A"
+    )
+  )  * 100 / 
+  nrow(
+    df_ncvoter_subset_distinct_demog
+  ),
+  digits=1
+) 
+```
+
+It can be seen that the NCSBE Other, Two or More, and Unreported amount to about `r npct`% of the total population with another `r npctA`% for Asians.  
+
+### Race and Gender of the Boards   
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+countsNCACC <- colSums(
+  df_NCACC_years[df_NCACC_years$Year>"2004",c(-1,-12)],
+  na.rm=TRUE
+)
+names(countsNCACC) <- c(
+  "N","new","Rep","Dem","Other","Female","White","Black","AmerInd","Other"
+)
+```
+
+The NCACC data produces the following counts for county commissioners, every two years starting with 2008. This shows the total number of opportunities for a board composition, not distinct individuals.  The "New" figure means that over those years there were that many instances when board membership changed. About `r round(countsNCACC[7]*100/countsNCACC[1],digits=1)`% of these board seats were occupied by people of the White race category.  
+
+```{r echo=FALSE}
+countsNCACC
+```
+
+### Processing the Candidate Names  
+
+The NCSBE provides two sources for determining the candidates for county boards of commissioners. One is the precinct results files, the other the candidate lists. The precinct results files are in a consistent format and available as csv files. The names of candidates are in a single text field called Choice which must be parsed to distinguish the individual parts of the names. Throughout this work, a name is constituted of last, first, and middle names, and suffix (Jr, Sr, II, III, IV). Unfortunately for this project, the ways that names appear in Choice are manifold and hardly consistent; accordingly, they do not always match with names in the voter registration file. I undertook various ways to remedy this, such as by matching nicknames to their likely proper name, for example, mapping MARTY to MARTIN.  
+
+The other source of candidate names is in the candidate files for the general elections, which I received through a data request to the NCSBE. These are pdf files that are not tabular, instead being reasonably neatly formatted text. While substantially consistent in format, there are differences that make parsing a substantial task. The candidate names require parsing but that is easier than in the precinct results files. There is also much more reliable mapping to the voter registration files. At this time, I have candidate list files only for general elections and I do not know if any exist for primaries. My extensive review of the precinct results files for primaries led me to conclude that the data quality, that is, determining the names of candidates, is substantially poorer than that of the general election candidate lists.  
+
+My approach was to use the candidate list files for the general elections, and the precinct results files for the primary elections, ignoring the latter files for the general elections. I had intended to count the candidates by county since perhaps 2008. However, there are so many ambiguities in the recording of candidate names that this modest goal has to be replaced with estimates whose reliability is difficult to assess. I have supplemented this with a detailed county commissioner list for 2016, provided by another CodeForDurham member, Nathania Johnson.  
+
+I reduced the task to creating a list of distinct candidate names by county, merging the data for the primary and general elections. The general elections were 2016, 2014, 2012, 2010 and 2008. The NCSBE supplied a pre-election candidate list for 2018, which I was able to parse in a way similar to the candidate lists for the general elections. The primary elections have county commissioner candidates for 2016/03/15, 2014/07/15, 2014/05/06, 2012/07/17, 2012/05/08, 2010/06/22, and 2010/05/04. I matched names against the voter registration files retrieved on 2018/04/07 from the NCSBE web site (see above for a link). This matching was 'best effort' in the sense that it requires a lot of effort and I ultimately decided I had better things to do.  
+
+Here is a breakdown of how I processed the names:  
+
+```{r echo=FALSE}
+Nstart <- df_cc_distinct_all_prior_dcast[1,2]
+Nrem <- nrow(df_candidates_distinct_all_elections_excluded)
+Ntot <- Nstart-Nrem
+```
+
+There were a total of `r format(Nstart,big.mark=",")` lexicographically distinct names prior to any data cleaning or matching but with exact duplicates removed.
+
+I began the matching with a visual review to identify redundant records, that is, near-duplicates and variants. That resulted in the removal of `r Nrem` names, leaving `r format(Ntot,big.mark=",")` records. I then proceeded to attend to the details of the remaining names.  
+
+```{r eval=FALSE, echo=FALSE, warning=FALSE, message=FALSE}
+df_candidates_distinct_all_elections_aug %>% 
+  dplyr::mutate(
+    Match=ifelse(
+      stringr::str_sub(match,1,1) == "?","No","Yes"
+    )
+  ) %>% 
+  reshape2::dcast(
+    Match~.,
+    margins=TRUE
+  ) %>%
+  plyr::rename(
+    c("."="N")
+  )
+```
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+Nall <- nrow(df_candidates_distinct_all_elections_aug)
+#
+Nunmatch <- nrow(
+  df_candidates_distinct_all_elections_aug %>%
+  dplyr::filter(
+    stringr::str_sub(match,1,1) == "?"
+  )
+)
+#
+Nmatch <- nrow(
+  df_candidates_distinct_all_elections_aug %>%
+  dplyr::filter(
+    stringr::str_sub(match,1,1) != "?"
+  )
+)
+#
+Nmissing <- nrow(
+  df_candidates_distinct_all_elections_aug %>%
+  dplyr::filter(
+    match == "?missing"
+  )
+)
+#
+Nambig <- nrow(
+  df_candidates_distinct_all_elections_aug %>%
+  dplyr::filter(
+    match == "?ambig"
+  )
+)
+```
+The first step was a careful 'manicuring' of the names, including recognizing the use of middle names as first names, and nicknames in place of first names (Chuck for Charles, etc.) I then removed duplicates and was left with `r format(Nall,big.mark=",")` names.  
+
+Of those `r format(Nall,big.mark=",")` names, I was able to match `r format(Nmatch,big.mark=",")` (`r round(Nmatch*100/Nall,digits=1)`%) names against the NCSBE voter registration file.  
+
+Of the `r Nunmatch` unmatched names, `r Nmissing` (`r round(Nmissing*100/Nall,digits=1)`% of the `r Nall` names) appeared to be plausible, that is, apparently not variants of other names, but were not in the voter registration file. Since the names of inactive or deceased voters are removed from the registration file after two elections, these names might be among those so removed.  
+
+In addition, the unmatched names included `r Nambig` (`r round(Nambig*100/Nall,digits=1)`% of the `r format(Nall,big.mark=",")` names) that I classified as ambiguous. For example, "Tom Smith" might be entered for a county, but the registration file might hold multiple variations on it.
+
+It appears that a few counties did not get the memo about being careful with names. The histogram below shows the number of names by county that I removed from the original list because of their being near-duplicates or variants, `r format(Nrem,big.mark=",")` in all as mentioned above. It is evident that some counties did poorly, although spread out over ten years this may not have significant impact on the quality.
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+d <- df_candidates_distinct_all_elections_excluded %>% 
+dplyr::group_by(
+  county
+) %>% 
+dplyr::summarise(
+  N=n()
+)
+#
+n5exc <- fivenum(d$N)
+#
+p <- d %>%
+ggplot(
+  aes(x=N)
+) +
+geom_histogram(
+  color="black", 
+  fill="white"
+) +
+labs(
+  title="Number Removed per County",
+  subtitle="Over the years as discussed in the text.",
+  x="Number Removed",
+  y="Number of Counties"
+) +
+theme(
+  plot.title = element_text(
+    hjust = 0.5
+  ),
+  plot.subtitle = element_text(
+    hjust = 0.5
+  )
+)
+```
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+p
+```
+
+The 3rd Quartile (actually the upper hinge) is at `r n5exc[4]` removed. The counties having more than that removed and arranged from lowest to highest were  
+
+```{r echo=FALSE}
+dd <- d %>% dplyr::filter(N > n5exc[4]) %>% dplyr::arrange(N) %>% dplyr::select(county)
+#
+dd$county
+```  
+
+The number of candidates per county is shown below. This counts only the matched names.  
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+d <- df_candidates_distinct_all_elections_aug %>% 
+dplyr::group_by(
+  county
+) %>% 
+dplyr::summarise(
+  N=n()
+)
+#
+n5inc <- fivenum(d$N)
+#
+p <- d %>%
+ggplot(
+  aes(x=N)
+) +
+geom_histogram(
+  color="black", 
+  fill="white"
+) +
+labs(
+  title="Number of Candidates per County",
+  subtitle="Over the years as discussed in the text.",
+  x="Number of Candidates",
+  y="Number of Counties"
+) +
+theme(
+  plot.title = element_text(
+    hjust = 0.5
+  ),
+  plot.subtitle = element_text(
+    hjust = 0.5
+  )
+)
+```
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+p
+```
+
+The 2nd Quartile (the lower hinge) is at `r n5inc[2]` candidates. The counties having fewer than that and arranged from lowest to highest were  
+
+```{r echo=FALSE}
+dd <- d %>% dplyr::filter(N < n5inc[2]) %>% dplyr::arrange(N) %>% dplyr::select(county)
+#
+dd$county
+```  
+
+The 3rd Quartile (the upper hinge) is at `r n5inc[4]` candidates. The counties having more than that and arranged from lowest to highest were  
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+dd <- d %>% 
+dplyr::filter(
+  N > n5inc[4]
+) %>% 
+dplyr::arrange(
+  N
+) %>% 
+dplyr::select(
+  county
+)
+#
+dd$county
+```  
+
+### Racial Composition of the Slates  
+
+Looking only at the `r format(Nmatch,big.mark=",")` matches we can calculate the racial composition of candidates in all elections, primaries and generals, rolled up for all the years as noted above. Race reported as Unknown is included as part of Other. The second line shows percentages.  
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+countsNCSBE <- 
+  df_candidates_distinct_all_elections_aug %>% 
+  dplyr::filter(stringr::str_sub(match,1,1) != "?") %>%  
+  dplyr::select(
+    county,
+    race_code
+  ) %>% 
+  reshape2::dcast(
+    .~race_code,
+    margins=TRUE
+  ) %>%
+  dplyr::mutate(
+    Other=M+O+U
+  ) %>%
+  plyr::rename(
+    c("(all)"="Total")
+  ) %>%
+  dplyr::select(
+    Total, 
+    W,
+    B,
+    I,
+    A,
+    Other
+  )
+#
+countsNCSBE[2,] <-
+  c(
+    100,
+    round(countsNCSBE[1,2]*100/countsNCSBE[1,1],digits=1),
+    round(countsNCSBE[1,3]*100/countsNCSBE[1,1],digits=1),
+    round(countsNCSBE[1,4]*100/countsNCSBE[1,1],digits=1),
+    round(countsNCSBE[1,5]*100/countsNCSBE[1,1],digits=1),
+    round(countsNCSBE[1,6]*100/countsNCSBE[1,1],digits=1)
+  ) 
+#
+names(countsNCSBE) <- c(
+  "Total",
+  "White",
+  "Black",
+  "AmerInd",
+  "Asian",
+  "Other"
+)
+```
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+countsNCSBE
+```
+
+### The Number of Choices    
+
+Looking at the entire state over a ten year period, the numbers reported above show that the racial composition of the boards closely matches the proportion of board candidates, with White candidates outnumbering Black candidates by a factor of about `r round(countsNCSBE[1,2]/countsNCSBE[1,3])`. An implication of this is that in some cases voters have few choices, that is, there is not much competition for board seats. This is not uniformly applicable. For instance, Mecklenburg has provided a large number of candidates compared to other counties.  
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+d <-
+df_candidates_distinct_all_elections_aug %>% 
+dplyr::filter(
+  stringr::str_sub(match,1,1) != "?" &
+  race_code %in% c("B","W")
+) %>%
+dplyr::group_by(
+  county,
+  race_code
+) %>% 
+dplyr::summarize(N=n()) %>% 
+reshape2::dcast(
+  county~race_code,
+  value.var="N"
+) %>%
+dplyr::mutate_if(
+  is.numeric, funs(ifelse(is.na(.), 0, .))
+)
+#
+p <- d %>%
+ggplot(
+  aes(label=county, x=W,y=B)
+) +
+geom_point(
+  size=2,
+  position=position_jitter(width=0.3, height=0)
+) +
+xlim(0,40) +
+ylim(0,40) +
+labs(
+  title="Number of Black and White Board Candidates by County",
+  subtitle="Over Ten Years",
+  x="Number of White Candidates",
+  y="Number of Black Candidates"
+) +
+theme(
+  plot.title = element_text(
+    hjust = 0.5
+  ),
+    plot.subtitle = element_text(
+    hjust = 0.5
+  )
+) +
+geom_abline(
+  slope=1,
+  intercept=0
+) +
+annotate(
+  geom="text",
+  x=10,
+  y=37,
+  hjust=0,
+  label="For matched names over the years\nin the primary and general elec-\ntions as discussed in the text."
+)
+#
+pp <- plotly::ggplotly(p)
+```
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+pp
+```
+
+### Some Exploratory Statistics  
+
+Does there appear to be a correlation between county total population and number of board candidates?  The wide range of county populations argues for using log of population. The scatterplot indicates that there is no appreciable relationship between county population and number of candidates. The points for Buncombe and Mecklenburg, being isolated from the mass of the other counties, do not have any influence on the computation of correlation. Refer to the histogram "Unmatched Candidates", below, to see the number of unmatched candidates, which can have some influence on the population:number of candidates correlation calculation.  
+
+```{r echo=FALSE}
+d1 <- df_totalbyrace %>% 
+  dplyr::select(
+    FIPS3,
+    Total
+  ) %>% 
+  dplyr::mutate(
+    logTotal=log10(Total)
+  )
+#
+d2 <- df_candidates_distinct_all_elections_aug %>% 
+dplyr::group_by(
+  county
+) %>% 
+dplyr::summarise(
+  N=n()
+) %>%
+dplyr::inner_join(
+  df_FIPS %>%
+    dplyr::mutate(
+      county=toupper(County)
+    ) %>%
+    dplyr::select(
+      county,
+      FIPS3
+    ),
+  by="county"
+) %>%
+dplyr::select(
+  FIPS3,
+  N,
+  county
+)
+#
+d3 <- dplyr::inner_join(
+    d1,
+    d2,
+    by="FIPS3"
+)
+#
+p <- d3 %>%
+ggplot(
+  aes(x=N, y=logTotal, label=county)
+) +
+geom_point() +
+labs(
+  title="Log Total Population vs. Number of Candidates",
+  x="Number of Candidates over the Years of the Study",
+  y="Log10 of the Total Population (ACS 2016)"
+) +
+theme(
+  plot.title = element_text(
+    hjust = 0.5
+  ),
+    plot.subtitle = element_text(
+    hjust = 0.5
+  )
+)
+#
+pp <- plotly::ggplotly(p)
+```
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+pp
+```
+
+The following histogram shows the number of unmatched candidates by county, over the years of this study. Unmatched includes missing, that is, plausible names that are not in the voter registration file, and ambiguous, where the names are plausible but could have multiple matches in the voter registration file.  
+
+```{r echo=FALSE}
+dquest <- df_candidates_distinct_all_elections_aug %>% 
+dplyr::filter(
+  stringr::str_sub(match,1,1) == "?"
+) %>%
+dplyr::group_by(
+  county
+) %>% 
+dplyr::summarise(
+  N=n()
+) %>%
+dplyr::inner_join(
+  df_FIPS %>%
+    dplyr::mutate(
+      county=toupper(County)
+    ) %>%
+    dplyr::select(
+      county,
+      FIPS3
+    ),
+  by="county"
+) %>%
+dplyr::select(
+  FIPS3,
+  N,
+  county
+)
+#
+n5q <- fivenum(dquest$N)
+#
+p <- dquest %>%
+ggplot(
+  aes(x=N)
+) +
+geom_histogram(
+  color="black", 
+  fill="white"
+) +
+labs(
+  title="Number of Unmatched Candidates per County",
+  subtitle="Over the years as discussed in the text.",
+  x="Number of Unmatched Candidates",
+  y="Number of Counties"
+) +
+theme(
+  plot.title = element_text(
+    hjust = 0.5
+  ),
+  plot.subtitle = element_text(
+    hjust = 0.5
+  )
+)
+```
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+p
+```
+
+The 3rd Quartile (the upper hinge) is at `r n5q[4]` candidates. The counties having more than that and arranged from lowest to highest were  
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+dd <- dquest %>% 
+dplyr::filter(
+  N > n5q[4]
+) %>% 
+dplyr::arrange(
+  N
+) %>% 
+dplyr::select(
+  county
+)
+#
+dd$county
+```  
+
+Consider now the proportion of White race in the overall county population. Since Other is consistently small, White and Black are more or less complementary. White percentage is above 80% in about thirty counties, so we will use the logit function instead of the percentage. Logit is calculated as log(p/(1-p)).  
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+d1 <- df_totalbyrace %>%
+  dplyr::filter(
+    Year==2016
+  ) %>%
+  dplyr::select(
+    FIPS3,
+    WhitePct
+  ) %>%
+  dplyr::mutate(
+    Wlogit=round(log(WhitePct/(100-WhitePct)),digits=4)
+  )
+#
+WlogitMin <- min(d1$Wlogit)
+WlogitMax <- max(d1$Wlogit)
+#
+d2 <- df_candidates_distinct_all_elections_aug %>% 
+dplyr::group_by(
+  county
+) %>% 
+dplyr::summarise(
+  N=n()
+) %>%
+dplyr::inner_join(
+  df_FIPS %>%
+    dplyr::mutate(
+      county=toupper(County)
+    ) %>%
+    dplyr::select(
+      county,
+      FIPS3
+    ),
+  by="county"
+) %>%
+dplyr::select(
+  FIPS3,
+  N,
+  county
+)
+#
+n5N <- fivenum(d2$N)
+hingeNL <- n5N[3] - 1.5*(n5N[4]-n5N[2])
+hingeNU <- n5N[3] + 1.5*(n5N[4]-n5N[2])
+#
+d3 <- dplyr::inner_join(
+    d1,
+    d2,
+    by="FIPS3"
+)
+#
+p <- d3 %>%
+ggplot(
+  aes(x=N, y=Wlogit, label=county)
+) +
+geom_point(
+  size=2,
+  position=position_jitter(width=0.3, height=0)
+) +
+xlim(5,55) +
+ylim(round(WlogitMin),round(WlogitMax)) +
+geom_hline(
+  yintercept=0,
+  linetype="dotted"
+) +
+geom_hline(
+  yintercept=log(3),
+  linetype="dotted"
+) +
+geom_hline(
+  yintercept=log(9),
+  linetype="dotted"
+) +
+geom_text(
+  x=11,
+  y=4,
+  hjust=0,
+  label="Dotted lines % White: "
+) +
+geom_text(
+  x=14.5,
+  y=3.8,
+  hjust=0,
+  label="Upper 90%, Middle 75%, Lower 50%"
+) +
+labs(
+  title="Logit White Percent of Total Population vs. Number of Candidates",
+  x="Number of Candidates over the Years of the Study",
+  y="Log(p/(1-p)) White Percent of Total Population (ACS 2016)"
+) +
+theme(
+  plot.title = element_text(
+    hjust = 0.5
+  ),
+    plot.subtitle = element_text(
+    hjust = 0.5
+  )
+)
+pp <- plotly::ggplotly(p)
+```
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+pp
+```
+
+It is evident from inspection that, if the outliers for Buncombe and Mecklenburg are excluded, there is little correlation between the White race population proportion expressed as a logit and the number of commissioner candidates.  
+
+## Conclusions  
+
+Reconstruction of the county commissioner candidate pool is made difficult by data quality deficiencies. Any conclusions have to be moderated by this, but reasonably reliable observations can still be made. Looking back over the past ten years, the proportion of candidates by race was about 81% White, 16% Black, with the remainder American Indian, Asian, or some other category.  
+
+Perhaps the most interesting observations are associated with the scatterplot, "Number of Black and White Board Candidates by County," which deserves your attention. Beyond that, whether there are any correlations between number of candidates and any characteristics of counties remains an open question.
+
+END  
