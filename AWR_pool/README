@@ -1,0 +1,28 @@
+30 October 2018
+David Hopp
+
+This is an R project that looks at the slates for county commissioner boards from 2008 to 2018, and may be extended as time moves along.
+
+Data is to be found in the repo AWR_data_only.
+
+The voter registration file, being very large, is in an AWS repository as a processed .RData file, at 
+https://s3.amazonaws.com/are-we-represented/NCSBE_data/ncvoter/df_ncvoter_subset_distinct_demog_20180407.RData
+
+In its original form it is the file ncvoter_Statewide_20180407.txt
+
+There are three R markdown scripts that make everything work:
+
+read_ncvoter_standalone.Rmd processes the NCSBE voter registration file (see above).
+You may want to run this once but do not run it every time you do something with this project.
+It never changes!
+
+prep_complete.Rmd creates the R objects needed for the analysis.
+
+compact_updates.Rmd USES THE OUTPUT of prep_complete.Rmd
+It painstakingly processes the NCSBE pdf candidate lists to filter names of candidates.
+
+A subsequent R markdowm file, pool_report.Rmd, is the report based on
+THE OUTPUT of both the preceding Rmd files.
+
+The first three of these incorporate file paths (data_dir, etc.) that stipulate just where
+files exist and to where they will be written. Change these as you find convenient.
