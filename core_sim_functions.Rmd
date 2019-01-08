@@ -1,0 +1,845 @@
+---
+title: "AreWeRepresented neo4j Simulation"
+output:
+  html_document: default
+author: "D. Hopp"
+date: "January 8, 2019"
+---
+
+```{r dyad}
+load("prep.RData")
+ls()
+```
+
+12/18/18 Change to replace=TRUE  
+
+## Sim functions  
+
+Run simulation by county based on df_totalbyrace  
+Use only the three race categories reported in NCACC data plus Other:  
+AmInd,Black,White,Other  
+
+#
+# sim functions  
+#
+
+```{r kapok}
+fn_sim_byrace <- function(df_aug_,m_sim_) {
+#
+# run the sim n_sim times
+# uses df_ACS_years_aug or df_totalbyrace_aug
+# and m_ACS_years_sim or m_totalbyrace_sim
+#
+  n_row <- 0
+  for (f_ in df_aug_$FIPS3) {
+    for (n_ in 1:n_sim) {
+      #
+      # select a sample of size ncomm from between 1  
+      #   and the total population of county
+      #
+      v_sim <- 
+        sample.int(
+          as.numeric(
+            df_aug_[df_aug_$FIPS3==f_,"Total"]
+          ),
+          df_NCACC_demog[df_NCACC_demog$FIPS3==f_,"ncomm"],
+          replace=TRUE
+        )
+      #
+      # decide in which race category each sample falls
+      #
+      n_row <- n_row+1
+      m_sim_[n_row,1] <- as.numeric(f_)
+      for (s_ in 1:length(v_sim)) {
+        if (v_sim[s_] <= df_aug_[df_aug_$FIPS3==f_,"AmIndEnd"]) {
+          c <- 2
+        } else if (v_sim[s_] <= df_aug_[df_aug_$FIPS3==f_,"BlackEnd"]) {
+          c <- 3
+        } else if (v_sim[s_] <= df_aug_[df_aug_$FIPS3==f_,"WhiteEnd"]){
+          c <- 4
+        } else {
+          c <- 5
+        }
+        m_sim_[n_row,c] <- m_sim_[n_row,c] + 1
+      }
+    }
+  }
+  return(m_sim_)
+}
+```
+
+```{r cozy}
+fn_sim_counts <- function(m_sim_){
+  #
+  # Change m_ACS_years_sim to a data frame
+  # produce df_ACS_years_sim_counts
+  #
+  df_sim <-
+    as.data.frame.matrix(
+      m_sim_
+    )
+  #
+  #str(df_sim)
+  #
+  df_sim %<>%
+    dplyr::inner_join(
+      df_FIPS %>%
+        dplyr::select(
+          County,
+          FIPS,
+          FIPS3
+        ),
+      by=c("V1"="FIPS")
+    ) %>%
+    dplyr::rename(
+      AmInd=V2,
+      Black=V3,
+      White=V4,
+      Other=V5
+    ) %>%
+  dplyr::select(
+      -V1
+    ) %>%
+    dplyr::group_by(
+      AmInd,
+      Black,
+      White,
+      Other,
+      FIPS3
+    )
+  #
+  #str(df_sim)
+  #
+  df_sim_counts <- 
+    df_sim %>%
+    dplyr::summarize(
+      N=n()
+    ) %>%
+    dplyr::mutate(
+      Npct=N*100/n_sim,
+      Nlogit=ifelse(
+        Npct==0,
+        0,
+        round(log(Npct/(100-Npct)),digits=4)
+      )
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(
+      FIPS3,
+      -N
+    )
+  #
+  return(df_sim_counts)
+}
+```
+
+See if any of the actual NCACC race compositions are in the results of the sim.  
+Use df_totalbyrace_sim_counts and df_NCACC_demog.  
+Add on election method but in only three categories: at large, district, or mixed.  
+
+
+```{r lumpy}
+fn_sim_counts_hits <- function(df_sim_counts_){
+  df_sim_counts_hits <-
+  dplyr::left_join(
+    df_NCACC_demog %>%
+      dplyr::filter(
+        Year==2016
+      ) %>%
+      dplyr::select(
+        FIPS3,
+        ncomm,
+        nwhite,
+        nafam,
+        namin
+      ),
+    df_sim_counts_ %>%
+      dplyr::filter(
+        Other==0
+      ),
+    by=c(
+      "FIPS3",
+      "nwhite"="White",
+      "nafam"="Black",
+      "namin"="AmInd"
+    )
+  ) %>%
+  dplyr::inner_join(
+    df_FIPS %>%
+      dplyr::select(
+        FIPS3,
+        County
+      ),
+    by="FIPS3"
+  ) %>%
+  dplyr::inner_join(
+    df_Tier %>%
+      dplyr::filter(
+        Year==2017
+      ) %>%
+      dplyr::select(
+        FIPS3,
+        Tier
+      ),
+    by="FIPS3"
+  ) %>%
+  dplyr::inner_join(
+    df_cc_method %>%
+      dplyr::select(
+        FIPS3,
+        Method
+      ),
+    by="FIPS3"
+  ) %>%
+  dplyr::mutate(
+    N=ifelse(is.na(N),0,N),
+    Npct=ifelse(is.na(Npct),0,Npct),
+    Nlogit=ifelse(
+      Npct==0,
+      0,
+      round(log(Npct/(100-Npct)),digits=4)
+    ),
+    Method=ifelse(Method %in% c("al","d"),Method,"m")
+  ) %>%
+  dplyr::arrange(
+    -N,
+    County
+  )
+  #
+  return(df_sim_counts_hits)
+}
+```  
+
+A function to allow easy use of list return from a function.  
+Source https://stackoverflow.com/questions/1826519/how-to-assign-from-a-function-which-returns-more-than-one-value  
+Use:  
+c(a,b) := someFunctionThatReturnsATwoItemList()  
+a is the first item, b is the second.  
+
+data.table has a := operator. May conflict???  
+
+```{r flung}
+':=' <- function(lhs, rhs) {
+  frame <- parent.frame()
+  lhs <- as.list(substitute(lhs))
+  if (length(lhs) > 1)
+    lhs <- lhs[-1]
+  if (length(lhs) == 1) {
+    do.call(`=`, list(lhs[[1]], rhs), envir=frame)
+    return(invisible(NULL)) 
+  }
+  if (is.function(rhs) || is(rhs, 'formula'))
+    rhs <- list(rhs)
+  if (length(lhs) > length(rhs))
+    rhs <- c(rhs, rep(list(NULL), length(lhs) - length(rhs)))
+  for (i in 1:length(lhs))
+    do.call(`=`, list(lhs[[i]], rhs[[i]]), envir=frame)
+  return(invisible(NULL)) 
+}
+```  
+
+This function adds results of a sim to the dataframes df_sim_results_counts, df_sim_results_hits and df_sim_results_index.  
+df_sim_results_counts:  
+"FIPS3" "AmInd" "Black" "White" "Other" "N" "Npct" "Nlogit" "index_uid"  
+
+df_sim_results_hits (Method is election method):  
+"FIPS3" "ncomm" "nwhite" "nafam" "namin" "Other" "N" "Npct" "Nlogit" "County" "Tier" "Method" "index_uid"  
+
+df_sim_results_index
+"index_uid" "Nsims" "Basis" "Election" "Dated" "Comment"  
+
+Use a dataframe to keep track of index_uid. A constant might get lost. This has only one row.  
+df_sim_results_next_index
+"next_index_uid"  
+
+```{r zinc}
+fn_sim_result.add <- function(df_counts_,df_hits_,Nsims_,Basis_,Election_,Dated_,Comment_){
+#
+# Three dataframes are involved, one to hold counts, one to hold hits, one to act as an index.
+# Check to see if dataframes exist. If none exist start anew. If some exist declare error.
+#
+# df_counts_ and df_hits_ are the results of a sim.
+#
+  check <- c(
+    exists("df_sim_results_counts"),
+    exists("df_sim_results_hits"),
+    exists("df_sim_results_index"),
+    exists("df_sim_results_next_index")
+  )
+  if (all(check)){
+    #
+    # add to existing data frames
+    #
+    new_index_uid <- df_sim_results_next_index[1,"next_index"]
+    df_sim_results_counts <- 
+      rbind(
+        df_sim_results_counts,
+        df_counts_ %>%
+          dplyr::mutate(
+            index_uid=new_index_uid
+          )
+      )
+    #
+    df_sim_results_hits <- 
+      rbind(
+        df_sim_results_hits,
+        df_hits_ %>%
+          dplyr::mutate(
+            index_uid=new_index_uid
+          )
+      )
+    #
+    df_sim_results_index <-
+      rbind(
+        df_sim_results_index,
+        c(
+          as.numeric(Nsims_),
+          as.character(Basis_),
+          as.character(Election_),
+          as.character(Dated_),
+          as.character(Comment_),
+          as.numeric(new_index_uid)
+        )
+      )
+    df_sim_results_index$index_uid <- as.numeric(df_sim_results_index$index_uid)
+    df_sim_results_index$Nsims <- as.numeric(df_sim_results_index$Nsims)
+    #
+    # update next_uid
+    #
+    df_sim_results_next_index[1,"next_index"] <- new_index_uid + 1
+    #
+  } else if (all(!check)) {
+    #
+    # create data frames
+    # index_uid starts at 1
+    #
+    df_counts_ %<>% 
+      dplyr::mutate(
+        index_uid=1
+      )
+    df_sim_results_counts <- df_counts_
+    #
+    df_hits_ %<>% 
+      dplyr::mutate(
+        index_uid=1
+      )
+    df_sim_results_hits <- df_hits_
+    #
+    df_sim_results_index <-
+      data.frame(
+        Nsims_,
+        Basis_,
+        Election_,
+        Dated_,
+        Comment_
+      ) %>%
+      dplyr::rename(
+        Nsims=Nsims_,
+        Basis=Basis_,
+        Election=Election_,
+        Dated=Dated_,
+        Comment=Comment_
+      ) %>%
+      dplyr::mutate(
+        index_uid=1
+      )
+    #
+    df_sim_results_index$index_uid <- as.numeric(df_sim_results_index$index_uid)
+    df_sim_results_index$Nsims <- as.numeric(df_sim_results_index$Nsims)
+    df_sim_results_index$Basis <- as.character(df_sim_results_index$Basis)
+    df_sim_results_index$Election <- as.character(df_sim_results_index$Election)
+    df_sim_results_index$Dated <- as.character(df_sim_results_index$Dated)
+    df_sim_results_index$Comment <- as.character(df_sim_results_index$Comment)
+    #
+    df_sim_results_next_index <-
+      data.frame(
+        2
+      )
+    names(df_sim_results_next_index) <- "next_index"
+    #
+  } else {
+    #
+    # error that must be attended to
+    # not all three dataframes are there
+    #
+    print(
+      "ERROR: Only some of df_sim_results_counts, df_sim_counts_hits, df_sim_results_index and df_sim_results_next_index exist"
+    )
+    knitr::knit_exit()
+  }
+  #
+  # finally
+  #
+  return(
+    list(
+      df_sim_results_counts,
+      df_sim_results_hits,
+      df_sim_results_index,
+      df_sim_results_next_index
+    )
+  )
+}
+```  
+
+```{r holly}
+fn_sim_result.delete <- function(v_index_uid_){
+#
+# v_index_uid_ is a vector of positive integers
+#
+# delete records with any of v_index_uid in the dataframes 
+# df_sim_results_counts, df_sim_results_hits and df_sim_results_index
+#
+# leaves df_sim_results_next_index unaltered
+#
+  check <- c(exists("df_sim_results_counts"),exists("df_sim_results_hits"),exists("df_sim_results_index"))
+  if (all(check)){
+    #
+    # all data frames exist
+    #
+    df_sim_results_index %<>% 
+      dplyr::filter(
+        !(index_uid %in% v_index_uid_)
+      )
+    df_sim_results_counts %<>% 
+      dplyr::filter(
+        !(index_uid %in% v_index_uid_)
+      )
+    df_sim_results_index %<>% 
+      dplyr::filter(
+        !(index_uid %in% v_index_uid_)
+      )
+    #
+    return(
+      list(
+        df_sim_results_counts,
+        df_sim_results_hits,
+        df_sim_results_index
+      )
+    )
+  } else if (all(!check)) {
+    #
+    # none of the data frames are there
+    #
+    return(NULL)
+  } else {
+    #
+    # some are there
+    #
+    print("Not all df_sim_results_counts, df_sim_results_hits and df_sim_results_index exist.")
+    knitr::knit_exit()
+  }
+}
+```
+
+## Carry out sim  
+
+```{r}
+Sys.time()
+```
+
+Results will be placed in a matrix. We need a structure that holds for 
+each county the sim results.  
+
+Create a matrix with all 0 cells to hold the sim results  
+
+Use fn_sim_result.add <- function(df_counts_,df_hits_,Nsims_,Basis_,Election_,Dated_,Comment_) to store results.  
+
+Added August 8, 2018. Move away from use of df_totalbyrace. Simpler to use augmented df_ACS_years. Note however that population estimates can be substantially different.  
+
+```{r shut}
+df_ACS_years_aug <-
+  df_ACS_years %>%
+    dplyr::mutate(
+      AmIndPct=round(AmInd*100/Total,digits=1),
+      BlackPct=round(Black*100/Total,digits=1),
+      WhitePct=round(White*100/Total,digits=1),      
+      OtherPct=round(Other*100/Total,digits=1)
+    )
+#
+str(df_ACS_years_aug)
+#
+# initialize save_core_sim_objects and save_this_sim_objects
+#
+save_core_sim_objects <- c("df_ACS_years","df_ACS_years_aug","df_totalbyrace","df_NCACC_demog")
+save_this_sim_objects <- ""
+```  
+
+```{r way}
+# AmInd can be zero
+df_ACS_years_aug %<>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    AmIndEnd=AmInd,
+    BlackEnd=AmIndEnd+Black,
+    WhiteEnd=BlackEnd+White    
+  ) %>%
+  dplyr::ungroup()
+#
+str(df_ACS_years_aug)
+```  
+
+df_turnout_election_wide_aug is for comparing against voting population  
+
+```{r jules}
+#
+# df_turnout_election_wide_aug is for comparing against census population
+#
+df_turnout_election_wide_aug <-
+df_turnout_election_wide %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    Total=Black+AmInd+White+Other,
+    AmIndEnd=AmInd,
+    BlackEnd=AmIndEnd+Black,
+    WhiteEnd=BlackEnd+White    
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(
+    FIPS3,
+    Election,
+    AmIndEnd,
+    BlackEnd,
+    WhiteEnd,
+    Total
+  )
+#
+str(df_turnout_election_wide_aug)
+save_core_sim_objects <- c(save_core_sim_objects,"df_turnout_election_wide_aug")
+```  
+
+Do the sim. Note especially the input to fn_sim_byrace(). If desired, name the data objects to match the sim data source and number of runs. Silently uses m_totalbyrace_sim.  
+
+```{r krebs}
+#
+# set seed by inspiration or using runif BUT NOT BOTH!
+#
+# not really random - biased towards afternoon and evening
+# use just decimal part
+#
+seed_1 <- 
+    as.numeric(Sys.time())-as.numeric(Sys.Date())*86400
+if (abs(round((seed_1-round(seed_1))*10000))==0){
+  seed_ <- seed1_ + 1
+} else {
+  seed_ <- abs(round((seed_1-round(seed_1))*10000))
+}
+#
+# or
+#
+#seed_ <- 1234
+#
+set.seed(seed_)
+#
+# runs per county:
+n_sim <- 2000
+#
+save_this_sim_objects <- c(save_this_sim_objects,"n_sim","seed_")
+save_file_suffix <- ""
+#
+seed_
+n_sim
+```  
+
+Sim for census data and 2016 general election  
+
+```{r juror}
+#
+# DO NOT USE
+#
+do_census_161108 <- FALSE
+#
+if (do_census_161108) {
+  #
+  # first column will be numeric interpretation of FIPS3
+  # then AmInd,Black,White,Other
+  #
+  m_totalbyrace_sim <-
+    matrix(
+      rep.int(0,100*n_sim*5),
+      ,
+      nrow=100*n_sim,
+      ncol=5
+    )
+  #
+  # does the sim
+  #
+  m_totalbyrace_sim <- 
+    fn_sim_byrace(
+      df_totalbyrace_aug,
+      m_totalbyrace_sim
+    )
+  str(m_totalbyrace_sim)
+  #
+  # uses m_totalbyrace_sim
+  #
+  df_totalbyrace_sim_counts_census_161108_ <- 
+    fn_sim_counts(m_totalbyrace_sim)
+  str(df_totalbyrace_sim_counts_census_161108_)
+  #
+  df_totalbyrace_sim_counts_hits_census_161108_ <- 
+    fn_sim_counts_hits(
+      df_totalbyrace_sim_counts_census_161108_
+    )
+  str(df_totalbyrace_sim_counts_hits_census_161108_)
+  #
+  # save in an RData file and remove from objects
+  #
+  save(
+    df_totalbyrace_sim_counts_hits_census_161108_,
+    df_totalbyrace_sim_counts_census_161108_,
+    file="totalbyrace_sim_counts_census_161108_.RData"
+  )
+  rm(
+    df_totalbyrace_sim_counts_hits_census_161108_,
+    df_totalbyrace_sim_counts_census_161108_
+  )
+  save(
+    m_totalbyrace_sim,
+    file="m_totalbyrace_sim_census_161108_.RData"
+  )
+  rm(m_totalbyrace_sim)
+  #
+  save_file_suffix <- paste0(save_file_suffix,"_total")
+}
+```  
+
+Sim for ACS data and 2016 general election  
+NOTE: For now must change by hand object names ending in number of sims  
+
+```{r want}
+do_ACS_161108 <- FALSE
+#
+if (do_ACS_161108) {
+  #
+  # first column will be numeric interpretation of FIPS3
+  # then AmInd,Black,White,Other
+  #
+  m_ACS_years_sim <-
+    matrix(
+      rep.int(0,100*n_sim*5),
+      ,
+      nrow=100*n_sim,
+      ncol=5
+    )
+  #
+  # does the sim
+  #
+  m_ACS_years_sim <- 
+    fn_sim_byrace(
+      df_ACS_years_aug %>% 
+        dplyr::filter(Year=="2016"),
+      m_ACS_years_sim
+    )
+  str(m_ACS_years_sim)
+  #
+  # uses m_ACS_years_sim
+  #
+  df_ACS_years_sim_counts_census_161108_ <- 
+    fn_sim_counts(m_ACS_years_sim)
+  #
+  df_ACS_years_sim_counts_census_161108_ %<>%
+    dplyr::mutate(
+      n_sim=n_sim,
+      seed=seed_
+    )
+  #
+  str(df_ACS_years_sim_counts_census_161108_)
+  #  
+  df_ACS_years_sim_counts_hits_census_161108_ <- 
+    fn_sim_counts_hits(
+      df_ACS_years_sim_counts_census_161108_
+    )
+  #
+  str(df_ACS_years_sim_counts_hits_census_161108_)
+  #
+  # add explicit row number for later use
+  #
+  df_ACS_years_sim_counts_census_161108_$n_row <-
+    as.numeric(
+      row.names(
+        df_ACS_years_sim_counts_census_161108_
+      )
+    )  
+  #
+  # change names and save as RData 
+  #
+  obj1 <- paste0("df_ACS_years_sim_counts_census_161108_",n_sim,"_rep_",seed_)
+  obj2 <- paste0("df_ACS_years_sim_counts_hits_census_161108_",n_sim,"_rep_",seed_)
+  #
+  assign(
+    obj1,
+    df_ACS_years_sim_counts_census_161108_
+  )
+  assign(
+    obj2,
+    df_ACS_years_sim_counts_hits_census_161108_
+  )  
+  #  
+  save_this_sim_objects <- c(save_this_sim_objects,
+    obj1,
+    obj2
+  )  
+  #
+  save_file_suffix <- paste0(save_file_suffix,"_ACS")
+  #
+  rm(m_ACS_years_sim)
+}
+```  
+
+```{r}
+Sys.time()
+```
+
+Sim for voting data - NCSBE counts of persons who voted in 2016 general election  
+
+```{r edith}
+do_voting_161108 <- TRUE
+#
+if (do_voting_161108) {
+  #
+  # first column will be numeric interpretation of FIPS3
+  # then AmInd,Black,White,Other
+  #
+  m_voting_sim <-
+    matrix(
+      rep.int(0,100*n_sim*5),
+      ,
+      nrow=100*n_sim,
+      ncol=5
+    )
+  #
+  # does the sim
+  #
+  m_voting_sim <- 
+    fn_sim_byrace(
+      df_turnout_election_wide_aug %>% 
+        dplyr::filter(
+          Election=="20161108"
+        ),
+      m_voting_sim
+    )
+  str(m_voting_sim)
+  #
+  # uses m_voting_sim
+  #
+  df_voting_sim_counts_ <- 
+    fn_sim_counts(
+      m_voting_sim
+    )
+  #
+  df_voting_sim_counts_ %<>%
+    dplyr::mutate(
+      n_sim=n_sim,
+      seed=seed_
+    )
+  #
+  str(df_voting_sim_counts_)
+  #
+  df_voting_sim_counts_hits_ <- 
+    fn_sim_counts_hits(
+      df_voting_sim_counts_
+    )
+  #
+  str(df_voting_sim_counts_hits_)
+  #
+  # add explicit row number for later use
+  #
+  df_voting_sim_counts_$n_row <-
+    as.numeric(
+      row.names(
+        df_voting_sim_counts_
+      )
+    )
+  #
+  c(df_sim_results_counts,
+    df_sim_results_hits,
+    df_sim_results_index,
+    df_sim_results_next_index
+  ) := fn_sim_result.add(
+    df_voting_sim_counts_,
+    df_voting_sim_counts_hits_,
+    n_sim,
+    "turnout",
+    "20161108",
+    format(Sys.Date(), format="%Y%m%d"),
+    ""
+  )
+  #
+  rm(m_voting_sim)
+  #
+  # change names and save
+  #
+  obj1 <- paste0("df_voting_sim_counts_",n_sim,"_rep_",seed_)
+  obj2 <- paste0("df_voting_sim_counts_hits_",n_sim,"_rep_",seed_)
+  #
+  assign(
+    obj1,
+    df_voting_sim_counts_
+  )
+  assign(
+    obj2,
+    df_voting_sim_counts_hits_
+  )
+  #
+  save_this_sim_objects <- c(save_this_sim_objects,
+    obj1,
+    obj2
+  )
+  #
+  save_file_suffix <- paste0(save_file_suffix,"_voting")
+}
+```  
+
+```{r}
+Sys.time()
+```
+
+```{r savoy}
+ls()
+#
+# save the save-lists
+#
+save_core_sim_objects <- c(save_core_sim_objects,"save_core_sim_objects")
+#
+# display it
+#
+save_core_sim_objects
+#
+# do the save
+#
+save(
+  list=save_core_sim_objects,
+  file=paste0("core_sim_objects_",n_sim,save_file_suffix,"_rep_",seed_,".RData")
+)
+```
+
+```{r savoy2}
+#
+save_this_sim_objects <- c(save_this_sim_objects,"save_this_sim_objects")
+#
+# display it
+#
+save_this_sim_objects
+#
+# do the save
+#
+save(
+  list=save_this_sim_objects,
+  file=paste0(output_dir,"this_sim_objects_",n_sim,save_file_suffix,"_rep_",seed_,".RData")
+)
+```
+
+```{r eval=FALSE, echo=FALSE}
+#
+# write to csv
+#
+for (s in save_this_sim_objects){
+  if (any(class(get(s))=="data.frame")){
+    readr::write_delim(
+      get(s),
+      path=paste0(output_dir,s,".csv"),
+      delim="\t"
+    )
+  }
+}
+```  

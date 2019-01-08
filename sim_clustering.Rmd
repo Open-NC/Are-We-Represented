@@ -1,0 +1,819 @@
+---
+title: "AreWeRepresented Sim Clustering"
+output:
+  html_document: default
+author: "D. Hopp"
+date: "January 7, 2019"
+---
+
+```{r }
+load("core_sim_objects.RData")
+#load("sim_objects_1000.RData")
+ls()
+```
+
+```{r}
+# https://stackoverflow.com/questions/1826519/how-to-assign-from-a-function-which-returns-more-than-one-value?noredirect=1&lq=1
+# c(a, b) := functionReturningTwoValues()
+#
+':=' <- function(lhs, rhs) {
+  frame <- parent.frame()
+  lhs <- as.list(substitute(lhs))
+  if (length(lhs) > 1)
+    lhs <- lhs[-1]
+  if (length(lhs) == 1) {
+    do.call(`=`, list(lhs[[1]], rhs), envir=frame)
+    return(invisible(NULL)) 
+  }
+  if (is.function(rhs) || is(rhs, 'formula'))
+    rhs <- list(rhs)
+  if (length(lhs) > length(rhs))
+    rhs <- c(rhs, rep(list(NULL), length(lhs) - length(rhs)))
+  for (i in 1:length(lhs))
+    do.call(`=`, list(lhs[[i]], rhs[[i]]), envir=frame)
+  return(invisible(NULL)) 
+}
+```
+## Clustering Analysis of the Sim Results  
+
+Use package Ckmeans.1d.dp  
+Note that weights cannot be used.  
+
+Can use vector of race-board member counts interpreted as a number  
+but package wants sorted data so that will not work.  
+
+Could assign the row number in a sorted sim results data frame and transform  
+into n_sim rows (each row a single instance of the row number).  
+
+How will the clustering algorithm act with so many repetitions?  
+
+names(df_voting_sim_counts_1000)  
+[1] "AmInd"  "Black"  "White"  "Other"  "FIPS3"  "N"      "Npct"   "Nlogit"  
+
+```{r }
+fn_do_Ckmeans.1d.dp <- function(sim,k_=4){
+  #
+  # sim is the results of a simulation run, e.g., df_voting_sim_counts_1000
+  # k_ is the starting (max) number of clusters to look for
+  #
+  # if Ckmeans.1d.dp is satisfied with k_ it stops
+  # if not it decreases k_ to a min value of 2 before giving up
+  #
+  # this returns a dataframe with one row cluster for each county
+  # the row contains:
+  #   the FIPS3 code as a numeric, 
+  #   the center of a cluster,
+  #   the withinss (sum of squares of deviations)
+  #   the size is number of rows of the input matrix that belong to the cluster
+  #
+  fn_transform_sim <- function(){
+    #
+    # sim is the results of a simulation run, e.g., df_voting_sim_counts_1000
+    #
+    # returns a matrix that can be used for further analysis
+    # the matrix has one row per instance of the sim result
+    # in the returned matrix:
+    # FIPS3 is the numeric county FIPS3
+    # n is just a row number that refers to the INPUT sim
+    # N is the count associated with that row number in the input sim
+    #  it is repeated N times which means that the race counts in
+    #  row n would be repeated that many times
+    # 
+#browser()
+    df_transform_ <-
+      sim %>%
+      dplyr::select(
+        FIPS3,
+        N,
+        n_row
+      )
+    #
+    # use FIPS3_ as a group indicator
+    # and n_row as an index
+    #
+    m <- matrix(
+      nrow=sum(df_transform_$N),
+      ncol=3
+    )
+    m_row <- 0
+    for (i in 1:nrow(df_transform_)) {
+      FIPS3_ <- as.numeric(df_transform_[i,"FIPS3"])
+      n_ <- as.numeric(df_transform_[i,"n_row"])
+      N_ <- as.numeric(df_transform_[i,"N"])
+      for (j in 1:N_) {
+        m_row <- m_row+1
+        m[m_row,1] <- FIPS3_
+        m[m_row,2] <- n_
+        m[m_row,3] <- N_
+      }
+    }
+    colnames(m) <- c("FIPS3_","n_row","N")
+    #
+    # use colnames() to retrieve names, not names()
+    #
+    return(m)
+  }  
+  # end function def
+  # ############################
+  #
+  # begin computations
+  #
+  # mat is created from the function fn_transform_sim
+  #
+#browser()
+  mat <- fn_transform_sim()
+  #
+  county_ <- unique(mat[,1])
+  #
+  # assumes same number of rows for all counties
+  #
+  chunk_ <- as.integer(nrow(mat)/length(county_))
+  # check
+  if (nrow(mat) != chunk_*length(county_)) {
+    print(
+      paste(
+        "Error: chunk count seems to be wrong.",
+        "\nnrow(mat) =", nrow(mat),
+        " chunk =",chunk
+      )
+    )
+    knitr::knit_exit()
+  }
+  #
+  # df_results will hold all the Ckmeans.1d.dp objects
+  #
+  n_res <- 1
+  n_mat <- 1
+  #
+  for (c_ in county_){
+    trythis_ <- TRUE
+    kthis_ <- k_
+    while (trythis_){
+      res <- Ckmeans.1d.dp(
+        mat[as.integer(n_mat):as.integer(n_mat+chunk_-1),3],
+        k=kthis_
+      )
+      #
+      # see if successful and whether to try again
+      #
+      kthis_ <- kthis_-1
+      trythis_ <- (length(res[[1]])==1 & kthis_>1)
+    } # end while
+    #
+#browser()
+    if (!exists("df_clusters",inherits=FALSE)) {
+      df_clusters <- data.frame(
+        FIPS3_=c_,
+        res2=res[2],
+        res3=res[3],
+        res4=res[4],
+        stringsAsFactors=FALSE
+      )
+    } else {
+      tmp_ <- data.frame(
+        FIPS3_=c_,
+        res2=res[2],
+        res3=res[3],
+        res4=res[4],
+        stringsAsFactors=FALSE
+      )
+      df_clusters <- rbind(
+        df_clusters,
+        tmp_
+      )
+      rm(tmp_)
+    }
+    #
+    n_res <- n_res+1
+    n_mat <- n_mat+chunk_
+  }
+  # 
+  # sort to match order of "sim" and
+  # assign an explicit cluster number
+  # (the combination of FIPS3_ and n_clus)
+  #
+  df_clusters %<>%
+    dplyr::mutate(
+      centers=round(centers,digits=1),
+      withinss=round(withinss,digits=1)
+    ) %>%
+    dplyr::arrange(
+      FIPS3_,
+      -centers
+    ) %>%
+    dplyr::group_by(
+      FIPS3_
+    ) %>% 
+    dplyr::mutate(
+      n_clus = row_number()
+    ) %>%
+    dplyr::ungroup()
+  #
+  # which rows of sim do the clusters include?
+  # this combines n_row in "sim" and "size" in df_clusters,
+  # connected by FIPS3_ and n_clus
+  #
+  # each row in df_cluster_row will be associated with
+  # either 0 or 1 cluster
+  #
+  df_cluster_row <-
+    sim %>%
+    dplyr::select(
+      FIPS3,
+      N,
+      n_row
+    ) %>%
+    dplyr::mutate(
+      FIPS3_=as.integer(FIPS3),
+      n_clus=0
+    )
+  #   
+  # row of df_clusters
+  r_clusters <- 1
+  running_sum <- 0
+  #
+  # step through df_clusters keeping track of row as r_
+  # df_clusters has one row per cluster while df_cluster_row
+  # is finer grained
+  #
+  # task is to assign a cluster (from df_clusters) to each
+  # row of df_cluster_row
+  #
+  for (r_ in 1:nrow(df_cluster_row)){
+    #
+    thisFips <- as.numeric(df_cluster_row[r_,"FIPS3_"])
+    # pick "size" from df_clusters
+    size_ <- as.numeric(df_clusters[r_clusters,"size"])
+    # and N from df_cluster_row
+    N_ <- as.numeric(df_cluster_row[r_,"N"])
+    # compare to this, not to N_:
+    running_sum <- running_sum + N_
+    #
+    # if exact match of "size" to N, then immediately assign cluster (n_clus)
+    # and see what comes next
+    # but if not an exact fit, then work through df_cluster_row until
+    # running N sum equals "size"
+    #
+    if (size_ == running_sum) {
+      # good fit
+      df_cluster_row[r_,"n_clus"] <- as.numeric(df_clusters[r_clusters,"n_clus"])
+      running_sum <- 0
+      # move to next row of df_clusters
+      r_clusters <- r_clusters + 1
+      #
+      if (r_clusters > nrow(df_clusters)+1){
+        print(paste("ERROR: overrun of df_clusters for r_:",r_))
+        knitr::knit_exit()
+      }
+    # size_ != running_sum
+    } else {
+      # stick it 
+      df_cluster_row[r_,"n_clus"] <- as.numeric(df_clusters[r_clusters,"n_clus"])
+      # DO NOT move to next row of df_clusters
+    }
+  }
+  #
+  # swap FIPS3 for FIPS3_
+  # should have done this earlier
+  #
+  df_clusters %<>%
+    dplyr::inner_join(
+      df_FIPS %>%
+        dplyr::select(
+          FIPS,
+          FIPS3
+        ),
+      by=c("FIPS3_"="FIPS")
+    ) %>%
+    dplyr::select(
+      -FIPS3_
+    )
+  #
+  df_cluster_row %<>%
+    dplyr::select(
+      -FIPS3_
+    )
+  #
+  # done
+  #  
+  return(
+    list(
+      df_clusters,
+      df_cluster_row
+    )
+  )
+}
+```
+
+```{r }
+c(
+  df_clusters_voting_1000_5,
+  df_cluster_row_voting_1000_5
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_1000,
+    k_=5
+  )
+#
+c(
+  df_clusters_ACS_161108_1000_5,
+  df_cluster_row_ACS_161108_1000_5
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_ACS_years_sim_counts_census_161108_1000,
+    k_=5
+  )
+```
+
+### New  
+
+```{r }
+#
+# 1264
+#
+c(
+  df_cluster_5_voting_2000_rep_1264,
+  df_cluster_5_row_voting_2000_rep_1264
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_2000_rep_1264,
+    k_=5
+  )
+#
+df_cluster_5_voting_2000_rep_1264 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="2000",
+    replace=TRUE,
+    seed="1264"
+  )
+#
+df_cluster_5_row_voting_2000_rep_1264 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="2000",
+    replace=TRUE,
+    seed="1264"
+  )
+#
+c(
+  df_cluster_3_voting_2000_rep_1264,
+  df_cluster_3_row_voting_2000_rep_1264
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_2000_rep_1264,
+    k_=3
+  )
+#
+df_cluster_3_voting_2000_rep_1264 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="2000",
+    replace=TRUE,
+    seed="1264"
+  )
+#
+df_cluster_3_row_voting_2000_rep_1264 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="2000",
+    replace=TRUE,
+    seed="1264"
+  )
+#
+# 1677
+#
+c(
+  df_cluster_5_voting_2000_rep_1677,
+  df_cluster_5_row_voting_2000_rep_1677
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_2000_rep_1677,
+    k_=5
+  )
+#
+df_cluster_5_voting_2000_rep_1677 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="2000",
+    replace=TRUE,
+    seed="1677"
+  )
+#
+df_cluster_5_row_voting_2000_rep_1677 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="2000",
+    replace=TRUE,
+    seed="1677"
+  )
+#
+c(
+  df_cluster_3_voting_2000_rep_1677,
+  df_cluster_3_row_voting_2000_rep_1677
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_2000_rep_1677,
+    k_=3
+  )
+#
+df_cluster_3_voting_2000_rep_1677 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="2000",
+    replace=TRUE,
+    seed="1677"
+  )
+#
+df_cluster_3_row_voting_2000_rep_1677 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="2000",
+    replace=TRUE,
+    seed="1677"
+  )
+#
+# 2935
+# 
+c(
+  df_cluster_5_voting_2000_rep_2935,
+  df_cluster_5_row_voting_2000_rep_2935
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_2000_rep_2935,
+    k_=5
+  )
+#
+df_cluster_5_voting_2000_rep_2935 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="2000",
+    replace=TRUE,
+    seed="2935"
+  )
+#
+df_cluster_5_row_voting_2000_rep_2935 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="2000",
+    replace=TRUE,
+    seed="2935"
+  )
+#
+c(
+  df_cluster_3_voting_2000_rep_2935,
+  df_cluster_3_row_voting_2000_rep_2935
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_2000_rep_2935,
+    k_=3
+  )
+#
+df_cluster_3_voting_2000_rep_2935 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="2000",
+    replace=TRUE,
+    seed="2935"
+  )
+#
+df_cluster_3_row_voting_2000_rep_2935 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="2000",
+    replace=TRUE,
+    seed="2935"
+  )
+#
+# 3226
+#
+c(
+  df_cluster_5_voting_2000_rep_3226,
+  df_cluster_5_row_voting_2000_rep_3226
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_2000_rep_3226,
+    k_=5
+  )
+#
+df_cluster_5_voting_2000_rep_3226 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="2000",
+    replace=TRUE,
+    seed="3226"
+  )
+#
+df_cluster_5_row_voting_2000_rep_3226 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="2000",
+    replace=TRUE,
+    seed="3226"
+  )
+#
+c(
+  df_cluster_3_voting_2000_rep_3226,
+  df_cluster_3_row_voting_2000_rep_3226
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_2000_rep_3226,
+    k_=3
+  )
+#
+df_cluster_3_voting_2000_rep_3226 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="2000",
+    replace=TRUE,
+    seed="3226"
+  )
+#
+df_cluster_3_row_voting_2000_rep_3226 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="2000",
+    replace=TRUE,
+    seed="3226"
+  )
+#
+```
+
+Jeremy ACS sim.  
+
+```{r }
+c(
+  df_cluster_5_jf_10k_rep,
+  df_cluster_5_row_jf_10k_rep
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_ACS_sim_jf_10k,
+    k_=5
+  )
+#
+df_cluster_5_jf_10k_rep %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="10000",
+    replace=TRUE,
+    seed=""
+  ) 
+#
+df_cluster_5_row_jf_10k_rep %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="10000",
+    replace=TRUE,
+    seed=""
+  )
+#
+c(
+  df_cluster_3_jf_10k_rep,
+  df_cluster_3_row_jf_10k_rep
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_ACS_sim_jf_10k,
+    k_=3
+  )
+#
+df_cluster_3_jf_10k_rep %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="10000",
+    replace=TRUE,
+    seed=""
+  )
+#
+df_cluster_3_row_jf_10k_rep %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="10000",
+    replace=TRUE,
+    seed=""
+  )
+```
+
+5000 run voting sim  
+
+```{r }
+c(
+  df_cluster_5_voting_5000_rep_1655,
+  df_cluster_5_row_voting_5000_rep_1655
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_5000_rep_1655,
+    k_=5
+  )
+#
+df_cluster_5_voting_5000_rep_1655 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="5000",
+    replace=TRUE,
+    seed="1655"
+  ) 
+#
+df_cluster_5_row_voting_5000_rep_1655 %<>%
+  dplyr::mutate(
+    k="5",
+    n_sim="5000",
+    replace=TRUE,
+    seed="1655"
+  )
+#
+c(
+  df_cluster_3_voting_5000_rep_1655,
+  df_cluster_3_row_voting_5000_rep_1655
+  ) :=
+  fn_do_Ckmeans.1d.dp(
+    df_voting_sim_counts_5000_rep_1655,
+    k_=3
+  )
+#
+df_cluster_3_voting_5000_rep_1655 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="5000",
+    replace=TRUE,
+    seed="1655"
+  )
+#
+df_cluster_3_row_voting_5000_rep_1655 %<>%
+  dplyr::mutate(
+    k="3",
+    n_sim="5000",
+    replace=TRUE,
+    seed="1655"
+  )
+```
+
+### IMPORTANT - DO THIS FOR VOTING SIMS  
+
+Meld into supersets and get rid of lots of objects.  
+Add time stamp.  
+
+```{r }
+dated <- Sys.time()
+df_cluster_voting_all <-
+  rbind(
+    df_cluster_5_voting_2000_rep_1264,
+    df_cluster_3_voting_2000_rep_1264,
+    df_cluster_5_voting_2000_rep_1677,
+    df_cluster_3_voting_2000_rep_1677,
+    df_cluster_5_voting_2000_rep_2935,
+    df_cluster_3_voting_2000_rep_2935,
+    df_cluster_5_voting_2000_rep_3226,
+    df_cluster_3_voting_2000_rep_3226
+  ) %>%
+  dplyr::mutate(
+    Dated=dated
+  )
+#
+df_cluster_row_voting_all <-
+  rbind(
+    df_cluster_5_row_voting_2000_rep_1264,
+    df_cluster_3_row_voting_2000_rep_1264,
+    df_cluster_5_row_voting_2000_rep_1677,
+    df_cluster_3_row_voting_2000_rep_1677,
+    df_cluster_5_row_voting_2000_rep_2935,
+    df_cluster_3_row_voting_2000_rep_2935,
+    df_cluster_5_row_voting_2000_rep_3226,
+    df_cluster_3_row_voting_2000_rep_3226
+  ) %>%
+  dplyr::mutate(
+    Dated=dated
+  )
+```
+
+Archive   
+
+```{r }
+save(
+    df_cluster_5_voting_2000_rep_1264,
+    df_cluster_3_voting_2000_rep_1264,
+    df_cluster_5_voting_2000_rep_1677,
+    df_cluster_3_voting_2000_rep_1677,
+    df_cluster_5_voting_2000_rep_2935,
+    df_cluster_3_voting_2000_rep_2935,
+    df_cluster_5_voting_2000_rep_3226,
+    df_cluster_3_voting_2000_rep_3226,
+    df_cluster_5_row_voting_2000_rep_1264,
+    df_cluster_3_row_voting_2000_rep_1264,
+    df_cluster_5_row_voting_2000_rep_1677,
+    df_cluster_3_row_voting_2000_rep_1677,
+    df_cluster_5_row_voting_2000_rep_2935,
+    df_cluster_3_row_voting_2000_rep_2935,
+    df_cluster_5_row_voting_2000_rep_3226,
+    df_cluster_3_row_voting_2000_rep_3226,
+    file=paste0(output_dir,"archive_cluster_row_voting_2000_all_A.RData")
+  )
+```  
+
+Add the 5000 run sim  
+
+```{r }
+dated <- Sys.time()
+df_cluster_3_voting_5000_rep_1655$Dated <- dated
+df_cluster_5_voting_5000_rep_1655$Dated <- dated
+#
+df_cluster_voting_all <- rbind(
+  df_cluster_voting_all,
+  df_cluster_3_voting_5000_rep_1655,
+  df_cluster_5_voting_5000_rep_1655
+)
+#
+df_cluster_3_row_voting_5000_rep_1655$Dated <- dated
+df_cluster_5_row_voting_5000_rep_1655$Dated <- dated
+#
+df_cluster_row_voting_all <- rbind(
+  df_cluster_row_voting_all,
+  df_cluster_3_row_voting_5000_rep_1655,
+  df_cluster_5_row_voting_5000_rep_1655
+)
+```
+
+Archive  
+
+```{r }
+save(
+  df_cluster_3_voting_5000_rep_1655,
+  df_cluster_5_voting_5000_rep_1655,
+  df_cluster_3_row_voting_5000_rep_1655,
+  df_cluster_5_row_voting_5000_rep_1655,
+  file=paste0(output_dir,"archive_cluster_voting_5000_rep_1655_all.RData")
+)
+```  
+
+KEY STEP    
+
+```{r }
+str(df_cluster_voting_all)
+str(df_cluster_row_voting_all)
+#
+save(
+  df_cluster_voting_all,
+  df_cluster_row_voting_all,
+  file="cluster_voting_all.RData"
+)
+```
+
+Archive  
+
+```{r }
+save(
+  df_cluster_5_voting_5000_rep_1655,
+  df_cluster_5_row_voting_5000_rep_1655,
+  df_cluster_3_voting_5000_rep_1655,
+  df_cluster_3_row_voting_5000_rep_1655,
+  file=paste0(output_dir,"archive_cluster_voting_5000.RData")
+)
+```
+
+### ATTEND TO POPULATION SIMS  
+
+All we have is what Jeremy contributed.  
+
+Use df_cluster_pop_all and df_cluster_row_pop_all  
+
+```{r }
+dated <- Sys.time()
+#
+df_cluster_pop_all <- 
+  rbind(
+    df_cluster_3_jf_10k_rep,
+    df_cluster_5_jf_10k_rep
+  )
+df_cluster_pop_all$Dated <- dated
+#
+df_cluster_row_pop_all <- 
+  rbind(
+    df_cluster_3_row_jf_10k_rep,
+    df_cluster_5_row_jf_10k_rep
+  )
+df_cluster_row_pop_all$Dated <- dated
+```
+
+Archive  
+
+```{r }
+save(
+  df_cluster_5_jf_10k_rep,
+  df_cluster_5_row_jf_10k_rep,
+  df_cluster_3_jf_10k_rep,
+  df_cluster_3_row_jf_10k_rep,
+  file=paste0(output_dir,"archive_cluster_ACS_jf_10k.RData")
+)
+```  
+KEY STEP    
+
+```{r }
+str(df_cluster_pop_all)
+str(df_cluster_row_pop_all)
+#
+save(
+  df_cluster_pop_all,
+  df_cluster_row_pop_all,
+  file="cluster_pop_all.RData"
+)
+```
+

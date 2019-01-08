@@ -1,0 +1,298 @@
+---
+title: "AreWeRepresented neo4j Jeremy Simulation"
+output:
+  html_document: default
+author: "D. Hopp"
+date: "December 22, 2018"
+---
+
+Revised 12/13/18  
+
+```{r dyad}
+load("prep.RData")
+ls()
+```
+
+
+Read Jeremy set of "result" files, one per county  
+File name includes county code of form "ccc.result"  
+where ccc is the FIPS code  
+Files are of form:  
+{('AMI', 'AMI', 'OTR', 'WHT', 'WHT'): 1,  
+ ('AMI', 'AMI', 'WHT', 'WHT', 'WHT'): 3,  
+ ('AMI', 'BLK', 'WHT', 'WHT', 'WHT'): 6,  
+ ('AMI', 'OTR', 'WHT', 'WHT', 'WHT'): 12,  
+ ('AMI', 'WHT', 'WHT', 'WHT', 'WHT'): 177,  
+ ('BLK', 'BLK', 'WHT', 'WHT', 'WHT'): 13,  
+ ('BLK', 'OTR', 'WHT', 'WHT', 'WHT'): 40,  
+ ('BLK', 'WHT', 'WHT', 'WHT', 'WHT'): 486,  
+ ('OTR', 'OTR', 'WHT', 'WHT', 'WHT'): 32,  
+ ('OTR', 'WHT', 'WHT', 'WHT', 'WHT'): 821,  
+ ('WHT', 'WHT', 'WHT', 'WHT', 'WHT'): 8409}  
+
+Handy-hint:  
+https://stackoverflow.com/questions/12626637/reading-a-text-file-in-r-line-by-line  
+
+
+
+```{r }
+fn_read_jeremy_as_one_file <- function(){
+  #
+  n_sim <- 10000
+  #
+  # create a matrix to hold composite results from all Jeremy files
+  # determine rows of matrix by scanning all the files
+  # first set up helper dataframe
+  # convert to dataframe
+  #
+  df_F <- dplyr::inner_join(
+    df_FIPS,
+    df_NCACC_years %>%
+      dplyr::filter(
+        Year=="2016"
+      ) %>%
+      dplyr::select(
+        County,
+        ncomm
+      ),
+    by="County"
+  ) %>%
+  dplyr::arrange(
+    ncomm,
+    FIPS
+  )
+  #
+  file_dir <- "../AWR_data_only/ACS_2016_10k_sim/"
+  #
+  nrow_matrix <- 0
+  for (FIPS_ in df_F[,"FIPS"]){
+    com <- paste("wc -l ", file_dir, FIPS_, ".result", sep="")
+    ntext  <- system(command=com, intern=TRUE)
+    nrow_matrix <- nrow_matrix + as.integer(stringr::str_sub(ntext,1,stringr::str_locate(ntext," ")[1]-1))
+  }
+  #
+  # create matrix
+  # columns AmInd,Black,White,Other,ncomm,N,FIPS as
+  # B,I,O,W,ncomm,N,FIPS
+  #
+  m_ <- matrix(
+    rep(0,7),
+    nrow=nrow_matrix,
+    ncol=7
+  )
+  colnames(m_)=c("AmInd","Black","White","Other","ncomm","N","FIPS")
+  #
+  # iterate thru files
+  #
+  m_row <- 0
+  for (fr_ in 1:nrow(df_F)){
+    FIPS_ <- df_F[fr_,"FIPS"]
+    nc_ <- df_F[fr_,"ncomm"]
+    # specify the input file
+    file_ <- paste0(
+      file_dir,FIPS_,".result"
+    )
+    # create a connection
+    conn <- file(
+      description=file_, 
+      open="r"
+    )
+    # slurp it
+    linn <- readLines(conn)
+    n_ <- length(linn)
+    #
+    # Loop over the file lines
+    for(r_ in 1:n_) {
+      tmp <- linn[r_]
+      # do something on a line of data 
+      nB <- stringr::str_count(tmp,"BLK")
+      nI <- stringr::str_count(tmp,"AMI")
+      nO <- stringr::str_count(tmp,"OTR")
+      nW <- stringr::str_count(tmp,"WHT")
+      N_ <- stringr::str_extract(tmp,'\\d+')
+      #
+      # construct vector of values and write line to m_
+      #
+      m_row <- m_row+1
+      m_[m_row,1:7] <- c(
+        nI,
+        nB,
+        nW,
+        nO,
+        nc_,
+        N_,
+        FIPS_
+      )
+    }    
+    close.connection(conn)
+  }
+  #
+  # convert to dataframe
+  #
+  df_ <- data.frame(
+    m_,
+    stringsAsFactors=FALSE
+  ) %>%
+  dplyr::mutate_if(
+    is.character,
+    as.numeric
+  ) %>%
+  dplyr::inner_join(
+    df_FIPS %>%
+      dplyr::select(
+        FIPS,
+        FIPS3
+      ),
+    by="FIPS"
+  ) %>%
+  dplyr::select(
+    -FIPS
+  ) %>%
+  dplyr::arrange(
+    FIPS3,
+    -N
+  )
+  #
+  # add Npct and Nlogit
+  # and running sum of Npct
+  #
+  df_ %<>%
+    dplyr::mutate(
+      Npct=N*100/n_sim,
+      Nlogit=ifelse(
+        Npct==0,
+        0,
+        round(log(Npct/(100-Npct)),digits=4)
+      )
+    ) %>%
+    dplyr::group_by(
+      FIPS3
+    ) %>%
+    dplyr::ungroup()
+  #
+  # add columns used by other sims  
+  # seed unknown
+  #
+  df_ %<>%
+    dplyr::mutate(
+      n_sim=10000,
+      seed=0
+    ) 
+  #
+  # add row number
+  #
+  df_$n_row <-
+    as.numeric(
+      row.names(
+        df_
+      )
+    ) 
+  #
+  # set column order as per other sims
+  #
+  df_%<>%
+    dplyr::select(
+      AmInd,
+      Black,
+      White,
+      Other,
+      FIPS3,
+      N,
+      Npct,
+      Nlogit,
+      n_sim,
+      seed,
+      n_row
+    )
+  #
+  return(df_)
+}
+```
+
+Preferred name of Jeremy sim:  
+
+```{r }
+df_ACS_sim_jf_10k <- fn_read_jeremy_as_one_file()
+```
+
+Create hits dataframe with rows matching board composition.  
+Use 2016 as the year.  
+
+```{r }
+fn_jeremy_hits <- function(use_dataframe=FALSE){
+  #
+  # value: hits dataframe derived from df_ACS_sim_jf_10k
+  #
+  # use_dataframe=FALSE
+  #   use fn_read_jeremy_as_one_file()
+  # TRUE use dataframe df_ACS_sim_jf_10k
+  #
+  if (use_dataframe){
+    df_N <- df_ACS_sim_jf_10k
+  } else {
+    df_N <- fn_read_jeremy_as_one_file()
+  }
+  #
+  # add FIPS and FIPS3 to df_NCACC_years
+  #
+  df_cc <- df_NCACC_years %>%
+    dplyr::filter(
+      Year=="2016"
+    ) %>%
+    dplyr::inner_join(
+      df_FIPS %>%
+        dplyr::select(
+          County,
+          FIPS,
+          FIPS3
+        ),
+      by="County"
+    )
+  #
+  # trivial Cartesian product since df_cc is 1:1 with counties
+  #
+  df_hits <-
+    dplyr::left_join(
+      df_cc,
+      df_N,
+      by="FIPS3"
+    )
+  #
+  # select the matching line
+  #
+  df_hits %<>%
+    dplyr::filter(
+      nwhite==White &
+      nafam==Black &
+      namin==AmInd
+    ) %>%
+    dplyr::select(
+      FIPS3,
+      nwhite,
+      nafam,
+      namin,
+      Other,
+      N,
+      Npct,
+      County
+    )
+  #
+  return(df_hits)
+}
+```
+
+Preferred name of hits (matches to 2016 board composition)  
+
+```{r }
+df_ACS_sim_hits_jf_10k <- fn_jeremy_hits()
+```
+
+```{r }
+save(
+  list=c(
+    "df_ACS_sim_jf_10k",
+    "df_ACS_sim_hits_jf_10k"
+  ),
+  file="ACS_sim_objects_jf_10k.RData"
+)
+```
