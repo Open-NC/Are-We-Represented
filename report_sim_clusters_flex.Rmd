@@ -1,12 +1,13 @@
 ---
-title: "AreWeRepresented Turnout Simulation, Clustering, and Diversity"
+title: "AreWeRepresented Population Simulation, Clustering, and Diversity"
 output:
   html_document: 
     toc: true
     toc_depth: 3
 author: "D. Hopp"
-date: "January 8, 2019"
+date: "January 9, 2019"
 ---
+
 
 ```{r setup, echo=FALSE}
 # https://stackoverflow.com/questions/15258233/using-table-caption-on-r-markdown-file-using-knitr-to-use-in-pandoc-to-convert-t
@@ -39,7 +40,7 @@ do_diag <- FALSE
 # use for population or turnout
 # POP or VOTING
 #
-do_for_which <- "VOTING"
+do_for_which <- "POP"
 ```
 
 ```{r eval=TRUE, include=FALSE}
@@ -48,8 +49,8 @@ load("prep.RData")
 # decide what to do
 #
 if (do_for_which=="POP"){
+  load(paste0(output_dir,"archive_cluster_ACS_jf_10k.RData"))
   load(paste0(output_dir,"ACS_sim_objects_jf_10k.RData"))
-  load(paste0(output_dir,"cluster_ACS_jf_10k.RData"))
 } else if (do_for_which=="VOTING"){
   load(paste0(output_dir,"this_sim_objects_5000_voting_rep_1655.RData"))
   load(paste0(output_dir,"archive_cluster_voting_5000.RData"))
@@ -168,7 +169,7 @@ df_ACS_years_aug2 <-
       BlackPct=round(Black*100/Total,digits=1),
       WhitePct=round(White*100/Total,digits=1),      
       OtherPct=round(Other*100/Total,digits=1),
-      Hpop= (AmInd/Total)*ifelse(AmInd==0,0,log(Total/AmInd))+
+      Hcty= (AmInd/Total)*ifelse(AmInd==0,0,log(Total/AmInd))+
             (Black/Total)*ifelse(Black==0,0,log(Total/Black))+
             (White/Total)*ifelse(White==0,0,log(Total/White))+
             (Other/Total)*ifelse(Other==0,0,log(Total/Other)),
@@ -180,7 +181,7 @@ df_ACS_years_aug2 <-
 #
 # names(df_ACS_years_aug2)
 #  [1] "Total"    "White"    "E_White"  "Black"    "E_Black"  "AmInd"    "E_AmInd"  "FIPS3"    "Other"   
-# [10] "E_Other"  "Year"     "AmIndPct" "BlackPct" "WhitePct" "OtherPct" "AmIndEnd" "BlackEnd" "WhiteEnd" "Hpop"
+# [10] "E_Other"  "Year"     "AmIndPct" "BlackPct" "WhitePct" "OtherPct" "AmIndEnd" "BlackEnd" "WhiteEnd" "Hcty"
 #
 if (do_diag){
   save(df_ACS_years_aug2,file="report_flex_df_ACS_years_aug2.RData")
@@ -204,7 +205,7 @@ df_turnout_election_wide_aug2 <-
     AmIndPct=round(100*AmInd/Total,digits=1),
     OtherPct=round(100*Other/Total,digits=1),
     WhitePct=round(100*White/Total,digits=1),
-    Hpop= (AmInd/Total)*ifelse(AmInd==0,0,log(Total/AmInd))+
+    Hcty= (AmInd/Total)*ifelse(AmInd==0,0,log(Total/AmInd))+
       (Black/Total)*ifelse(Black==0,0,log(Total/Black))+
       (White/Total)*ifelse(White==0,0,log(Total/White))+
       (Other/Total)*ifelse(Other==0,0,log(Total/Other))
@@ -220,7 +221,7 @@ df_turnout_election_wide_aug2 <-
     BlackPct,
     WhitePct,
     OtherPct,
-    Hpop,
+    Hcty,
     Election
   ) %>%
   dplyr::ungroup()
@@ -241,15 +242,229 @@ if (do_for_which=="POP"){
 }
 ```
 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+fn_the_clus <- function(df_sim_,df_clus_){
+  #
+  # find the cluster that contains the actual board composition
+  # DIH: verified results against a sample of large and small counties
+  #
+  # first, find max cluster number for each county
+  # this is just a helper
+  #
+  df_max_clus_ <- 
+    df_clus_ %>% 
+    dplyr::group_by(
+      FIPS3
+    ) %>% 
+    dplyr::summarise(
+      kmax=max(n_clus)
+    ) %>%
+    dplyr::ungroup()
+  #
+  # this does all the work
+  #
+  df_clus_match <-
+    dplyr::inner_join(
+      df_clus_ %>%
+        dplyr::select(
+          FIPS3,
+          N,
+          n_clus,
+          n_row
+        ),
+      df_sim_ %>%
+      dplyr::select(
+        AmInd,
+        Black,
+        White,
+        Other,
+        Npct,
+        n_row
+      ),
+      by="n_row"
+    ) %>%
+    dplyr::inner_join(
+      df_NCACC_years_focus %>%
+        dplyr::filter(
+          Year=="2016"
+        ) %>%
+        dplyr::select(
+          -Year
+        ),
+      by=c("FIPS3","AmInd","Black","White","Other")
+    ) %>%
+    dplyr::inner_join(
+      df_max_clus_,
+      by="FIPS3"
+    ) %>%
+    dplyr::inner_join(
+      df_basis_aug2 %>%
+        dplyr::mutate(
+          over10=ifelse(BlackPct>10,"YES","NO")
+        ) %>%
+        dplyr::select(
+          FIPS3,
+          over10
+        ),
+      by="FIPS3"
+    )
+  #
+  return(df_clus_match)
+}
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+#
+# compute the clusters
+#
+df_3_theClus <- 
+  fn_the_clus(
+    df_sim_target,
+    df_cluster_3_target
+  )
+#
+df_5_theClus <- 
+  fn_the_clus(
+    df_sim_target,
+    df_cluster_5_target
+  )
+```
+
+```{r echo=FALSE}
+if (do_diag){
+  save(df_3_theClus,file="report_flex_df_3_theClus.RData")
+  save(df_5_theClus,file="report_flex_df_5_theClus.RData")
+}
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#
+# summarize the clusters
+#
+df_5_dcast <- 
+  df_5_theClus %>% 
+  reshape2::dcast(over10+n_clus~.) %>%
+  plyr::rename(
+    c(
+      "."="N",
+      "n_clus"="Cluster"
+    )
+  )
+#
+df_3_dcast <- 
+  df_3_theClus %>% 
+  reshape2::dcast(over10+n_clus~.) %>%
+  plyr::rename(
+    c(
+      "."="N",
+      "n_clus"="Cluster"
+    )
+  )
+``` 
+
+```{r echo=FALSE}
+#
+# compare H for board composition to that for population
+#
+df_H_board_3 <-
+  df_3_theClus %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    Hboard=(AmInd/ncomm)*ifelse(AmInd==0,0,log(ncomm/AmInd))+
+      (Black/ncomm)*ifelse(Black==0,0,log(ncomm/Black))+
+      (White/ncomm)*ifelse(White==0,0,log(ncomm/White))+
+      (Other/ncomm)*ifelse(Other==0,0,log(ncomm/Other)),
+    Cluster=as.character(n_clus)
+  ) %>%
+  dplyr::select(
+    FIPS3,
+    Hboard,
+    Cluster
+  ) %>%
+  dplyr::inner_join(
+    df_basis_aug2 %>%
+      dplyr::select(
+        FIPS3,
+        Hcty
+      ),
+    by="FIPS3"
+  )
+#
+if (do_diag){
+  save(df_H_board_3,file="report_flex_df_H_board_3.RData")
+}
+```
+
+```{r echo=FALSE}
+#
+# use with plots
+#
+line_ <- list(
+  type='line',
+  line=list(color='pink',dash='dot'),
+  xref='x',
+  yref='y'
+)
+lines_=list()
+for (i in c(0)) {
+   line_[["x0"]] <- i
+   line_[["x1"]] <- i + 1
+   line_[["y0"]] <- i
+   line_[["y1"]] <- i+ 1
+   lines_ <- c(lines_, list(line_))
+ }
+``` 
+
+```{r echo=FALSE}
+pH123 <-
+  df_H_board_3 %>%
+  dplyr::inner_join(
+    df_FIPS %>%
+      dplyr::select(
+        FIPS3,
+        County
+      ),
+    by="FIPS3"
+  ) %>%
+  dplyr::inner_join(
+    df_NCACC_years %>%
+      dplyr::filter(
+        Year=="2016"
+      ) %>%
+      dplyr::select(
+        County,
+        ncomm
+      ),
+    by="County"
+  ) %>%
+  plot_ly(
+    x=~Hcty,
+    y=~Hboard,
+    type='scatter',
+    mode='markers',
+    marker=list(size=9),
+    symbol=~Cluster,
+    symbols=c(1:3),
+    text=~paste(County,"<br>N: ",ncomm)
+  ) %>%
+  plotly::layout(
+    title="2016 Diversity Index for Counties by Cluster of Three",
+    xaxis=list(title=paste("Diversity Index County",ifelse(do_for_which=="POP","Population","Turnout"))),
+    yaxis=list(title='Diversity Index Board'),
+    legend=list(x=0.9,y=0.5),
+    shapes=lines_
+    )
+```
+
 ## Summary  
 
-I have used a simulation of random selections from the 2016 `r ifelse(do_for_which=="POP","ACS county populations","NCSBE voter turnout")`  in the identification of counties that have boards of county commissioners representative of the race of their county `r ifelse(do_for_which=="POP","population","turnout")`. This study uses four race categories, American Indian, Black, White, and Other. The simulation results in identifying at least seventy counties where the actual 2016 board of county commissioners racial composition, as reported by the NCACC, was representative of the county population. To a significant extent this follows from there being `r english::as.english(nrow(df_ACS_years_aug2 %>% dplyr::filter(Year=="2016" & BlackPct <= 10)))` counties that have fewer than ten percent Black residents, where accordingly there are few likely outcomes. I also utilize a diversity index to make a semi-quantitative statement about the remaining, less representative, counties.  
+This report addresses the assessment of the extent to which the racial composition of North Carolina boards of county commissioners represent that of their respective counties. I have used a simulation of random selections from the 2016 `r ifelse(do_for_which=="POP","ACS county populations","NCSBE voter turnout")` in this assessment. This study uses four race categories, American Indian, Black, White, and Other. The simulation results in identifying over one-half the counties where the actual 2016 board of county commissioners racial composition, as reported by the NCACC, was representative of the county population. To a significant extent this follows from there being `r as.character(english::as.english(nrow(df_ACS_years_aug2 %>% dplyr::filter(Year=="2016" & BlackPct <= 10))))` counties that have fewer than ten percent Black residents, where accordingly there are few likely outcomes. I also utilize a diversity index to make semi-quantitative statements about the counties. The simulation and the diversity methods are independent of each other, providing two ways to assess representation. This analysis suggests that there are `r as.character(english::as.english(nrow(df_H_board_3 %>% dplyr::filter(Cluster != "1"))))` counties where the computed lack of representation merits further study.  
 
 ## Methodology  
 
-The purpose of this report is to assess the representativeness of the racial composition of boards of county commissioners with respect to that of their constituents. The methodology is to treat this as a combinatorial problem, where the results of sampling constituents is compared to board compositions. The sampling is carried out by use of simulations based on either Census Bureau American Community Survey estimates, or NCSBE voter turnout records, and is compared with NCACC board compositions.  
+The purpose of this report is to assess the representativeness of the racial composition of boards of county commissioners with respect to that of their constituents. I will first utilize a methodology that treats this as a combinatorial problem, where the results of sampling constituents is compared to board compositions. The sampling is carried out by use of simulations based on either Census Bureau American Community Survey estimates, or NCSBE voter turnout records, and is compared with NCACC board compositions.  
 
-An inherent property of simulations is the variability of results. This variability results from the use of different randomization seeds, and also from using different numbers of simulation runs. This is compounded by the population estimates, which are indeed, just estimates. Even in the decadal censuses, populations are estimates. Another contributing factor is that race reporting is shaped by being self-reported and using categories that are somewhat different for the Census Bureau, NCSBE,and possibly for the NCACC.  
+An inherent property of simulations is the variability of results. This variability is a consequence of the use of different randomization seeds, and also from using different numbers of simulation runs. This is compounded by the population estimates, which are indeed, just estimates. Even in the decadal censuses, populations are estimates. Another contributing factor is that race reporting is shaped by being self-reported and using categories that are somewhat different for the Census Bureau, NCSBE,and possibly for the NCACC.  
 
 As a consequence of this, results from simulations must not be over-interpreted. Small differences in the assessments between counties or over years, are of minor consequence. "Small", however, needs to be determined as the analysis progresses. Practically, this mitigates against rank ordering of counties on the basis of simulation results. It argues towards using quartiles, which while requiring ranking presents gross rather than fine results, as well as for repeating simulations using different seeds and number of runs.   
 
@@ -962,129 +1177,11 @@ dfT5 %>%
 
 ### Clusters  
 
-Which counties had boards that did not well-represent the racial composition of the `r ifelse(do_for_which=="POP","population","turnout")`? What objective criteria can we establish? I will use clustering, which is a mathematical approach to sweeping together simulated board compositions that have nearly the same probabilities. It is far from simple to compute clusters. Briefly, for this analysis, I will use the R package [Ckmeans.1d.dp](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5148156/). The computation starts with supposing that there are a small number k of clusters, perhaps three to five. It proceeds to find k (or fewer) positions for the Npct such that the within cluster sum of squares to each cluster mean (*withinss*) is minimized. This takes a lot of work and I depend entirely on the sagacity of the authors of that package. Not all data is amenable to cluster analysis. The Appendix pursues *withinss* at more length.  
+Which counties had boards that did, or did not, well-represent the racial composition of the `r ifelse(do_for_which=="POP","population","turnout")`? What objective criteria can we establish? I will use clustering, which is a mathematical approach to sweeping together simulated board compositions that have nearly the same probabilities. It is far from simple to compute clusters. Briefly, for this analysis, I will use the R package [Ckmeans.1d.dp](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5148156/). Picture, then, a histogram of the percentage of the simulation runs that resulted in each board compositions, Npct. Now arrange this histogram in descending order by Npct. The computation starts with supposing that there are a small number k of clusters, perhaps three to five. It proceeds to find k (or fewer) positions for the Npct such that the within cluster sum of squares to each cluster mean (*withinss*) is minimized. This takes a lot of work and I depend entirely on the sagacity of the authors of that package. I will number the clusters from left to right, that is, cluster 1 will correspond to the grouping of the highest values for Npct. Not all data is amenable to cluster analysis - the flatter the distribution of the variable of interest, the less well can it be said to have clusters. The Appendix pursues *withinss* at more length.  
 
 I will use the clusters computed for the board composition simulations based on `r ifelse(do_for_which=="POP","population","turnout")` estimates of all the counties. Using both three and five cluster targets, I will determine the cluster number for the actual 2016 board compositions. I have already mentioned that there were `r nrow(df_ACS_years_aug2 %>% dplyr::filter(Year=="2016" & BlackPct <= 10))` counties with under 10% Black population. It seems reasonable to expect that there would be good matches for these counties since there are few choices other than all White commissioners. In light of this I will note counties as being over or under 10% Black population proportion when that seems useful.  
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-fn_the_clus <- function(df_sim_,df_clus_){
-  #
-  # find the cluster that contains the actual board composition
-  # DIH: verified results against a sample of large and small counties
-  #
-  # first, find max cluster number for each county
-  # this is just a helper
-  #
-  df_max_clus_ <- 
-    df_clus_ %>% 
-    dplyr::group_by(
-      FIPS3
-    ) %>% 
-    dplyr::summarise(
-      kmax=max(n_clus)
-    ) %>%
-    dplyr::ungroup()
-  #
-  # this does all the work
-  #
-  df_clus_match <-
-    dplyr::inner_join(
-      df_clus_ %>%
-        dplyr::select(
-          FIPS3,
-          N,
-          n_clus,
-          n_row
-        ),
-      df_sim_ %>%
-      dplyr::select(
-        AmInd,
-        Black,
-        White,
-        Other,
-        Npct,
-        n_row
-      ),
-      by="n_row"
-    ) %>%
-    dplyr::inner_join(
-      df_NCACC_years_focus %>%
-        dplyr::filter(
-          Year=="2016"
-        ) %>%
-        dplyr::select(
-          -Year
-        ),
-      by=c("FIPS3","AmInd","Black","White","Other")
-    ) %>%
-    dplyr::inner_join(
-      df_max_clus_,
-      by="FIPS3"
-    ) %>%
-    dplyr::inner_join(
-      df_basis_aug2 %>%
-        dplyr::mutate(
-          over10=ifelse(BlackPct>10,"YES","NO")
-        ) %>%
-        dplyr::select(
-          FIPS3,
-          over10
-        ),
-      by="FIPS3"
-    )
-  #
-  return(df_clus_match)
-}
-```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE}
-#
-# compute the clusters
-#
-df_3_theClus <- 
-  fn_the_clus(
-    df_sim_target,
-    df_cluster_3_target
-  )
-#
-df_5_theClus <- 
-  fn_the_clus(
-    df_sim_target,
-    df_cluster_5_target
-  )
-```
-
-```{r echo=FALSE}
-if (do_diag){
-  save(df_3_theClus,file="report_flex_df_3_theClus.RData")
-  save(df_5_theClus,file="report_flex_df_5_theClus.RData")
-}
-```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-#
-# summarize the clusters
-#
-df_5_dcast <- 
-  df_5_theClus %>% 
-  reshape2::dcast(over10+n_clus~.) %>%
-  plyr::rename(
-    c(
-      "."="N",
-      "n_clus"="Cluster"
-    )
-  )
-#
-df_3_dcast <- 
-  df_3_theClus %>% 
-  reshape2::dcast(over10+n_clus~.) %>%
-  plyr::rename(
-    c(
-      "."="N",
-      "n_clus"="Cluster"
-    )
-  )
-``` 
 
 For five clusters the fit to the first cluster, where the actual board composition matches well with the `r ifelse(do_for_which=="POP","population","turnout")`, we have:  
 
@@ -1228,67 +1325,99 @@ df_cluster_5_target %>%
 
 ## A Diversity Measure for Counties: Theil's Entropy Index  
 
-Analysis of representativeness may benefit from use of an alternative to the combinatorial approach, that of a quantitative measure of diversity, one used by economists and social scientists. The measure I will use is called Theil's Entropy Index, which comes from information theory. The Index measures diversity but in a way that does not distinguish between specific population groups. For example, in our case populations are composed of the race categories American Indian, Black, White, and Other. The index would have the same value for 20% Black and 80% White, compared to 80% Black and 20% White - it measures diversity not matter how it is achieved. Theil's Entropy Index, called H in this report, is computed as described in the next paragraph. I will do this for the board, and also for the county `r ifelse(do_for_which=="POP","populations","turnouts")`. These two indexes can then be compared.  
+Analysis of representativeness may benefit from use of an alternative to the combinatorial approach, that of a quantitative measure of diversity, one used by economists and social scientists. The measure I will use is called Theil's Entropy Index, which comes from information theory. The Index measures diversity but in a way that does not distinguish between specific population groups. For example, in our case populations are composed of the four race categories American Indian, Black, White, and Other. The index would have the same value for 20% Black and 80% White, compared to 80% Black and 20% White - it measures diversity not matter how it is achieved. Theil's Entropy Index, called H in this report, is computed as described in the next paragraph. I will do this for the board, and also for the county `r ifelse(do_for_which=="POP","populations","turnouts")`. These two indexes can then be compared.  
 
 Mathematically, the calculation looks like this: let p<sub>i</sub> be the proportion of race i, then H is the sum of $p_i\cdot ln(1/p_i)$. If there are four categories and only one is present, then $H=1\cdot ln(1)=0$. This is the least diverse, and has the lowest H. If the proportions are (0,0,0.2,0.8), then $H=0.2\cdot ln(1/0.2)+0.8\cdot ln(1/0.8)\sim 0.50$. An even split between only two races (0,0,0.5,0.5) would result in $H=2\cdot (0.5)\cdot ln(1/0.5)\sim 0.69$. If all are present equally, then $H=4\cdot (1/4)\cdot ln(1/0.25)\sim 1.39$. If there are N categories, H varies between 0 for the least diversity to ln(N) for the most uniform, which can be called the most diverse. In our case, N=4, so the maximum H is 1.39.  
 
-### Plots  
-
-The following plot shows the counties that were in cluster 1, the most likely board compositions on the basis of the `r ifelse(do_for_which=="POP","population","turnout")` simulation.  Counties collect in more-or-less horizontal lines because boards are small in size and, accordingly, there are only a few realizable values for their diversity index. Counties with boards that have a zero diversity index have members of one race only. Speaking in general terms, it would be desirable to have board diversity comparable to that of the county `r ifelse(do_for_which=="POP","population","turnout")`. This would put the data points in the next plots near the diagonal line, where the county and the actual board diversities would be the same. 
+Counties collect in more-or-less horizontal lines because boards are small in size and, accordingly, there are only a few realizable values for their diversity index. Counties with boards that have a zero diversity index have members of one race only. Speaking in general terms, it would be desirable to have board diversity comparable to that of the county `r ifelse(do_for_which=="POP","population","turnout")`. This would put the data points in the next plots near the diagonal line, where the county and the actual board diversities would be the same. 
 <br/>  
 
+
+
+The next plot utilizes data for all one hundred counties. Even though the diversity measure is entirely independent of the clustering we used previously, it may be of interest to identify the counties by which cluster they were in. That is what is embodied in this plot.   
+
+
+
 ```{r echo=FALSE}
-#
-# compare H for board composition to that for population
-#
-df_H_board_3 <-
-  df_3_theClus %>%
-  dplyr::rowwise() %>%
-  dplyr::mutate(
-    Hboard=(AmInd/ncomm)*ifelse(AmInd==0,0,log(ncomm/AmInd))+
-      (Black/ncomm)*ifelse(Black==0,0,log(ncomm/Black))+
-      (White/ncomm)*ifelse(White==0,0,log(ncomm/White))+
-      (Other/ncomm)*ifelse(Other==0,0,log(ncomm/Other)),
-    Cluster=as.character(n_clus)
-  ) %>%
-  dplyr::select(
-    FIPS3,
-    Hboard,
-    Cluster
-  ) %>%
+pH123
+```
+ 
+The `r nrow(df_H_board_3 %>% dplyr::filter(Hboard==0))` counties with Board Diversity Index of zero (that is, where the board is composed of members of a single race category) are shown below in order by Hcty, the `r ifelse(do_for_which=="POP","population","turnout")` Diversity Index, with their `r ifelse(do_for_which=="POP","populations","turnouts")` and 2016 board compositions. Since these counties have boards composed of persons from one race only (the board H is zero), the further from zero the Hcty, the less representative the board.  
+
+```{r echo=FALSE}
+df_H_board_3 %>% 
+  dplyr::filter(
+    Hboard==0
+  ) %>% 
+  dplyr::inner_join(
+    df_FIPS %>% 
+    dplyr::select(
+      FIPS3,
+      County
+    ),
+    by="FIPS3"
+  ) %>% 
   dplyr::inner_join(
     df_basis_aug2 %>%
       dplyr::select(
         FIPS3,
-        Hpop
+        Total,
+        AmIndPct,
+        BlackPct,
+        WhitePct,
+        OtherPct
       ),
     by="FIPS3"
+  ) %>% 
+  dplyr::inner_join(
+    df_NCACC_years %>%
+      dplyr::filter(
+        Year=="2016"
+      ) %>%
+      dplyr::select(
+        County,
+        ncomm,
+        namin,
+        nafam,
+        nwhite
+      ),
+    by="County"
+  ) %>%
+  dplyr::select(
+    County,
+    Total,
+    AmIndPct,
+    BlackPct,
+    WhitePct,
+    OtherPct,
+    Hcty,
+    ncomm,
+    namin,
+    nafam,
+    nwhite
+  ) %>%
+  dplyr::mutate(
+    Hcty=round(Hcty,digits=3)
+  ) %>%
+  dplyr::arrange(
+    Hcty
+  ) %>%
+  knitr::kable() %>%
+  kableExtra::kable_styling() %>%
+  kableExtra::scroll_box(
+    width="830px",
+    height="300px"
   )
-#
-if (do_diag){
-  save(df_H_board_3,file="report_flex_df_H_board_3.RData")
-}
 ```
 
-```{r echo=FALSE}
-#
-# use with plots
-#
-line_ <- list(
-  type='line',
-  line=list(color='pink',dash='dot'),
-  xref='x',
-  yref='y'
-)
-lines_=list()
-for (i in c(0)) {
-   line_[["x0"]] <- i
-   line_[["x1"]] <- i + 1
-   line_[["y0"]] <- i
-   line_[["y1"]] <- i+ 1
-   lines_ <- c(lines_, list(line_))
- }
-``` 
+## Combining Simulations and Diversity Indexes  
+
+The two methodologies discussed above, simulation and diversity index, are independent of each other. That is to say that, while that use the same data, their computations have nothing in common. In this section I will combine them in what I feel is a reasonable way and make some interesting observations.  
+
+### Plots  
+
+The following plot shows the counties that were in cluster 1, where the actual board result was a likely result of the `r ifelse(do_for_which=="POP","population","turnout")` simulation.   
+<br/>  
 
 ```{r echo=FALSE}
 pH1 <-
@@ -1316,7 +1445,7 @@ pH1 <-
     by="County"
   ) %>%
   plot_ly(
-    x=~Hpop,
+    x=~Hcty,
     y=~Hboard,
     type='scatter',
     mode='markers',
@@ -1367,7 +1496,7 @@ pH23 <-
     by="County"
   ) %>%
   plot_ly(
-    x=~Hpop,
+    x=~Hcty,
     y=~Hboard,
     type='scatter',
     mode='markers',
@@ -1394,8 +1523,8 @@ pH23
 ```
 
 ### Tables  
- 
-The `r nrow(df_H_board_3 %>% dplyr::filter(Cluster == "1" & Hboard==0))` counties with Board Diversity Index of zero (that is, where the board is composed of members of a single race category) that are in cluster 1 are shown below in alphabetical order, with their `r ifelse(do_for_which=="POP","populations","turnouts")` and 2016 board compositions. The further from zero the Hpop, the `r ifelse(do_for_which=="POP","population","turnout")` Diversity Index, the less representative the board.  
+
+The `r nrow(df_H_board_3 %>% dplyr::filter(Cluster == "1" & Hboard==0))` counties with Board Diversity Index of zero (that is, where the board is composed of members of a single race category) that are in cluster 1 are shown below in Hcty order, with their `r ifelse(do_for_which=="POP","populations","turnouts")` and 2016 board compositions.  Since these counties have boards composed of persons from one race only (the board H is zero), the further from zero the Hcty, the `r ifelse(do_for_which=="POP","population","turnout")` Diversity Index, the less representative the board.  
 
 ```{r echo=FALSE}
 df_H_board_3 %>% 
@@ -1444,17 +1573,17 @@ df_H_board_3 %>%
     BlackPct,
     WhitePct,
     OtherPct,
-    Hpop,
+    Hcty,
     ncomm,
     namin,
     nafam,
     nwhite
   ) %>%
   dplyr::mutate(
-    Hpop=round(Hpop,digits=3)
+    Hcty=round(Hcty,digits=3)
   ) %>%
   dplyr::arrange(
-    County
+    Hcty
   ) %>%
   knitr::kable() %>%
   kableExtra::kable_styling() %>%
@@ -1465,7 +1594,7 @@ df_H_board_3 %>%
 ```
 
 <br/>
-The `r nrow(df_H_board_3 %>% dplyr::filter(Cluster != "1" & Hboard==0))` counties with Board Diversity Index of zero that are in clusters 2 or 3 are shown below in alphabetical order, with their `r ifelse(do_for_which=="POP","populations","turnouts")` and 2016 board compositions. They may all be considered unrepresentative.  
+The `r nrow(df_H_board_3 %>% dplyr::filter(Cluster != "1" & Hboard==0))` counties with Board Diversity Index of zero that are in clusters 2 or 3 are shown below in Hcty order, with their `r ifelse(do_for_which=="POP","populations","turnouts")` and 2016 board compositions. Since they all have boards composed of persons of a single race, and they were in cluster 2 or 3, where the board composition was an unlikely consequence of their `r ifelse(do_for_which=="POP","population","turnout")` proportions, they may all be considered unrepresentative. These counties merit further study.  
 
 ```{r echo=FALSE}
 df_H_board_3 %>% 
@@ -1514,17 +1643,17 @@ df_H_board_3 %>%
     BlackPct,
     WhitePct,
     OtherPct,
-    Hpop,
+    Hcty,
     ncomm,
     namin,
     nafam,
     nwhite
   ) %>%
   dplyr::mutate(
-    Hpop=round(Hpop,digits=3)
+    Hcty=round(Hcty,digits=3)
   ) %>%
   dplyr::arrange(
-    County
+    Hcty
   ) %>%
   knitr::kable() %>%
   kableExtra::kable_styling() %>%
@@ -1534,8 +1663,7 @@ df_H_board_3 %>%
   )
 ```
 <br/>
-The remaining `r nrow(df_H_board_3 %>% dplyr::filter(Cluster != "1" & Hboard>0))` counties in this plot are in the following list. They are arranged by the difference between the county `r ifelse(do_for_which=="POP","population","turnout")` H and the board H, in ascending order. 
-
+The remaining `r nrow(df_H_board_3 %>% dplyr::filter(Cluster != "1" & Hboard>0))` counties in this plot are in the following list. They are arranged by the difference between the county `r ifelse(do_for_which=="POP","population","turnout")` H and the board H, in ascending order. These counties have boards composed of more than one race, and are in cluster 2 or 3, the less likely simulation compositions. These counties are of less pronounced representation concerns than those discussed immediately above but may merit further study.  
 
 ```{r echo=FALSE}
 df_H_board_3 %>% 
@@ -1584,7 +1712,7 @@ df_H_board_3 %>%
     BlackPct,
     WhitePct,
     OtherPct,
-    Hpop,
+    Hcty,
     ncomm,
     namin,
     nafam,
@@ -1592,9 +1720,9 @@ df_H_board_3 %>%
     Hboard
   ) %>%
   dplyr::mutate(
-    Hdiff=round(Hpop-Hboard,digits=3),
+    Hdiff=round(Hcty-Hboard,digits=3),
     Hboard=round(Hboard,digits=3),
-    Hpop=round(Hpop,digits=3)
+    Hcty=round(Hcty,digits=3)
   ) %>%
   dplyr::arrange(
     Hdiff
@@ -1942,8 +2070,6 @@ Clustering makes most sense if the underlying proportion data has features. The 
 
 I have scaled the *withinss* by dividing by the ratio of the county `r ifelse(do_for_which=="POP","population","turnout")` to the minimum of all `r ifelse(do_for_which=="POP","populations","turnouts")`. I present in the following plot the log of the scaled *withinss*. The counties grouped horizontally at the bottom all have a cluster 1 with only one member Npct, that is, the simulation results in a unique match to the actual board. Counties toward the top of the plot, with cluster 1 having the highest scaled *withinss*, should be associated with counties that have greater numbers of simulated board compositions in cluster 1.  
  
-
- 
 ```{r echo=FALSE}
 #
 # prep sim cluster results to look at withinss
@@ -2018,6 +2144,7 @@ p_wss <- df_wss %>%
   )
 ```
 
+<br/>  
 <div align="center">  
 ```{r echo=FALSE}
 p_wss
@@ -2074,7 +2201,7 @@ df_Hdiff <-
     by="County"
   ) %>%
   dplyr::mutate(
-    Hdiff=Hpop-Hboard
+    Hdiff=Hcty-Hboard
   )
 #
 # boxplot and points
@@ -2128,7 +2255,7 @@ df_ACS_years_aug2 %>%
     by="FIPS3"
   ) %>%
   dplyr::mutate(
-    Hpop=round(Hpop,digits=4)
+    Hcty=round(Hcty,digits=4)
   ) %>%
   dplyr::select(
     County,
@@ -2142,7 +2269,7 @@ df_ACS_years_aug2 %>%
     BlackPct,
     WhitePct,
     OtherPct,
-    Hpop
+    Hcty
   ) %>%
   knitr::kable() %>%
   kableExtra::kable_styling() %>%
@@ -2153,3 +2280,4 @@ df_ACS_years_aug2 %>%
 ```
 
 </div>  
+

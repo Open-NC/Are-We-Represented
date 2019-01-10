@@ -1,0 +1,18 @@
+
+
+> load("C:/Users/cassi/CodeForAmerica/AWR_neo4j/output/df_cluster_row_voting_all.RData")
+[1] "df_cluster_row_voting_all"
+
+  n_sim 1264 1677 2935 3226
+1  2000 4498 4456 4490 4520
+
+> load("C:/Users/cassi/CodeForAmerica/AWR_neo4j/output/df_voting_sim_counts_all.RData")
+[1] "df_voting_sim_counts_all"
+
+  n_sim 1234 1264 1677 2912 2935 3226 4303 4537
+1  1000 1976    0    0 1951    0    0 1985 1984
+2  2000    0 2249 2228    0 2245 2260    0    0
+
+load("C:/Users/cassi/CodeForAmerica/AWR_neo4j/output/ACS_sim_objects_jf_10k.RData")
+> ls()
+[1] "df_ACS_sim_hits_jf_10k" "df_ACS_sim_jf_10k" 
