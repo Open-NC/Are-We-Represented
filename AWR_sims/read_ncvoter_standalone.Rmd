@@ -1,0 +1,170 @@
+---
+title: "AreWeRepresented Munging NCVOTER ID Fields"
+output:
+  html_document: default
+author: "D. Hopp"
+date: "October 1, 2018"
+---
+
+Read the NCSBE ncvoter files (we have only one) and retain only the "id" fields.  
+
+This is a stand-alone, single purpose Rmd script.  
+
+```{r a1}
+require(data.table)
+```
+```{r a2}
+data_dir <- "../AWR_data_only/"
+data_ncvoter_dir <- paste0(data_dir,"ncvoter/")
+data_ncvhis_dir <- paste0(data_dir,"ncvhis/")
+data_RData_dir <- paste0(data_dir,"RData/")
+```
+
+Retain fields:  
+
+```{r b1} 
+v_ncvoter_cols <- c(
+  "county_id",
+  "county_desc",
+  "voter_reg_num",
+  "status_cd",
+  "reason_cd",
+  "last_name",
+  "first_name",
+  "middle_name",
+  "name_suffix_lbl",
+  "res_street_address",
+  "registr_dt",
+  "race_code",
+  "ethnic_code",
+  "party_cd",
+  "gender_code",
+  "birth_year",
+  "ncid"
+)
+```
+Should be able to do this but it takes a long time:  "unzip -q data/ncvoter_Statewide_180818.zip"  
+Has to be serialized. Why bother to do every time this is run?  
+Appears that zipped file should have same name as .zip, or that there should be some way to explicitly name the the zipped file we are looking for ... maybe.  
+  
+Build and save ncvoter.  
+
+```{r c1}
+do_build <- TRUE
+```  
+
+Do not trust the quality of the data.  
+Coerce middle_name of length 1 to add a period. This is for standardization.  
+
+```{r d1}
+if (do_build){
+  df_ncvoter_subset <- data.table::fread(
+    paste0(data_ncvoter_dir,"ncvoter_Statewide_20180407.txt"),
+    header=TRUE,
+    sep="\t",
+    stringsAsFactors=FALSE,
+    select=v_ncvoter_cols,
+    data.table=FALSE
+  ) %>%
+  dplyr::mutate(
+    last_name=trimws(last_name),
+    first_name=trimws(first_name),
+    middle_name=trimws(middle_name),
+    middle_name=ifelse(
+      nchar(middle_name)==1,
+      paste0(middle_name,"."),
+      middle_name
+    ),
+    name_suffix_lbl=trimws(name_suffix_lbl),
+    middle_init=ifelse(
+      nchar(middle_name)>0,
+      paste0(stringr::str_sub(middle_name,1,1),"."),
+      ""
+    ),
+    as_of="20180407"
+  ) %>%
+  dplyr::arrange(
+    county_desc,
+    last_name,
+    first_name,
+    middle_name,
+    name_suffix_lbl,
+    ncid
+  )
+  #
+  str(df_ncvoter_subset)
+  #
+  save(
+    df_ncvoter_subset,
+    file=paste0(data_RData_dir,"df_ncvoter_subset_20180818.RData")
+  )
+}
+```  
+
+### Look for duplicate records on basis of all columns except as noted (includes address).  
+
+```{r e1}
+N_A <- nrow(
+  df_ncvoter_subset %>%
+  dplyr::distinct(
+    county_id,
+    county_desc,
+    status_cd,
+    reason_cd,
+    last_name,
+    first_name,
+    middle_name,
+    middle_init,
+    name_suffix_lbl,
+    res_street_address,
+    registr_dt,
+    race_code,
+    ethnic_code,
+    party_cd,
+    gender_code,
+    birth_year,
+    as_of
+  )
+)
+```
+
+Shrinkage by `r nrow(df_ncvoter_subset)-N_A` rows, about `r round(N_A*100/nrow(df_ncvoter_subset),digits=1)`%.  
+
+Note: ncid distinguishes otherwise identical records.  
+
+### Look for duplicate records on basis of all columns except as noted (does NOT include address).  
+
+```{r f1}
+df_ncvoter_subset_distinct_demog <-
+  df_ncvoter_subset %>%
+  dplyr::distinct(
+    county_id,
+    county_desc,
+    last_name,
+    first_name,
+    middle_name,
+    middle_init,
+    name_suffix_lbl,
+    race_code,
+    ethnic_code,
+    party_cd,
+    gender_code,
+    birth_year,
+    as_of
+  )
+#
+str(df_ncvoter_subset_distinct_demog) 
+```  
+
+Shrinkage by `r nrow(df_ncvoter_subset)-nrow(df_ncvoter_subset_distinct_demog)` rows, about `r round(nrow(df_ncvoter_subset_distinct_demog)*100/nrow(df_ncvoter_subset),digits=1)`%.  
+
+```{r g1}
+save(
+  df_ncvoter_subset,
+  file=paste0(data_RData_dir,"df_ncvoter_subset_20180407.RData")
+)
+save(
+  df_ncvoter_subset_distinct_demog,
+  file=paste0(data_RData_dir,"df_ncvoter_subset_distinct_demog_20180407.RData")
+)
+```  

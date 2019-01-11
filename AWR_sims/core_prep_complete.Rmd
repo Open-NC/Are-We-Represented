@@ -1,0 +1,887 @@
+---
+title: "AreWeRepresented neo4j Preparation"
+output:
+  html_document: default
+author: "D. Hopp"
+date: "September 17, 2018"
+---
+
+```{r}
+do_write_csv <- FALSE
+```
+
+This attempt at using a graph database is built on the following considerations:  
+
+Counties are geographical entities that can be characterized in several different ways. For instance, they can be geographically adjacent, they can belong to the economic tiers used by the NC Dept of Commerce, they have populations (total as well as divided into racial categories), they can have the various economic indicators provided by the Census Bureau, etc.  
+
+Each county has elected county commissioners. Counties may be associated with cities and towns, which may have elected boards similar to county commissioners. The cities and towns may have associated data similar to that for counties.  
+
+DIRECTORY STRUCTURE:  
+
+```{r abner}
+data_dir <- "../AWR_data_only/"
+data_ncvoter_dir <- paste0(data_dir,"ncvoter/")
+data_ncvhis_dir <- paste0(data_dir,"ncvhis/")
+data_RData_dir <- paste0(data_dir,"RData/")
+output_dir <- "output/"
+saved_dir <- "saved/"
+#
+AWR_data_dir <- "../AWR_data_only/"
+AWR_data_ncvoter_dir <- paste0(AWR_data_dir,"ncvoter/")
+AWR_data_ncvhis_dir <- paste0(AWR_data_dir,"ncvhis/")
+AWR_data_RData_dir <- paste0(AWR_data_dir,"RData/")
+```
+
+Note: rm(list=setdiff(ls(), "df_ncvoter_subset_distinct"))  
+
+## A. FIPS Code and Economic Tier  
+
+Add 3-char FIPS3 code since some sources use as a numeric, some as character.  
+Also add county_id used in NCSBE data.  
+This code chunk appears in several places to assure that df_FIPS exists.  
+
+```{r zilch}
+df_FIPS <- read.csv(
+  paste0(data_dir,"FIPS.csv"),
+  header=TRUE,
+  stringsAsFactors = FALSE
+) %>%
+dplyr::rowwise() %>%
+dplyr::mutate(
+   FIPS3=paste0(substr("00",1,3-nchar(as.character(FIPS))),as.character(FIPS))
+) %>%
+as.data.frame()
+#
+df_FIPS %<>%
+cbind(
+  rownames(df_FIPS)
+) %>%
+plyr::rename(
+  c("rownames(df_FIPS)"="county_id")
+)
+#
+df_FIPS$county_id <- as.character(df_FIPS$county_id)
+```
+
+```{r flask}
+str(df_FIPS)
+```
+
+Economic Tier from 2017 file  
+
+```{r oskar}
+df_Tier <-
+  dplyr::inner_join(
+    df_FIPS %>%
+      dplyr::select(
+        County,
+        FIPS3
+      ),
+    read.csv(
+      paste0(data_dir,"NCcountyTier2017.txt"),
+      sep="\t",
+      stringsAsFactors = FALSE
+    ) %>%
+    plyr::rename(
+      c("Tier.2017"="Tier")
+    ) %>%
+    dplyr::mutate(
+      Year=2017
+    ),
+    by="County"
+  ) %>%
+  dplyr::select(
+    FIPS3,
+    Tier,
+    Year
+  )
+```
+
+```{r prize}
+str(df_Tier)
+```
+
+### Added July 21, 2018: Additional data from NCACC.org and Census Bureau  
+
+This is data from NCACC.org from the link http://www.ncacc.org/DocumentCenter/View/3858 on the page http://www.ncacc.org/197/Election-Results (7/21/18). The file delivered is '2016 Election Demographics for Website_1.xlsx'. I expect this name to change after the 2018 election, since it is not consistent with the names of other files on that same page. This spreadsheet appears in not quite curated condition. I have extracted from it the data in my data file NCACC_2002_2016_summary.csv by hand, since the spreadsheet makes it inordinately difficult to do so programatically.  
+
+```{r mosaic}
+df_NCACC_summary <- read.csv(
+  paste0(data_dir,"NCACC_2002_2016_summary.csv"),
+  header=TRUE,
+  sep="\t",
+  stringsAsFactors = FALSE
+) %>%
+dplyr::rename(
+  AfAm=AfricanAmerican,
+  AmIn=AmericanIndian
+  )
+```
+```{r watts}
+str(df_NCACC_summary)
+```  
+
+These are the national registration and voting rates reported by the Census Bureau in voting rates table A-6 ('c2010 a6.csv') from https://www.census.gov/data/tables/time-series/demo/voting-and-registration/voting-historical-time-series.html (https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/a6.xlsx) (July 21, 2018).  
+
+```{r bulky}
+df_voting_rates_summary <- read.csv(
+  paste0(data_dir,"census_bureau_voting_rates.csv"),
+  header=TRUE,
+  skip=5,
+  sep=",",
+  stringsAsFactors = FALSE
+) 
+```
+```{r gem}
+str(df_voting_rates_summary)
+```
+
+End July 21, 2018  
+
+Get a list of 50 largest cities and towns from https://en.wikipedia.org/wiki/List_of_municipalities_in_North_Carolina 6/12/2018.
+For id, use County but remove blanks and convert to lower case.  
+
+```{r hap}
+df_largest_cities <-
+  dplyr::inner_join(
+    df_FIPS %>%
+      dplyr::select(
+        County,
+        FIPS3
+      ),
+    read.csv(
+      paste0(data_dir,"largest_cities_towns_cleaned.csv"),
+      sep=",",
+      stringsAsFactors = FALSE
+    ),
+  by="County"
+  ) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    id=tolower(
+      stringr::str_remove_all(
+        stringr::str_remove_all(Name," "),
+        "-"
+      )
+    ),
+    Year=2017
+  ) %>%
+  data.frame() %>%
+  dplyr::select(
+    -County
+  ) %>%
+  dplyr::rename(
+    pop=Population2017
+  )
+```
+
+```{r solon}
+str(df_largest_cities)
+```
+
+### NCACC Elections spreadsheet  
+
+Source is https://www.ncacc.org/409/County-Elections  
+File is "2016 Election Demographics for Website_1_extract.csv"  
+Skip row 1, which holds text for columns.  
+
+Added 24 Jul,2018 Use CORRECTED file Cleveland and Duplin incorrected in original  
+
+```{r  grown}
+df_NCACC_2016_demog <- read.csv(
+  paste0(data_dir,"2016 Election Demographics CORRECTED for Website_1_extract.csv"),
+  sep=",",
+  skip=1,
+  header=TRUE,
+  stringsAsFactors=FALSE
+)
+```
+
+```{r very}
+str(df_NCACC_2016_demog)
+```
+
+Check for error in commissioner count. MUST BE ZERO.  
+
+```{r pump}
+if (
+  nrow(
+    df_NCACC_2016_demog %>%
+      dplyr::mutate_if(
+        is.numeric, funs(ifelse(is.na(.), 0, .))
+      ) %>%
+      dplyr::filter(
+        ncomm != nwhite + nafam + namin
+      )
+    ) != 0
+  ) knitr::knit_exit()
+```  
+End July 24, 2018  
+
+Add FIPS3 and remove County  
+Replace NA with zero  
+
+Note that this matches the 2016 NCACC file which has exactly the race categories White, Afam, and Amind.  
+This is different from the county population data, which also has Asian and Other.  
+Data for other years will have to be reviewed to see if there are other races reported.  
+
+```{r stroll}
+df_NCACC_demog <-
+df_NCACC_2016_demog %>%
+  dplyr::inner_join(
+    df_FIPS,
+    by="County"
+  ) %>%
+  dplyr::select(
+    FIPS3,
+    ncomm,
+    new,
+    nrep,
+    ndem,
+    nother,
+    nfemale,
+    nwhite,
+    nafam,
+    namin
+  ) %>%
+  dplyr::mutate_if(
+    is.numeric, funs(ifelse(is.na(.), 0, .))
+  ) %>%
+  dplyr::mutate(
+    id=paste0("CC_",FIPS3),
+    Year=2016,
+    Hrace=round(
+      (nwhite/ncomm)*ifelse(nwhite>0,log(nwhite/ncomm),0)+
+      (nafam/ncomm)*ifelse(nafam>0,log(nafam/ncomm),0)+
+      (namin/ncomm)*ifelse(namin>0,log(namin/ncomm),0),
+       digits=4)
+  )
+```
+
+```{r peru}
+str(df_NCACC_demog)
+```
+ 
+Added August 5, 2018. Incorporate prior years of NCACC. Source http://www.ncacc.org/197/Election-Results  
+
+```{r gear}
+fn_NCACC_build <- function(){
+  # start with df_NCACC_2016_demog and add to it
+  df_all <- 
+    df_NCACC_2016_demog %>%
+    dplyr::mutate_if(
+      is.numeric, funs(ifelse(is.na(.), 0, .))
+    ) %>%
+    dplyr::mutate(
+      nother_race=0,
+      Year="2016"
+    )
+  #
+  NCACC_files <- list(
+    c("2004","NCACC_electionresults04_201209251258330448.2004.csv"),
+    c("2006","NCACC_electionresults04_201209251258330448.2006.csv"),
+    c("2008","NCACC_electionresults08_201209251258339823.2008.csv"),
+    c("2010","NCACC_electionresults10_201209251258349042.2010.csv"),
+    c("2012","NCACC_electionresults12_201302190817370069.2012.csv"),
+    c("2014","NCACC_electionresults14_201503031245453010.2014.csv")
+  )
+  for (i in 1:length(NCACC_files)){
+    df_ <- read.csv(
+      paste0(data_dir,NCACC_files[[i]][2]),
+      sep="\t",
+      stringsAsFactors=FALSE
+    ) %>%
+    dplyr::mutate_if(
+      is.numeric, funs(ifelse(is.na(.), 0, .))
+    ) %>%
+    plyr::rename(c(
+      "No..of.Comm."="ncomm",
+      "New"="new",
+      "Repub."="nrep",
+      "Dem."="ndem",
+      "Other"="nother",
+      "Female"="nfemale",
+      "African.American"="nafam",
+      "Native.American"="namin",
+      "Other.1"="nother_race"
+      )
+    ) %>%
+    dplyr::mutate(
+      nwhite=ncomm-nafam-namin-nother_race,
+      Year=NCACC_files[[i]][1]
+    ) %>%
+    dplyr::select(
+      County,
+      ncomm,
+      new,
+      nrep,
+      ndem,
+      nother,
+      nfemale,
+      nwhite,
+      nafam,
+      namin,
+      nother_race,
+      Year
+    )
+    #
+    df_all <- rbind(
+      df_all,
+      df_
+    )
+  }
+  return(df_all)
+}
+```  
+
+```{r sybil}
+df_NCACC_years <- fn_NCACC_build()
+str(df_NCACC_years)
+```  
+
+### County election methods  
+http://www.ncacc.org/195/County-Election-Methods  
+
+```{r utah}
+df_cc_method <- read.csv(
+  paste0(data_dir,"cc_method.csv"),
+  skip=1,
+  sep="\t",
+  stringsAsFactors=FALSE
+) %>%
+dplyr::select(
+  County,
+  Election.Method
+) %>%
+dplyr::mutate(
+  asof=2014
+) %>%
+dplyr::rename(
+  Method=Election.Method
+) %>%
+dplyr::inner_join(
+  df_FIPS %>%
+    dplyr::select(
+      County,
+      FIPS3
+    ),
+  by="County"
+)
+#
+str(df_cc_method)
+#
+df_cc_method_text <-
+  data.frame(
+    c("al","d","dal","l","cda","cdal","l/al","m"),
+    c("Pure at large",
+    "Pure district",
+    "Residence in district required, but nominated and elected at-large",
+    "Limited voting plan",
+    "Combination of pure district and pure at large seats",
+    "Combination of pure at large seats with some seats requiring residency in districts, but still nominated/elected at large",
+    "Mixed limited and pure at large",
+    "Mixed")
+  )
+names(df_cc_method_text) <- c("Method","Text")
+#
+str(df_cc_method_text)
+```  
+
+### Census Bureau Data  
+
+Continue August 5, 2018. ACS Census Bureau County/Race populations data. Source https://factfinder.census.gov/faces/nav/jsf/pages/searchresults.xhtml?refresh=t dataset B02001.  
+The reported "error" is margin of error at 90%, i.e., 1.645*sqrt(variance). Source https://www.census.gov/content/dam/Census/programs-surveys/acs/guidance/training-presentations/20180418_MOE.pdf   
+
+Census ftp site at https://www2.census.gov/ Full datasets are available.  
+
+These are ACS samples. 2006 and 2008 did not cover all NC counties.  
+
+```{r styx}
+fn_census_build <- function(){
+#
+  ACS_files <- list(
+    # incomplete c("2006","ACS_06_EST_B02001_with_ann.csv"),
+    # incomplete c("2008","ACS_08_3YR_B02001_with_ann.csv"),
+    c("2010","ACS_10_5YR_B02001_with_ann.csv"),
+    c("2012","ACS_12_5YR_B02001_with_ann.csv"),
+    c("2014","ACS_14_5YR_B02001_with_ann.csv"),
+    c("2016","ACS_16_5YR_B02001_with_ann.csv")
+  )
+  for (i in 1:length(ACS_files)){
+      df_ <- read.csv(
+      paste0(data_dir,ACS_files[[i]][2]),
+      sep=",",
+      stringsAsFactors=FALSE
+    ) %>%
+    dplyr::mutate_if(
+      is.numeric, funs(ifelse(is.na(.), 0, .))
+    ) %>%
+    dplyr::select(
+      GEO.id2,
+      HD01_VD01,
+      HD01_VD02,
+      HD02_VD02,
+      HD01_VD03,
+      HD02_VD03,
+      HD01_VD04,
+      HD02_VD04
+    ) %>%
+    dplyr::rename(
+      Total=HD01_VD01,
+      White=HD01_VD02,
+      E_White=HD02_VD02,
+      Black=HD01_VD03,
+      E_Black=HD02_VD03,
+      AmInd=HD01_VD04,
+      E_AmInd=HD02_VD04
+    ) %>%
+    dplyr::mutate(
+      FIPS3=stringr::str_sub(as.character(GEO.id2),3),
+      Other=Total-White-Black-AmInd,
+      E_Other=round(sqrt(E_White^2+E_Black^2+E_AmInd^2)),
+      Year=ACS_files[[i]][1]
+    ) %>%
+    dplyr::select(
+      -GEO.id2
+    )
+    #
+    if (i==1){
+      df_all <- df_
+    } else {
+      df_all <- rbind(
+        df_all,
+        df_
+      )
+    }
+  }
+  return(df_all)
+}
+```  
+
+```{r maze}
+df_ACS_years <- fn_census_build()
+str(df_ACS_years)
+```  
+
+End August 5, 2018.  
+
+
+
+Consider voting rates in primary and general elections 2016. These are the Voter Turnout Statistics on https://er.ncsbe.gov/downloads.html?election_dt=11/08/2016 for those two election dates in the selection dropdown. Just create summary data frames. Race codes are from the layout files on those pages.  
+
+Race_code:  
+
+label	description  
+B  	BLACK or AFRICAN AMERICAN  
+I  	AMERICAN INDIAN or ALASKA NATIVE  
+O  	OTHER  
+W  	WHITE  
+U  	UNDESIGNATED  
+A  	ASIAN  
+M  	TWO or MORE RACES  
+
+This report considers only B, I, W and Other, so collect rest into Other.  
+
+```{r done}
+df_turnout_160315 <- read.csv(
+  paste0(data_dir,"history_stats_20160315_turnout.txt"),
+  sep="\t",
+  header=TRUE,
+  stringsAsFactors = FALSE
+)
+#
+str(df_turnout_160315)
+#
+df_turnout_160315 %<>%
+dplyr::mutate_if(
+  is.numeric, funs(ifelse(is.na(.), 0, .))
+) %<>%
+dplyr::mutate(
+  race_code=ifelse(
+    race_code %in% c("B","I","O","W"),race_code,"O"
+  )
+) %>%
+dplyr::select(
+  county_desc,
+  race_code,
+  total_voters
+) %>%
+dplyr::rename(
+  County=county_desc
+) %>%
+dplyr::group_by(
+  County,
+  race_code
+) %>%
+dplyr::summarize(
+  total=sum(total_voters)
+) %>%
+dplyr::ungroup() %>%
+dplyr::mutate(
+  Election="20160315"
+)
+#
+str(df_turnout_160315)
+```  
+  
+```{r rip}
+df_turnout_161108 <- read.csv(
+  paste0(data_dir,"history_stats_20161108_turnout.txt"),
+  sep="\t",
+  header=TRUE,
+  stringsAsFactors = FALSE
+)
+#
+str(df_turnout_161108)
+#
+df_turnout_161108 %<>%
+dplyr::mutate_if(
+  is.numeric, funs(ifelse(is.na(.), 0, .))
+) %<>%
+dplyr::mutate(
+  race_code=ifelse(
+    race_code %in% c("B","I","O","W"),race_code,"O"
+  )
+) %>%
+dplyr::select(
+  county_desc,
+  race_code,
+  total_voters
+) %>%
+dplyr::rename(
+  County=county_desc
+) %>%
+dplyr::group_by(
+  County,
+  race_code
+) %>%
+dplyr::summarize(
+  total=sum(total_voters)
+) %>%
+dplyr::ungroup() %>%
+dplyr::mutate(
+  Election="20161108"
+)
+#
+str(df_turnout_161108)
+```  
+
+Combine data frames and add FIPS3  
+
+```{r wax}
+df_turnout_election <-
+  rbind(
+    df_turnout_160315,
+    df_turnout_161108
+  ) %>%
+dplyr::inner_join(
+   df_FIPS %>% 
+      dplyr::select(
+        County,
+        FIPS3
+      ) %>% 
+      dplyr::mutate(
+        County=toupper(County)
+      ),
+    by="County"
+  ) %>%
+  dplyr::select(
+    -County
+  )
+#
+str(df_turnout_election)
+```  
+```{r bleak}
+df_turnout_election_wide <- 
+  df_turnout_election %>%
+  reshape2::dcast(
+    FIPS3+Election~race_code,
+    value.var = "total",
+    fun=sum
+  ) %>%
+  dplyr::rename(
+    AmInd=I,
+    Black=B,
+    White=W,
+    Other=O
+  )
+#
+str(df_turnout_election_wide)
+```  
+
+Create df_totalbyrace which will be used in the sim  
+
+Get population from https://www.osbm.nc.gov/facts-figures/demographics for 2016  
+
+```{r rinse}
+df_totalbyrace <-
+  read.csv(
+    paste0(data_dir,"totalbyrace_cleaned_2016.csv"),
+    sep="\t",
+    stringsAsFactors = FALSE
+  ) %>%
+  dplyr::inner_join(
+    df_FIPS %>%
+      dplyr::select(
+        County,
+        FIPS3
+      ),
+    by="County"
+  ) %>%
+  dplyr::select(
+    -County
+  ) %>%
+  dplyr::mutate(
+    Year=2016
+  )
+#
+str(df_totalbyrace)
+```
+
+
+## Begin write csv for neo4j  
+
+Use existing data frames to create the various csv files that feed Neo4j.  
+
+Counties node:
+
+```{r blue}
+# build the data lines
+#
+# include entropy score E for race
+# Notice that there are five categories
+#
+df_counties_out <-
+dplyr::inner_join(
+  df_FIPS %>%
+    dplyr::select(
+      FIPS3,
+      County
+    ),
+  df_Tier %>%
+    dplyr::select(
+      FIPS3,
+      Tier
+    ),
+  by="FIPS3"
+) %>%
+dplyr::inner_join(
+  df_totalbyrace %>%
+    dplyr::filter(
+      Year==2016
+    ),
+  by="FIPS3"
+) %>%
+dplyr::select(
+  -Year
+) %>%
+dplyr::select(
+  FIPS3,
+  County,
+  Total,
+  BlackPct,
+  WhitePct,
+  AmIndPct,
+  AsianPct,
+  OtherPct,
+  Tier
+) %>%
+dplyr::mutate(
+  E=round(
+    (BlackPct/100)*ifelse(BlackPct>0,log(BlackPct/100),0)+
+    (WhitePct/100)*ifelse(WhitePct>0,log(WhitePct/100),0)+
+    (AmIndPct/100)*ifelse(AmIndPct>0,log(AmIndPct/100),0)+
+    (AsianPct/100)*ifelse(AsianPct>0,log(AsianPct/100),0) +
+    (OtherPct/100)*ifelse(OtherPct>0,log(OtherPct/100),0),
+    digits=4
+    )
+)
+```
+
+```{r hydro}
+str(df_counties_out)
+```
+
+```{r feud}
+#
+# write to a file
+#
+if (do_write_csv==TRUE) {
+  df_counties_out %>%
+  readr::write_csv(
+    paste0(output_dir,"counties.csv"),
+    col_names = TRUE
+  )
+}
+```
+
+Cities node:  
+
+```{r waco}
+if (do_write_csv==TRUE) {
+  df_largest_cities %>%
+    dplyr::select(
+      id,
+      Name,
+      pop,
+      Type
+    ) %>%
+  readr::write_csv(
+    paste0(output_dir,"cities.csv"),
+    col_names = TRUE
+  )
+}
+```
+
+County Commissioners node:  
+
+```{r navy}
+if (do_write_csv==TRUE) {
+  df_NCACC_demog %>%
+    dplyr::mutate(
+      id=paste0("Board",FIPS3)
+    ) %>%
+    dplyr::select(
+      id,
+      ncomm,
+      new,
+      nrep,
+      ndem,
+      nother,
+      nfemale,
+      nwhite,
+      nafam,
+      namin
+    ) %>%
+  readr::write_csv(
+    paste0(output_dir,"boards.csv"),
+    col_names = TRUE
+  )
+}
+```
+
+### Relationships  
+
+Counties and commissioners  
+
+```{r vade}
+if (do_write_csv==TRUE) {
+  df_NCACC_demog %>%
+    dplyr::select(
+      FIPS3,
+      id
+    ) %>%
+  readr::write_csv(
+    paste0(output_dir,"countyBoards.csv"),
+    col_names = TRUE
+  )
+}
+```
+
+Counties and cities  
+
+```{r hang}
+if (do_write_csv==TRUE) {
+  df_largest_cities %>%
+    dplyr::select(
+      FIPS3,
+      id
+    ) %>%
+  readr::write_csv(
+    paste0(output_dir,"countyCity.csv"),
+    col_names = TRUE
+  )
+}
+```
+
+
+### Euclidean Separation  
+
+Try to make some sense out of a Euclidean distance between races for counties and commissioners.  
+Use df_counties_out BlackPct,WhitePct,AmIndPct,AsianPct,OtherPct and df_NCACC_demog nwhite,nafam,hnamin and ncomm. There is asymmetry here that will have to be addressed, but the NCACC data is what it is.  
+
+```{r tusk}
+df_Euclidean_race <-
+  dplyr::inner_join(
+    df_counties_out %>%
+      dplyr::select(
+          FIPS3,
+          BlackPct,
+          WhitePct,
+          AmIndPct,
+          AsianPct,
+          OtherPct
+        ),
+    df_NCACC_demog %>%
+      dplyr::mutate(
+        whitePct=round(nwhite*100/ncomm,digits=1),
+        afamPct=round(nafam*100/ncomm,digits=1),
+        aminPct=round(namin*100/ncomm,digits=1)
+      ) %>%
+      dplyr::select(
+        FIPS3,
+        whitePct,
+        afamPct,
+        aminPct
+      ),
+    by="FIPS3"
+  ) %>%
+  dplyr::mutate(
+    dist=round(
+      sqrt(
+        (WhitePct-whitePct)^2 + (BlackPct-afamPct)^2 + (AmIndPct-aminPct)^2 + AsianPct^2 + OtherPct^2
+      ),
+      digits=1
+      )
+    )
+#
+# in order to use the Euclidean distance with an edge, as a weight,
+# it should be heavier for smaller values, just the opposite of what it is.
+# so recompute it into dist_wt
+#
+dist_adjust <- min(df_Euclidean_race$dist) + max(df_Euclidean_race$dist)
+#
+df_Euclidean_race %<>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    dist_wt=dist_adjust-dist
+  ) %>%
+  dplyr::ungroup()
+```
+
+```{r cecil}
+str(df_Euclidean_race)
+```
+
+### Entropy
+
+Theil's H for entire state.  
+May not be of much use.  
+
+```{r rube}
+fn_state_entropy_index <- function() {
+  AmIndTot <- sum(df_totalbyrace$AmInd)
+  AsianTot <- sum(df_totalbyrace$Asian)
+  BlackTot <- sum(df_totalbyrace$Black)
+  WhiteTot <- sum(df_totalbyrace$White)
+  OtherTot <- sum(df_totalbyrace$Other)
+  TotalTot <- sum(df_totalbyrace$Total)
+  #
+  return(
+    (AmIndTot/TotalTot)*log(AmIndTot/TotalTot)+
+    (AsianTot/TotalTot)*log(AsianTot/TotalTot)+
+    (BlackTot/TotalTot)*log(BlackTot/TotalTot)+
+    (WhiteTot/TotalTot)*log(WhiteTot/TotalTot)+
+    (OtherTot/TotalTot)*log(OtherTot/TotalTot)
+  )
+}
+#
+Hstate <- fn_state_entropy_index()
+```  
+
+### Save objects  
+
+```{r foil}
+ls()
+save.image("prep.RData")
+```

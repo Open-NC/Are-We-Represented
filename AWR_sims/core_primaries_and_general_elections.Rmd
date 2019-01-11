@@ -1,0 +1,3336 @@
+---
+title: "AreWeRepresented Primaries and NCSBE pdfs"
+output:
+  html_document: default
+author: "D. Hopp"
+date: "October 1, 2018"
+---
+
+do_general_elections must be FALSE or general elections will be done twice from different sources. Code is included for inspection of alternative source data.  
+
+```{r mow}
+do_general_elections <- FALSE
+```
+
+These dataframes are saved individually as RData files:  
+
+df_general_candidate_list <- (in the project root) GENERAL ELECTIONS CANDIDATE LISTS  
+df_general_candidate_list_distinct  
+df_cc_distinct_results_persons_primaries  
+df_candidates_distinct_all_elections  COMBINED PRIMARY AND GENERAL ELECTIONS (brief columns)  
+
+df_cc_results_20161108_complete <- in saved_dir  
+df_cc_results_20160315_complete  
+df_cc_results_20141104_complete  
+df_cc_results_20140715_complete  
+df_cc_results_20140506_complete  
+df_cc_results_20121106_complete  
+df_cc_results_20120717_complete  
+df_cc_results_20120508_complete  
+df_cc_results_20101102_complete  
+df_cc_results_20100622_complete  
+df_cc_results_20100504_complete  
+df_cc_results_20081104_complete  
+df_cc_results_primaries  
+
+
+```{r money}
+load("prep.RData")
+load(paste0(AWR_data_RData_dir,"df_ncvoter_subset_distinct_demog_20180407.RData"))
+```   
+
+## Part A. NCSBE Candidate Lists pdf Files  
+
+NCSBE Candidate List pdf seriously varies in format!!!  
+
+Problem here is that this well-formed data seems to be lacking for other than general elections. This will leave out the Board candidates who did not make it out of those elections or, conversely, who did not have to contest a seat in the general election.  
+
+Data located in CodeForAmerica\AWR_data_only  
+Use package pdftools  
+
+### Older Candidate Lists   
+
+Much easier to deal with earlier elections since format was simpler.  
+Note: df_FIPS has county names.  
+
+File names in file_list must start with year (four characters). These are general elections.   
+
+```{r monte}
+file_list <- c(
+  "2008Candidatelist.pdf",
+  "2010Candidatelist.pdf",
+  "2012Candidatelist.pdf",
+  "2014Candidatelist.pdf",
+  "2016Candidatelist.pdf"
+)
+```
+
+A handy list of suffixes.  
+
+```{r month}
+suffixes <- c(
+  "JR",
+  "SR",
+  "II",
+  "III",
+  "IV"
+)
+```
+
+Read through the files in file_list. Parse them to create a single dataframe.  
+
+```{r mood}
+fn_general_candidate_list <- function(){
+  #
+  # start fresh
+  #
+  start_fresh <- TRUE
+  #
+  for (f in file_list){
+    #
+    Year <- stringr::str_sub(f,1,4)
+    #
+    # read file and convert to pages using strsplit
+    #
+    doc <- pdftools::pdf_text(
+        paste0(AWR_data_dir,f)
+    ) %>% 
+    strsplit(split = "\r")
+    #
+    # this is how many pages
+    #
+    len_doc <- length(doc)
+    #
+    # step through all the pages for a file
+    #
+    for (p in 1:len_doc){
+      #
+      # this is how many lines on a page
+      #
+      len_page <- length(doc[[p]])
+      #
+      # flag to say if ready to look for a name
+      #
+      look_for_name <- FALSE
+      #
+      # step through the lines
+      #
+      for (c in 1:len_page){
+        #
+        # grab the line
+        # each line is made of strings
+        #
+        whole_line <- stringr::str_replace_all(doc[[p]][c],"\\n","")
+        #
+        # is this a county line? has only a county in caps, nothing else.
+        # if so, grab county
+        # these lines may appear multiple times for a county, but are harmless
+        #
+        if(nrow(
+            df_FIPS %>%
+            dplyr::filter(toupper(County)==whole_line)
+          ) == 1
+        ){
+          #
+          # remember county
+          #
+          county <- whole_line
+        } else {
+          #
+          # not a county line
+          #
+          last_name <- ""
+          first_name <- ""
+          middle_name <- ""
+          suffix <- ""
+          middle_init <- ""
+          #
+          # this is the line split into words
+          #
+          s <- stringr::str_split(whole_line,"\\b")
+          len_s <- length(s[[1]])
+          #
+          if (!look_for_name){
+            #
+            # keep on looking for the ID line
+            #
+            if (stringr::str_detect(whole_line,"COUNTY BOARD OF COMMISSIONERS") |
+                stringr::str_detect(whole_line,"COUNTY COMMISSIONER")){  
+              #
+              # got one
+              #
+              look_for_name <- TRUE
+            }
+          } else {
+            #
+            # empty line terminates the block of names
+            # look for name or empty line
+            #
+            if (trimws(whole_line)==""){
+              #
+              # found empty line
+              # done with names
+              #
+              look_for_name <- FALSE
+            } else {
+              #
+              # should be a name
+              # say a little prayer
+              # are there any names with more than four fields???
+              # that would be a problem, as will be the two-part last names (Di Whatever, etc.)
+              # have to use the comma that terminates last name
+              #
+              # last name might be two part
+              # look for comma
+              #
+              field_n <- 2
+              last_name <- s[[1]][field_n]
+              field_n <- field_n + 1
+              #
+              while(trimws(s[[1]][field_n]) != ","){
+                if(trimws(s[[1]][field_n]) != ""){
+                  last_name <- paste(last_name,s[[1]][field_n])
+                  last_name <- stringr::str_replace(last_name," - ","-")
+                }
+                field_n <- field_n + 1
+                if (field_n > len_s){
+                  break
+                }
+              } # while
+              #
+              field_n <- field_n + 1
+              if (field_n > len_s){
+                break
+              }
+              first_name <- s[[1]][field_n]
+              if (nchar(first_name)==1){
+                first_name <- paste0(first_name,".")
+              }
+              #
+              # skip a blank
+              #
+              field_n <- field_n + 2
+              if (field_n > len_s){
+                break
+              }
+              #
+              # middle name maybe
+              # must be all caps or have bumped into casual name (mixed case I hope)
+              # or found a field with multiple blanks
+              # but have to deal with suffix
+              #
+              middle_name <- ""
+              middle_init <- ""
+              while (!(
+                (nchar(s[[1]][field_n])>1 & trimws(s[[1]][field_n])=="") | 
+                (toupper(s[[1]][field_n])!= s[[1]][field_n])
+                )){
+                if (s[[1]][field_n] != " ") {
+                  if (s[[1]][field_n] %in% suffixes){
+                    suffix <- s[[1]][field_n]
+                  } else {
+                    middle_name <- paste(middle_name,s[[1]][field_n])
+                    middle_name <- stringr::str_replace(trimws(middle_name)," - ","-")
+                    if (nchar(middle_name) > 0){
+                      middle_init <- paste0(stringr::str_sub(middle_name,1,1),".")
+                    }
+                  }
+                }
+                field_n <- field_n +1
+                if (field_n > len_s){
+                  break
+                }
+              } # while
+              #
+              if (nchar(middle_name)==1){
+                middle_name <- paste0(middle_name,".")
+              }
+              #
+            } # if (grepl("^\\n$",whole_line))
+          } # if (!look_for_name)
+          #
+          if (last_name != ""){
+            if(start_fresh){
+              #
+              # this dataframe will hold all results
+              # df[nrow(df) + 1,] = list("v1","v2")
+              #
+              df_ <-
+                  data.frame(
+                  county,
+                  last_name,
+                  first_name,
+                  middle_name,
+                  suffix,
+                  middle_init,
+                  Year,
+                  stringr::str_split(f,"\\.")[[1]][1],
+                  stringsAsFactors=FALSE
+                )
+              names(df_) <- c(
+                "county",
+                "last_name",
+                "first_name",
+                "middle_name",
+                "suffix",
+                "middle_init",
+                "Year",
+                "source"
+              )
+              #
+              start_fresh <- FALSE
+              #
+            } else {
+              df_[nrow(df_)+1,] <-
+                list(
+                  county,
+                  last_name,
+                  first_name,
+                  middle_name,
+                  suffix,
+                  middle_init,
+                  Year,
+                  stringr::str_split(f,"\\.")[[1]][1]
+                ) 
+            }
+          }
+        } # if nrow
+      } # for (c in 1:len_page)
+    } # for (p in 1:len_doc)
+  } # for (f in file_list)
+  #
+  # finish
+  #
+  if (exists("df_")){
+    return(df_)
+  } else {
+    return(NULL)
+  }
+}
+```  
+
+Here is the parsed data from file_list:  
+
+```{r moody}
+df_general_candidate_list <- fn_general_candidate_list()
+class(df_general_candidate_list)
+save_these_objects <- c("df_general_candidate_list","fn_general_candidate_list")
+```  
+
+## 2018 Candidate List With Contacts  
+
+The 2018 NCSBE file is of a different, and much more difficult to parse, format.  
+
+Use 2018_General_Election_Candidates_with_Contacts.pdf  
+Includes "COUNTY BOARD OF COMMISSIONERS"  Is this consistent?  Can be split on two lines, as per BRUNSWICK, CUMBERLAND, EDGECOMBE, HENDERSON, MECKLENBURG, MONTGOMERY, NEW HANOVER, NORTHAMPTON, PASQUOTANK, PERQUIMANS, ROCKINGHAM, RUTHERFORD, TRANSYLVANIA, WASHINGTON. Split is COUNTY BOARD OF/COMMISSIONERS.  
+
+```{r moon}
+file_list_2018 <- "2018_General_Election_Candidates_with_Contacts.pdf"
+```
+
+These words are confounders, appearing on a second line in the role of names, and must be excluded.  
+
+```{r moor}
+stop_words <- c(
+  "CHURCH",
+  "LANDING",
+  "MOON",
+  "PKWY",
+  "CUNNINGHAM",
+  "CROSSROAD",
+  "RD"
+)
+```
+
+```{r moot}
+fn_general_candidate_list_2018 <- function(){
+  #
+  # start fresh
+  #
+  start_fresh <- TRUE
+  #
+  for (f in file_list_2018){
+    #
+    Year <- "2018"
+    #
+    # read file and convert to pages using strsplit
+    #
+    doc <- pdftools::pdf_text(
+        paste0(AWR_data_dir,f)
+    ) %>% 
+    strsplit(split = "\r")
+    #
+    # this is how many pages
+    #
+    len_doc <- length(doc)
+    #
+    # step through all the pages for a file
+    #
+    for (p in 1:len_doc){
+      #
+      # this is how many lines on a page
+      #
+      len_page <- length(doc[[p]])
+      #
+      # flag to say if ready to look for a name
+      #
+      look_for_name <- FALSE
+      #
+      # step through the lines
+      #
+      for (c in 1:len_page){
+        #
+        # grab the line
+        # do some cleanup
+        # each line is made of strings
+        #
+        line_ <- stringr::str_replace_all(doc[[p]][c],"\\n","")
+        whole_line <- stringr::str_replace(line_,"\\(UNEX\\)","")
+        whole_line <- stringr::str_replace(whole_line,"\\(UNEXPIRED\\)","")
+        whole_line <- stringr::str_replace(whole_line,"\\(UNEXPIRED TERM\\)","")
+        whole_line <- stringr::str_replace(whole_line,"AT-LARGE","")
+        whole_line <- stringr::str_replace(whole_line,"MEMBERS","")
+        whole_line <- stringr::str_replace(whole_line,"CHAIRMAN","")
+        if (c < len_page){
+          line_ <- stringr::str_replace_all(doc[[p]][c+1],"\\n","")
+          next_line <- stringr::str_replace(line_,"\\(UNEX\\)","")
+          next_line <- stringr::str_replace(next_line,"\\(UNEXPIRED\\)","")
+          next_line <- stringr::str_replace(next_line,"\\(UNEXPIRED TERM\\)","")
+          next_line <- stringr::str_replace(next_line,"AT-LARGE","")
+          next_line <- stringr::str_replace(next_line,"[A-Z]*\\s*DISTRICT\\s*[1-9]*(\\b[IV]+\\b)*","")
+          next_line <- stringr::str_replace(next_line,"[A-Z]*\\s*TOWNSHIP\\s*[1-9]*(\\b[IV]+\\b)*","")
+          next_line <- stringr::str_replace(next_line,"[A-Z]*\\s*TWP\\s*[1-9]*(\\b[IV]+\\b)*","")
+          next_line <- stringr::str_replace(next_line,"MEMBERS","")
+          next_line <- stringr::str_replace(next_line,"CHAIRMAN","")
+        } else {
+          next_line <- ""
+        }
+        #
+        # is this a county line? has only a county in caps, nothing else.
+        # if so, grab county
+        # these lines may appear multiple times for a county, but are harmless
+        #
+        if(
+          nrow(
+            df_FIPS %>%
+            dplyr::filter(toupper(County)==whole_line)
+            ) == 1
+          )
+        {
+          #
+          # remember county
+          #
+          county <- whole_line
+        } else { 
+          #
+          # not a county line
+          #
+          last_name <- ""
+          first_name <- ""
+          middle_name <- ""
+          suffix <- ""
+          middle_init <- ""
+          #
+          # this is the line split into words
+          #
+          s <- stringr::str_split(whole_line,"\\b")
+          len_s <- length(s[[1]])
+          s_next <- stringr::str_split(next_line,"\\b")
+          len_s_next <- length(s_next[[1]])
+          #
+          # keep on looking for the ID line
+          # could be on one line
+          #
+          split_line <- TRUE
+          look_on_next_line <- FALSE
+          look_for_name <- FALSE
+          if (stringr::str_detect(whole_line,"COUNTY BOARD OF COMMISSIONERS")){     
+            #
+            # found COUNTY BOARD OF COMMISSIONERS
+            #
+            look_for_name <- TRUE
+            split_line <- FALSE
+            #
+            # there will be a field of multiple blanks following COMMISSIONERS
+            #
+            field_n <- 1
+            while(!(nchar(s[[1]][field_n]) > 1 & trimws(s[[1]][field_n]) == "")){
+              field_n <- field_n + 1
+              if (field_n > len_s){
+                print(paste("field_n overrun",whole_line))
+                knitr::knit_exit()
+              }
+            } # while
+            #
+            # check to see if anything at all on next line
+            # the unfriendly formatting causes something to be there just about all the time
+            #
+            if (nchar(trimws(next_line)) > 0){
+              look_on_next_line <- TRUE
+              next_field_n <- 1
+            } else {
+              look_on_next_line <- FALSE
+            } 
+            #
+          } # on one line
+          #
+          # or on two
+          #
+          if (split_line){
+            if (stringr::str_detect(whole_line,"COUNTY BOARD OF") & 
+                stringr::str_detect(next_line,"COMMISSIONERS")) {
+              #
+              # there will be a field of multiple blanks following OF
+              # and the next line following COMMISSIONERS ...
+              #
+              split_line <- TRUE
+              look_for_name <- TRUE
+              field_n <- 1
+              while(!(nchar(s[[1]][field_n]) > 1 & trimws(s[[1]][field_n]) == "")){
+                field_n <- field_n + 1
+                if (field_n > len_s){
+                  print(paste("field_n overrun",whole_line))
+                  knitr::knit_exit()
+                }
+              } # while
+              #
+              # what follows COMMISSIONERS ... could be entirely blank,
+              # that is, nothing else on next line
+              #
+              next_field_n <- 1
+              look_on_next_line <- TRUE
+              while(!(nchar(s_next[[1]][next_field_n])>1 & trimws(s_next[[1]][next_field_n]) == "")){
+                next_field_n <- next_field_n + 1
+                if (next_field_n > len_s_next){
+                  look_on_next_line <- FALSE
+                  break
+                }
+              } # while
+            } # on two lines
+          } # if split_line 
+          #
+          if (look_for_name){
+            #
+            # ok to look for name
+            # field_n pertains to first line
+            # next_field_n pertains to second line if look_on_next_line is TRUE
+            #
+            # should be a name
+            # say a little prayer
+            # name can be split on two lines LAST,FIRST/MIDDLE
+            #
+            # are there any names with more than four fields???
+            # that would be a problem, as will be the two-part last names (Di Whatever, etc.)
+            # have to use the comma that terminates last name
+            #
+            # last name might be two part
+            # look for comma
+            #
+            # pick up where we left off
+            #
+            field_n <- field_n + 1
+            if (trimws(s[[1]][field_n]) == "" | toupper((s[[1]][field_n])) != s[[1]][field_n]){
+               print("where is last name?")
+              knitr::knit_exit()
+            }
+            #
+            last_name <- s[[1]][field_n]
+            field_n <- field_n + 1
+            #
+            while(trimws(s[[1]][field_n]) != ","){
+              if(trimws(s[[1]][field_n]) != ""){
+                last_name <- paste(last_name,s[[1]][field_n])
+                last_name <- stringr::str_replace(last_name," - ","-")
+              }
+              field_n <- field_n + 1
+              if (field_n > len_s){
+                break
+              }
+            } # while
+            #
+            field_n <- field_n + 1
+            if (field_n > len_s){
+              break
+            }
+            first_name <- s[[1]][field_n]
+            if (nchar(first_name)==1){
+              first_name <- paste0(first_name,".")
+            }
+            #
+            # skip a blank
+            #
+            field_n <- field_n + 2
+            if (field_n > len_s){
+              break
+            }
+            #
+            # middle name maybe
+            # must be all caps 
+            # or found a field with multiple blanks 
+            # or field that is a date like mm / dd / yyyy
+            # but have to deal with suffix
+            #
+            middle_name <- ""
+            middle_init <- ""
+            while (!(
+              (nchar(s[[1]][field_n]) > 1 & trimws(s[[1]][field_n]) == "") | 
+                grepl("^\\d{2}",s[[1]][field_n])
+              )
+            ){
+              if (s[[1]][field_n] != " ") {
+                if (s[[1]][field_n] %in% suffixes){
+                  suffix <- s[[1]][field_n]
+                  break
+                } else {
+                  middle_name <- paste(middle_name,s[[1]][field_n])
+                  middle_name <- stringr::str_replace(trimws(middle_name)," - ","-")
+                  if (nchar(middle_name)==1){
+                    middle_name <- paste0(middle_name,".")
+                  }
+                  if (nchar(middle_name) > 0){
+                    middle_init <- paste0(stringr::str_sub(middle_name,1,1),".")
+                  }
+                }
+              }
+              #
+              # keep trying
+              #
+              field_n <- field_n +1
+              if (field_n > len_s){
+                break
+              }
+            } # while
+            #
+            # look at next_line to see if anything of interest is there
+            # pick up from where we were earlier
+            #
+            if (look_on_next_line){
+              next_field_n <- next_field_n + 1
+              while (next_field_n <= len_s_next){
+                if (
+                  nchar(s_next[[1]][next_field_n]) > 1 & trimws(s_next[[1]][next_field_n]) == "" |
+                  grepl("\\d{2}",s_next[[1]][next_field_n]) |
+                  toupper(s_next[[1]][next_field_n]) != s_next[[1]][next_field_n]
+                ){
+                  break
+                } else {
+                  if (s_next[[1]][next_field_n] != ""){
+                    if (s_next[[1]][next_field_n] %in% stop_words){
+                      break
+                    }
+                    #
+                    if (s_next[[1]][next_field_n] %in% suffixes){
+                      suffix <- s_next[[1]][next_field_n]
+                      break
+                    }
+                    #
+                    middle_name <- paste(middle_name,s_next[[1]][next_field_n])
+                    middle_name <- stringr::str_replace(trimws(middle_name)," - ","-")
+                    if (nchar(middle_name) > 0){
+                      middle_init <- paste0(stringr::str_sub(middle_name,1,1),".")
+                    }
+                  }
+                }
+                next_field_n <- next_field_n + 1
+              } # while look_for_name
+            } # if look_on_next_line
+            #
+            # finished building name
+            # add to data frame
+            #
+            if (last_name != ""){
+              if(start_fresh){
+                #
+                # this dataframe will hold all results
+                # df[nrow(df) + 1,] = list("v1","v2")
+                #
+                df_ <-
+                    data.frame(
+                    county,
+                    last_name,
+                    first_name,
+                    middle_name,
+                    suffix,
+                    middle_init,
+                    Year,
+                    stringr::str_split(f,"\\.")[[1]][1],
+                    stringsAsFactors=FALSE
+                  )
+                names(df_) <- c(
+                  "county",
+                  "last_name",
+                  "first_name",
+                  "middle_name",
+                  "suffix",
+                  "middle_init",
+                  "Year",
+                  "source"
+                )
+                #
+                start_fresh <- FALSE
+                #
+              } else {
+                df_[nrow(df_)+1,] <-
+                  list(
+                    county,
+                    last_name,
+                    first_name,
+                    middle_name,
+                    suffix,
+                    middle_init,
+                    Year,
+                    stringr::str_split(f,"\\.")[[1]][1]
+                  ) 
+              }
+            }
+          } # if build name
+        } # not a county line
+      } # for (c in 1:len_page)
+    } # for (p in 1:len_doc)
+  } # for (f in file_list)
+  #
+  # finish
+  #
+  if (exists("df_")){
+    return(df_)
+  } else {
+    return(NULL)
+  }
+}
+```  
+
+```{r mop}
+df_general_candidate_list_2018 <- fn_general_candidate_list_2018()
+class(df_general_candidate_list_2018)
+save_these_objects <- c(save_these_objects,"df_general_candidate_list_2018","fn_general_candidate_list_2018")
+```  
+
+## Rbind and Save 
+
+Combine all the general election data:  
+
+```{r morale}
+df_general_candidate_list <- rbind(
+  df_general_candidate_list,
+  df_general_candidate_list_2018
+)
+#
+df_general_candidate_list %>% 
+  reshape2::dcast(
+    Year~.,
+    margins=TRUE
+  )
+#
+nrow(
+  df_general_candidate_list %>% 
+  dplyr::distinct(
+    county,
+    last_name,
+    first_name,
+    middle_name,
+    suffix
+  )
+)
+```
+
+```{r morn}
+df_general_candidate_list_distinct <- 
+  df_general_candidate_list %>% 
+  dplyr::distinct(
+    county,
+    last_name,
+    first_name,
+    middle_name,
+    suffix
+  )
+#
+nrow(df_general_candidate_list_distinct)
+#
+save_these_objects <- c(save_these_objects,"df_general_candidate_list_distinct")
+```
+
+```{r more}
+if (any(class(df_general_candidate_list)=="data.frame")) {
+  save(
+    df_general_candidate_list,
+    file=paste0(saved_dir,"df_general_candidate_list.RData")
+  )
+#
+df_general_candidate_list %>% 
+  readr::write_csv(
+    "df_general_candidate_list.csv"
+  )
+}
+```  
+
+```{r moron}
+if (any(class(df_general_candidate_list_distinct)=="data.frame")) {
+  save(
+    df_general_candidate_list_distinct,
+    file=paste0(saved_dir,"df_general_candidate_list_distinct.RData")
+  )
+#
+df_general_candidate_list_distinct %>% 
+  readr::write_csv(
+    "df_general_candidate_list_distinct.csv"
+  )
+}
+```
+
+## Part B. County Commissioner Elections  
+
+Sources for data primarily at https://er.ncsbe.gov/?ElectionResults/?county_id=34&election_dt=05/06/2014 via the "Downloads" option.  
+
+Commissioners data file prepared by Nathania https://github.com/Open-NC/Are-We-Represented/blob/master/nc-cc-data/cc-db-21june2018.csv via copy and paste.  
+In data dir as Nat-cc-db-21june2018.csv  
+
+```{r igor}
+df_cc_db_21june2018 <-
+  read.csv(
+    paste0(data_dir,"Nat-cc-db-21june2018.csv"),
+    sep="\t",
+    stringsAsFactors=FALSE
+  )
+#
+str(df_cc_db_21june2018)
+save_these_objects <- c(save_these_objects,"df_cc_db_21june2018")
+```  
+
+```{r roost}
+df_cc_db_21june2018_dcast <-
+df_cc_db_21june2018 %>%
+  reshape2::dcast(
+    County~Race
+  )
+#
+str(df_cc_db_21june2018_dcast)
+```  
+
+Look at this by election date. Date includes "Appointed" in twenty counties. Value is 1 except for 2 in 2 cases.  
+
+```{r floe}
+df_cc_db_21june2018_date_dcast <-
+df_cc_db_21june2018 %>%
+  reshape2::dcast(
+    County~Election.Date
+  ) %>%
+  dplyr::inner_join(
+    df_FIPS %>%
+      dplyr::select(
+        FIPS3,
+        County
+      ),
+    by="County"
+  ) %>%
+  dplyr::inner_join(
+    df_NCACC_demog %>%
+      dplyr::select(
+        FIPS3,
+        ncomm
+      ),
+    by="FIPS3"
+  )
+#
+str(df_cc_db_21june2018_date_dcast)
+```
+
+## Precinct Results to Identify CC Candidates  
+
+This is a list of the NCSBE results_pct_... files that contain CC votes. They are available at https://s3.amazonaws.com/dl.ncsbe.gov/list.html  Data prior to 2008 general election seems a bit of a mess and is avoided here. There are some formatting, column naming, and embedded nulls issues so files should be inspected individually.  
+
+results_pct_20081104.txt  
+"county","precinct","contest_type","runoff_status ","recount_status","contest","choice","winner_status","party","Election Day","Absentee / One Stop","Provisional","total votes","district"  
+
+results_pct_20100504.txt  
+"county","precinct","contest_type","runoff_status ","recount_status","contest","choice","winner_status","party","Election Day","One Stop","Absentee by Mail","Provisional","total votes","district"  
+
+results_pct_20100622.txt  
+"county","precinct","contest_type","runoff_status ","recount_status","contest","choice","winner_status","party","Election Day","One Stop","Absentee by Mail","Provisional","total votes","district"  
+
+results_pct_20101102.txt  
+"county","precinct","contest_type","runoff_status ","recount_status","contest","choice","winner_status","party","Election Day","One Stop","Absentee by Mail","Provisional","total votes","district"  
+
+results_pct_20120508.txt  
+"county","precinct","contest_type","runoff_status ","recount_status","contest","choice","winner_status","party","Election Day","One Stop","Absentee by Mail","Provisional","total votes","district"  
+
+results_pct_20120717.txt  
+"county","precinct","contest_type","runoff_status ","recount_status","contest","choice","winner_status","party","Election Day","One Stop","Absentee by Mail","Provisional","total votes","district"  
+
+results_pct_20121106.txt  
+"county","precinct","contest_type","runoff_status ","recount_status","contest","choice","winner_status","party","Election Day","One Stop","Absentee by Mail","Provisional","total votes","district"  
+
+results_pct_20140506.txt  
+County	Election Date	Precinct	Contest Group ID	Contest Type	Contest Name	Choice	Choice Party	Vote For	Election Day	One Stop	Absentee by Mail	Provisional	Total Votes  
+
+results_pct_20140715.txt  
+County	Election Date	Precinct	Contest Group ID	Contest Type	Contest Name	Choice	Choice Party	Vote For	Election Day	One Stop	Absentee by Mail	Provisional	Total Votes  
+
+results_pct_20141104.txt  
+County	Election Date	Precinct	Contest Group ID	Contest Type	Contest Name	Choice	Choice Party	Vote For	Election Day	One Stop	Absentee by Mail	Provisional	Total Votes  
+
+results_pct_20151103.txt  NO CC CANDIDATES - DO NOT USE  
+
+results_pct_20160315.txt  embedded nulls  
+County	Election Date	Precinct	Contest Group ID	Contest Type	Contest Name	Choice	Choice Party	Vote For	Election Day	One Stop	Absentee by Mail	Provisional	Total Votes  
+
+results_pct_20161108.txt  
+County	Election Date	Precinct	Contest Group ID	Contest Type	Contest Name	Choice	Choice Party	Vote For	Election Day	One Stop	Absentee by Mail	Provisional	Total Votes	 
+
+### 20160315  
+
+Embedded nulls for party.  
+Handle in Notepad++ by Find/Replace \x00 with <leave blank> using Regular Expressions.  
+
+```{r usaf}
+df_cc_results_20160315_complete <- read.csv(
+  paste0(data_dir,"results_pct_20160315.txt"),
+  sep="\t",
+  stringsAsFactors=FALSE
+)
+#
+str(df_cc_results_20160315_complete)
+```  
+
+Isolate county commissioner candidates by county. Drop contest name for this analysis. Use N/R (Not Reported) if Choice.Party NA.  
+
+Checked by hand to see that the COUNTY & COMMISSIONER filter caught all and only the ones sought. There are 21 counties that had no county commissioners on primary ballot.  
+
+```{r fief}
+df_cc_results_20160315 <-
+df_cc_results_20160315_complete %>%
+  dplyr::rowwise() %>%
+  dplyr::filter(
+    stringr::str_detect(Contest.Name,"COMMISSIONER") &
+    (stringr::str_detect(Contest.Name,"COUNTY") | stringr::str_detect(Contest.Name,"BOARD"))
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::select(
+    County,
+    Choice,
+    Contest.Name,
+    Choice.Party,
+    Total.Votes
+  ) %>%
+  dplyr::mutate(
+    Choice.Party=ifelse(trimws(Choice.Party)=="","N/R",Choice.Party),
+    Election="20160315"
+  )
+#
+str(df_cc_results_20160315)
+```  
+
+Counties with no county commissioners:
+
+```{r scarf}
+unlist(
+  dplyr::anti_join(
+    df_FIPS %>% 
+      dplyr::select(County) %>% 
+      dplyr::mutate(County=toupper(County)
+    ),
+    df_cc_results_20160315 %>%
+      dplyr::select(
+        County
+      ),
+    by="County"
+  ) %>% dplyr::distinct() 
+)
+```  
+
+```{r nova}
+save(
+  df_cc_results_20160315_complete,
+  file=paste0(saved_dir,"df_cc_results_20160315_complete.RData")
+)
+rm(df_cc_results_20160315_complete)
+```  
+
+### results_pct_20140715.txt  
+
+```{r pong}
+df_cc_results_20140715_complete <- read.csv(
+  paste0(data_dir,"results_pct_20140715.txt"),
+  sep="\t",
+  stringsAsFactors=FALSE
+)
+#
+str(df_cc_results_20140715_complete)
+```  
+
+Isolate county commissioner candidates by county. Drop contest name for this analysis. Use N/R (Not Reported) if Choice.Party NA.  
+
+Checked by hand to see that the COUNTY BOARD OF COMMISSIONER filter caught all and only the ones sought.  
+
+```{r haunt}
+df_cc_results_20140715 <-
+df_cc_results_20140715_complete %>%
+  dplyr::filter(
+    stringr::str_detect(Contest.Name,"BOARD OF COMMISSIONER")
+  ) %>%
+  dplyr::select(
+    County,
+    Choice,
+    Contest.Name,
+    Choice.Party,
+    Total.Votes
+  ) %>%
+  dplyr::mutate(
+    Choice.Party=ifelse(trimws(Choice.Party)=="","N/R",Choice.Party),
+    Election="20140715"
+  )
+#
+str(df_cc_results_20140715)
+```  
+
+These counties have no CC candidates (verified by inspection):  
+
+```{r porch}
+unlist(
+  dplyr::anti_join(
+    df_FIPS %>% 
+    dplyr::select(County) %>% 
+    dplyr::mutate(County=toupper(County)),
+    df_cc_results_20140715 %>% 
+    dplyr::select(County) %>% 
+    dplyr::distinct(),
+    by="County"
+  )
+)
+``` 
+
+```{r torch}
+save(
+  df_cc_results_20140715_complete,
+  file=paste0(saved_dir,"df_cc_results_20140715_complete.RData")
+)
+rm(df_cc_results_20160315_complete)
+```  
+
+### results_pct_20140506.txt  
+
+Embedded nulls.Replace \x00 with <empty> using Notepad++  
+
+```{r lawn}
+df_cc_results_20140506_complete <- read.csv(
+  paste0(data_dir,"results_pct_20140506.txt"),
+  sep="\t",
+  stringsAsFactors=FALSE
+)
+#
+str(df_cc_results_20140506_complete)
+```  
+
+Isolate county commissioner candidates by county. Drop contest name for this analysis. Use N/R (Not Reported) if Choice.Party NA.  
+
+Checked by hand to see that the COUNTY BOARD OF COMMISSIONER filter caught all and only the ones sought.  
+
+```{r davit}
+df_cc_results_20140506 <-
+df_cc_results_20140506_complete %>%
+  dplyr::filter(
+    stringr::str_detect(Contest.Name,"BOARD OF COMMISSIONER")
+  ) %>%
+  dplyr::select(
+    County,
+    Choice,
+    Contest.Name,
+    Choice.Party,
+    Total.Votes
+  ) %>%
+  dplyr::mutate(
+    Choice.Party=ifelse(trimws(Choice.Party)=="","N/R",Choice.Party),
+    Election="20140506"
+  )
+#
+str(df_cc_results_20140506)
+```  
+
+These counties have no CC candidates (verified by inspection):  
+
+```{r bawl}
+unlist(
+  dplyr::anti_join(
+    df_FIPS %>% 
+    dplyr::select(County) %>% 
+    dplyr::mutate(County=toupper(County)),
+    df_cc_results_20140506 %>% 
+    dplyr::select(County) %>% 
+    dplyr::distinct(),
+    by="County"
+  )
+)
+``` 
+
+```{r meter}
+save(
+  df_cc_results_20140506_complete,
+  file=paste0(saved_dir,"df_cc_results_20140715_complete.RData")
+)
+rm(df_cc_results_20140506_complete)
+```  
+
+### results_pct_20120717.txt  
+
+```{r plate}
+df_cc_results_20120717_complete <- read.csv(
+  paste0(data_dir,"results_pct_20120717.txt"),
+  sep=",",
+  stringsAsFactors=FALSE
+)
+#
+str(df_cc_results_20120717_complete)
+```  
+
+```{r grow}
+df_cc_results_20120717 <-
+df_cc_results_20120717_complete %>%
+  dplyr::filter(
+      stringr::str_detect(contest,"COUNTY BOARD OF COMMISSIONERS")
+  ) %>%
+  dplyr::select(
+    county,
+    choice,
+    contest,
+    party,
+    total.votes
+  ) %>%
+  dplyr::rename(
+    County=county,
+    Choice=choice,
+    Contest.Name=contest,
+    Choice.Party=party,
+    Total.Votes=total.votes
+  ) %>%
+  dplyr::mutate(
+    Election="20120717"
+  )
+#
+str(df_cc_results_20120717)
+```  
+
+These counties have no CC candidates:  
+
+```{r bony}
+unlist(
+  dplyr::anti_join(
+    df_FIPS %>% 
+    dplyr::select(County) %>% 
+    dplyr::mutate(County=toupper(County)),
+    df_cc_results_20120717 %>% 
+    dplyr::select(County) %>% 
+    dplyr::distinct(),
+    by="County"
+  )
+)
+``` 
+
+```{r hail}
+save(
+  df_cc_results_20120717_complete,
+  file=paste0(saved_dir,"df_cc_results_20120717_complete.RData")
+)
+rm(df_cc_results_20120717_complete)
+```  
+
+### results_pct_20120508.txt  
+
+```{r loaf}
+df_cc_results_20120508_complete <- read.csv(
+  paste0(data_dir,"results_pct_20120508.txt"),
+  sep=",",
+  stringsAsFactors=FALSE
+)
+#
+str(df_cc_results_20120508_complete)
+```  
+
+```{r trim}
+df_cc_results_20120508 <-
+df_cc_results_20120508_complete %>%
+  dplyr::filter(
+      stringr::str_detect(contest,"COUNTY BOARD OF COMMISSIONERS")
+  ) %>%
+  dplyr::select(
+    county,
+    choice,
+    contest,
+    party,
+    total.votes
+  ) %>%
+  dplyr::rename(
+    County=county,
+    Choice=choice,
+    Contest.Name=contest,
+    Choice.Party=party,
+    Total.Votes=total.votes
+  ) %>%
+  dplyr::mutate(
+    Election="20120508"
+  )
+#
+str(df_cc_results_20120508)
+```  
+
+These counties have no CC candidates:  
+
+```{r paine}
+unlist(
+  dplyr::anti_join(
+    df_FIPS %>% 
+    dplyr::select(County) %>% 
+    dplyr::mutate(County=toupper(County)),
+    df_cc_results_20120508 %>% 
+    dplyr::select(County) %>% 
+    dplyr::distinct(),
+    by="County"
+  )
+)
+``` 
+
+```{r ride}
+save(
+  df_cc_results_20120508_complete,
+  file=paste0(saved_dir,"df_cc_results_20120508_complete.RData")
+)
+rm(df_cc_results_20120508_complete)
+```  
+
+### results_pct_20100622.txt  
+
+```{r xerox}
+df_cc_results_20100622_complete <- read.csv(
+  paste0(data_dir,"results_pct_20100622.txt"),
+  sep=",",
+  stringsAsFactors=FALSE
+)
+#
+str(df_cc_results_20100622_complete)
+```  
+
+```{r bear}
+df_cc_results_20100622 <-
+df_cc_results_20100622_complete %>%
+  dplyr::filter(
+      stringr::str_detect(contest,"COUNTY COMMISSIONER")
+  ) %>%
+  dplyr::select(
+    county,
+    choice,
+    contest,
+    party,
+    total.votes
+  ) %>%
+  dplyr::rename(
+    County=county,
+    Choice=choice,
+    Contest.Name=contest,
+    Choice.Party=party,
+    Total.Votes=total.votes
+  ) %>%
+  dplyr::mutate(
+    Election="20100622"
+  )
+#
+str(df_cc_results_20100622)
+```  
+
+These counties have no CC candidates:  
+
+```{r pinto}
+unlist(
+  dplyr::anti_join(
+    df_FIPS %>% 
+    dplyr::select(County) %>% 
+    dplyr::mutate(County=toupper(County)),
+    df_cc_results_20100622 %>% 
+    dplyr::select(County) %>% 
+    dplyr::distinct(),
+    by="County"
+  )
+)
+```
+
+```{r hour}
+save(
+  df_cc_results_20100622_complete,
+  file=paste0(saved_dir,"df_cc_results_20100622_complete.RData")
+)
+rm(df_cc_results_20100622_complete)
+```  
+
+### results_pct_20100504.txt  
+
+```{r laden}
+df_cc_results_20100504_complete <- read.csv(
+  paste0(data_dir,"results_pct_20100504.txt"),
+  sep=",",
+  stringsAsFactors=FALSE
+)
+#
+str(df_cc_results_20100504_complete)
+```  
+
+```{r prep}
+df_cc_results_20100504 <-
+df_cc_results_20100504_complete %>%
+  dplyr::filter(
+      stringr::str_detect(contest,"COUNTY COMMISSIONER")
+  ) %>%
+  dplyr::select(
+    county,
+    choice,
+    contest,
+    party,
+    total.votes
+  ) %>%
+  dplyr::rename(
+    County=county,
+    Choice=choice,
+    Contest.Name=contest,
+    Choice.Party=party,
+    Total.Votes=total.votes
+  ) %>%
+  dplyr::mutate(
+    Election="20100504"
+  )
+#
+str(df_cc_results_20100504)
+```  
+
+These counties have no CC candidates:  
+
+```{r regina}
+unlist(
+  dplyr::anti_join(
+    df_FIPS %>% 
+    dplyr::select(County) %>% 
+    dplyr::mutate(County=toupper(County)),
+    df_cc_results_20100504 %>% 
+    dplyr::select(County) %>% 
+    dplyr::distinct(),
+    by="County"
+  )
+)
+```
+
+```{r slope}
+save(
+  df_cc_results_20100504_complete,
+  file=paste0(saved_dir,"df_cc_results_20100504_complete.RData")
+)
+rm(df_cc_results_20100504_complete)
+```  
+
+### COMBINE data frames  
+
+General elections only.  
+
+```{r gout}
+if (do_general_elections==TRUE) {
+  df_cc_results_general_election <-
+    rbind(
+      df_cc_results_20161108,
+      df_cc_results_20141104,
+      df_cc_results_20121106,
+      df_cc_results_20101102,
+      df_cc_results_20081104
+    )
+  #
+  str(df_cc_results_general_election)
+  #
+  rm(
+    df_cc_results_20161108,
+    df_cc_results_20141104,
+    df_cc_results_20121106,
+    df_cc_results_20101102,
+    df_cc_results_20081104
+  )
+  #
+  save_these_objects <- c(save_these_objects,"df_cc_results_general_election")
+}
+```  
+
+Primaries only.  
+
+```{r molal}
+df_cc_results_primaries <-
+  rbind(
+    df_cc_results_20160315,
+    df_cc_results_20140715,
+    df_cc_results_20140506,
+    df_cc_results_20120717,
+    df_cc_results_20120508,
+    df_cc_results_20100622,
+    df_cc_results_20100504
+  )
+#
+rm(
+    df_cc_results_20160315,
+    df_cc_results_20140715,
+    df_cc_results_20140506,
+    df_cc_results_20120717,
+    df_cc_results_20120508,
+    df_cc_results_20100622,
+    df_cc_results_20100504
+)
+#
+save_these_objects <- c(save_these_objects,"df_cc_results_primaries")
+``` 
+
+Determine which people competed in each county for CC board. Exclude write-ins. These include the "Write-In (Miscellaneous)" (and variations) and the named persons with appended "(Write-In)". There are also a few with "Yes" or "No".  
+
+```{r ieee2}
+df_cc_distinct_results_primaries <-
+  df_cc_results_primaries %>%
+  dplyr::select(
+    County,
+    Choice,
+    Choice.Party,
+    Election
+  )  %>%
+  dplyr::rowwise() %>%
+  dplyr::filter(
+    !any(
+      stringr::str_detect(Choice,c("Write-","WRITE")) |
+      Choice %in% c("Yes","No")
+    )
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::distinct()
+#
+str(df_cc_distinct_results_primaries)
+save_these_objects <- c(save_these_objects,"df_cc_distinct_results_primaries")
+```   
+
+```{r super2}
+df_cc_distinct_results_persons_primaries <-
+  df_cc_distinct_results_primaries %>%
+  dplyr::select(
+    County,  
+    Choice
+  ) %>%
+  dplyr::distinct()
+#
+str(df_cc_distinct_results_persons_primaries)
+n_tmpP <- nrow(df_cc_distinct_results_persons_primaries)
+#
+save_these_objects <- c(save_these_objects,"df_cc_distinct_results_persons_primaries")
+```  
+
+Curate the names by removing any parenthesized groups of characters - Robert (Bob) Jones.   
+
+```{r goal2} 
+df_cc_distinct_results_persons_primaries %<>%  
+  dplyr::mutate(  
+    Choice=stringr::str_replace(Choice,"\\(.*\\)",""),  
+    Choice=stringr::str_replace(Choice," *$","")  
+  )  
+#
+str(df_cc_distinct_results_persons_primaries)
+```  
+
+Create a list containing words in the name.  
+Suffixes are  / Jr. / III / Sr. / IV / II / V  
+Replace "," with "" then split on " " to handle ", Jr." and " Jr." etc.  
+Also there a some cases of two blanks instead of one as a separator.  
+
+```{r goes2}
+df_cc_distinct_results_persons_primaries %<>% 
+  dplyr::mutate(
+    Choice=stringr::str_replace(
+      Choice,
+      ",",
+      ""
+    ),
+    Choice=gsub("\\s+"," ",Choice),
+    Choice_list=
+      stringr::str_split(
+        Choice,
+        " "
+    )
+  ) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    Choice_list_len=
+      length(Choice_list)
+  ) %>%
+  dplyr::ungroup()
+#
+str(df_cc_distinct_results_persons_primaries)
+```    
+
+```{r repent}
+v_Choice_suffix <- c(
+  "Jr.",
+  "Sr.",
+  "II",
+  "III",
+  "IV",
+  "V"
+)
+```
+
+```{r moist2}
+df_cc_distinct_results_persons_primaries %<>%
+  dplyr::filter(
+    Choice_list_len < 5
+  ) %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    first_name=toupper(Choice_list[1]),
+    name_suffix_lbl=ifelse(
+      Choice_list[Choice_list_len] %in% v_Choice_suffix,
+      toupper(stringr::str_replace(Choice_list[Choice_list_len],"\\.","")),
+      ""
+    ),
+    last_name=ifelse(
+      Choice_list[Choice_list_len] %in% v_Choice_suffix,
+      toupper(Choice_list[Choice_list_len-1]),
+      toupper(Choice_list[Choice_list_len])
+    ),
+    Choice_list_len=ifelse(
+      Choice_list[Choice_list_len] %in% v_Choice_suffix,
+      Choice_list_len-1,
+      Choice_list_len
+    ),
+    middle_name=ifelse(
+      Choice_list_len==2,
+      "",
+      ifelse(
+        Choice_list_len==3,
+        toupper(Choice_list[2]),
+        toupper(paste(Choice_list[2],Choice_list[3]))
+      )
+    ),
+    middle_init=ifelse(
+      middle_name=="",
+      "",
+      paste0(stringr::str_sub(middle_name,1,1),".")
+    )
+  ) %>%
+  dplyr::ungroup()
+#
+str(df_cc_distinct_results_persons_primaries)
+```  
+
+Combine the general and primary elections lists  
+
+names(df_general_candidate_list_distinct)  
+[1] "county"      "last_name"   "first_name"  "suffix"      "middle_name"  
+
+names(df_cc_distinct_results_persons_primaries)  
+[1] "County"          "Choice"          "Choice_list"     "Choice_list_len"  
+[5] "first_name"      "name_suffix_lbl" "last_name"       "middle_name"  
+[9] "middle_init"  
+
+
+```{r mossy}
+df_candidates_distinct_all_elections <- rbind(
+  df_general_candidate_list_distinct,
+  df_cc_distinct_results_persons_primaries %>%
+    dplyr::select(
+      County,
+      last_name,
+      first_name,
+      middle_name,
+      name_suffix_lbl
+    ) %>%
+    dplyr::rename(
+      county=County,
+      suffix=name_suffix_lbl
+    )
+  ) %>%
+  dplyr::distinct()
+#
+nrow(df_candidates_distinct_all_elections)
+save_these_objects <- c(save_these_objects,"df_candidates_distinct_all_elections")
+```
+
+### Summaries  
+
+Party seems to need a lot attention. Some candidates change party from one election to another.  
+
+```{r road2}
+df_cc_distinct_party_primaries_dcast <-
+  df_cc_distinct_results_primaries %>%
+  reshape2::dcast(
+    Election+County+Choice.Party~.
+  )
+#
+str(df_cc_distinct_party_primaries_dcast)
+#
+df_cc_distinct_primaries_dcast <-
+  df_cc_distinct_results_primaries %>%
+  reshape2::dcast(
+    Election+County~.
+  ) %>%
+  plyr::rename(
+    c("."="N")
+  )
+#
+str(df_cc_distinct_primaries_dcast)
+```  
+
+## Process hits and misses  
+ 
+names(df_ncvoter_subset_distinct_demog)  
+ [1] "county_id"       "county_desc"     "last_name"       "first_name"     
+ [5] "middle_name"     "name_suffix_lbl" "race_code"       "ethnic_code"    
+ [9] "party_cd"        "gender_code"     "as_of"  
+ 
+General elections:  
+names(df_general_candidate_list)  
+[1] "county"      "last_name"   "first_name"  "middle_name" "suffix"     
+[6] "middle_init" "Year"        "source"     
+
+names(df_general_candidate_list_distinct)  
+[1] "county"      "last_name"   "first_name"  "suffix"      "middle_name"  
+
+Primary elections:
+names(df_cc_distinct_results_persons_primaries)  
+[1] "County"          "Choice"          "Choice_list"     "Choice_list_len"  
+[5] "first_name"      "name_suffix_lbl" "last_name"       "middle_name"    
+[9] "middle_init"   
+
+Combined primary and general elections:  
+names(df_candidates_distinct_all_elections)
+      county, last_name, first_name, middle_name, suffix
+
+
+Make changes to df_candidates_distinct_all_elections via df_candidates_distinct_all_elections_aug  
+Repair the `r nrow(df_ncvoter_subset_distinct_demog %>% dplyr::filter(middle_name=="NMN"))` rows with middle_name "NMN".  
+Run distinct on this. Risk of throwing away a small number but reduces complexity substantially.  
+
+```{r motel}
+df_candidates_distinct_all_elections_aug <-
+  df_candidates_distinct_all_elections %>%
+  dplyr::mutate(
+    middle_name=ifelse(
+      middle_name=="NMN",
+      "",
+      middle_name
+    ),
+    middle_name=ifelse(
+      stringr::str_sub(middle_name,2,1)==".",
+      stringr::str_sub(middle_name,1,1),
+      middle_name
+    ),
+    middle_init=ifelse(
+      nchar(middle_name)>0,
+      paste0(stringr::str_sub(middle_name,1,1),"."),
+      ""
+    ),
+    match="?"
+  )
+#
+str(df_candidates_distinct_all_elections_aug)
+save_these_objects <- c(save_these_objects,"df_candidates_distinct_all_elections_aug")
+```
+      
+Make a list of nicknames. Leave out PAT since it matches PATRICIA as well as PATRICK. MILLY can be MILLICENT or MILDRED.  
+
+```{r mica}
+subst_names <- list(
+  "ABE"="ABRAHAM",
+  "AL"="ALEX",
+  "ANDY"="ANDREW",
+  "ANGIE"="ANGELA",
+  "ART"="ARTHUR",
+  "BECKY"="REBECCA",
+  "BEN"="BENJAMIN",
+  "BENNY"="BENJAMIN",
+  "BILL"="WILLIAM", 
+  "BOB"="ROBERT",
+  "BOBBY"="ROBERTA",
+  "CAL"="CALVIN",
+  "CHARLIE"="CHARLES",
+  "CHUCK"="CHARLES",
+  "CINDY"="CYNTHIA",
+  "CHRIS"="CHRISTIAN",
+  "CHUCK"="CHARLES",
+  "CLIFF"="CLIFFORD",
+  "CRISTY"="CHRISTINE",
+  "DAN"="DANIEL",
+  "DANNY"="DANIEL",
+  "DAVE"="DAVID",
+  "DEBBIE"="DEBORAH",
+  "DON"="DONALD",
+  "DOUG"="DOUGLAS",
+  "ED"="EDWARD",
+  "EDDIE"="EDWARD",
+  "ERNIE"="ERNEST",
+  "FRED"="FREDERICK",
+  "HAL"="HAROLD",
+  "HERB"="HERBERT",
+  "HERBIE"="HERBERT",
+  "JEFF"="JEFFREY",
+  "JERRY"="GERALD",
+  "JIM"="JAMES",
+  "JIMMY"="JAMES",
+  "JOE"="JOSEPH",
+  "JOEY"="JOSEPH",
+  "JOHN"="JOHNATHON",
+  "JOHNNY"="JOHNATHON",
+  "JOSH"="JOSHUA",
+  "KEN"="KENNETH",
+  "KENN"="KENNETH",
+  "LARRY"="LAWRENCE",
+  "MARTY"="MARTIN",
+  "MATT"="MATTHEW",
+  "MICKEY"="MICHAEL",
+  "MIKE"="MICHAEL",
+  "MILLY"="MILLICENT",
+  "NICK"="NICHOLAS",
+  "PAM"="PAMELA",
+  "PATTI"="PATRICIA",
+  "PHIL"="PHILIP",
+  "RANDY"="RANDOLPH",
+  "RAY"="RAYMOND",
+  "RICK"="RICHARD",
+  "ROB"="ROBERT",
+  "ROBBIE"="ROBERT",
+  "RON"="RONALD",
+  "RONNIE"="RONALD",
+  "SAM"="SAMUEL",
+  "SAMMY"="SAMUEL",
+  "SANDY"="SANDRA",
+  "SCOTTY"="SCOTT",
+  "SID"="SIDNEY",
+  "STAN"="STANLEY",
+  "STEVE"="STEVEN",
+  "SUE"="SUSAN",
+  "TERRY"="TERRANCE",
+  "TIM"="TIMOTHY",
+  "TOM"="THOMAS",
+  "TOMMY"="THOMAS",
+  "TONY"="ANTHONY",
+  "VIC"="VICTOR",
+  "WALLY"="WALLACE",
+  "WILL"="WILLIAM"
+)
+#
+save_these_objects <- c(save_these_objects,"subst_names")
+```
+
+Add a column long_first to df_candidates_distinct_all_elections_aug  
+Populate it for the match "?" records.  
+
+```{r much}
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::mutate(
+    long_first=""
+  )
+#
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(
+    long_first=ifelse(
+      any(
+        which(
+          first_name==names(subst_names)
+        )
+      ),
+      unlist(subst_names[which(first_name==names(subst_names))]),
+      first_name
+    )
+  ) %>%
+  dplyr::ungroup() 
+#
+str(df_candidates_distinct_all_elections_aug)
+```
+
+Some errant records need to be changed by hand in df_candidates_distinct_all_elections_aug   
+
+```{r muffin}
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::mutate(
+long_first=ifelse(county=="ALLEGHANY" & last_name=="ROTEN" & first_name=="STEVE", "STEVENSON", long_first),  
+long_first=ifelse(county=="ASHE" & last_name=="ROSE" & first_name=="JEFF", "JEFFERY", long_first),
+long_first=ifelse(county=="BEAUFORT" & last_name=="BOOTH" & first_name=="ED", "EDWIN", long_first),
+long_first=ifelse(county=="BLADEN" & last_name=="COGDELL" & first_name=="G.", "GEORGE", long_first),
+long_first=ifelse(county=="BRUNSWICK" & last_name=="SYKES" & first_name=="PAT", "PATRICIA", long_first),
+long_first=ifelse(county=="BUNCOMBE" & last_name=="HOWARD" & first_name=="JB", "JOSEPH", long_first),
+long_first=ifelse(county=="CABARRUS" & last_name=="MORRIS" & first_name=="STEVE", "STEPHEN", long_first),
+long_first=ifelse(county=="CARTERET" & last_name=="FRANK" & first_name=="TERRY", "TERENCE", long_first),
+long_first=ifelse(county=="CATAWBA" & last_name=="ISENHOWER" & first_name=="C.", "CHARLES", long_first),
+long_first=ifelse(county=="DARE" & last_name=="CULPEPPER" & first_name=="BOBBY", "ROBERT", long_first),
+long_first=ifelse(county=="DARE" & last_name=="OVERMAN" & first_name=="WALLY", "WALTER", long_first),
+long_first=ifelse(county=="GATES" & last_name=="NICKENS" & first_name=="E.", "ERIC", long_first),
+long_first=ifelse(county=="HALIFAX" & last_name=="MANNING" & first_name=="J.", "JOHN", long_first),
+long_first=ifelse(county=="HAYWOOD" & last_name=="KIRKPATRICK" & first_name=="J.W.", "JAMES", long_first),
+long_first=ifelse(county=="ROWAN" & last_name=="LOVE" & first_name=="JOHNNY", "JONATHAN", long_first), 
+long_first=ifelse(county=="SWAIN" & last_name=="CARSON" & first_name=="PHIL", "PHILLIP", long_first)
+)
+#
+nrow(df_candidates_distinct_all_elections_aug)
+```
+  
+```{r mug}
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::mutate(
+middle_name=ifelse(county=="ALLEGHANY" & last_name=="SMITH" & long_first=="THOMAS", "FRANKLIN", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="MCMILLAN" & long_first=="DANIEL", "FRANKLIN", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="ROSE" & long_first=="JEFFERY", "ALLAN", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="BOOTH" & long_first=="EDWIN", "EARNHARDT", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="BUZZEO" & long_first=="RONALD", "WILLIAM", middle_name),
+middle_name=ifelse(county=="BLADEN" & last_name=="REGISTER" & long_first=="KENNETH", "M", middle_name),
+middle_name=ifelse(county=="BUNCOMBE" & last_name=="ARCHERD" & long_first=="CHARLES", "WALLACE", middle_name),
+middle_name=ifelse(county=="BUNCOMBE" & last_name=="HOWARD" & long_first=="JOSEPH", "BURTON", middle_name),
+middle_name=ifelse(county=="CLEVELAND" & last_name=="BRIDGES" & long_first=="DOUGLAS", "GENE", middle_name),
+middle_name=ifelse(county=="CLEVELAND" & last_name=="HAWKINS" & long_first=="RONALD", "JAY", middle_name),
+middle_name=ifelse(county=="CUMBERLAND" & last_name=="KEEFE" & long_first=="JAMES", "K", middle_name),
+middle_name=ifelse(county=="CURRITUCK" & last_name=="HALL" & long_first=="MICHAEL", "DENNIS", middle_name),
+middle_name=ifelse(county=="CURRITUCK" & last_name=="PAYMENT" & long_first=="MICHAEL", "HENRY", middle_name),
+middle_name=ifelse(county=="DARE" & last_name=="CULPEPPER" & long_first=="ROBERT", "S", middle_name),
+middle_name=ifelse(county=="DARE" & last_name=="OVERMAN" & long_first=="WALTER", "LEON", middle_name),
+middle_name=ifelse(county=="DAVIDSON" & last_name=="TRUELL" & long_first=="DONALD", "WILSON", middle_name),
+middle_name=ifelse(county=="DAVIDSON" & last_name=="WATFORD" & long_first=="SAMUEL", "LEE", middle_name),
+middle_name=ifelse(county=="HARNETT" & last_name=="BLACKBURN" & long_first=="STEVEN", "DALE", middle_name),
+middle_name=ifelse(county=="HAYWOOD" & last_name=="KIRKPATRICK" & long_first=="JAMES", "WEAVER", middle_name),
+middle_name=ifelse(county=="JONES" & last_name=="WIGGINS" & long_first=="JOSEPH", "FRANKLIN", middle_name),
+middle_name=ifelse(county=="LINCOLN" & last_name=="BEAM" & long_first=="WILLIAM", "STEVE", middle_name),
+middle_name=ifelse(county=="MACON" & last_name=="HAVEN" & long_first=="RONALD", "MARION", middle_name),
+middle_name=ifelse(county=="MCDOWELL" & last_name=="DOBSON" & long_first=="JOSHUA", "ROBERT", middle_name),
+middle_name=ifelse(county=="MITCHELL" & last_name=="GAROFALO" & long_first=="JAMES", "JOSEPH", middle_name),
+middle_name=ifelse(county=="MITCHELL" & last_name=="HOLLIFIELD" & long_first=="KENNETH", "WAYNE", middle_name)
+)
+#
+nrow(df_candidates_distinct_all_elections_aug)
+```
+
+```{r muggy}
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::mutate(
+middle_name=ifelse(county=="ALAMANCE" & last_name=="BOSWELL" & first_name=="EDDIE", "DARRELL", middle_name),
+middle_name=ifelse(county=="ALAMANCE" & last_name=="INGLE" & first_name=="DAN", "WINSLOW", middle_name),
+middle_name=ifelse(county=="ALAMANCE" & last_name=="MANNING" & first_name=="TOM", "KENT", middle_name),
+middle_name=ifelse(county=="ALAMANCE" & last_name=="MASSEY" & first_name=="LINDA", "HARDER", middle_name),
+middle_name=ifelse(county=="ALAMANCE" & last_name=="SUTTON" & first_name=="TIMOTHY", "DOUGLAS", middle_name),
+middle_name=ifelse(county=="ALAMANCE" & last_name=="VAUGHAN" & first_name=="ANN", "GARDNER", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="BARNES" & first_name=="LISA", "COTHREN", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="HARBISON" & first_name=="JOEL", "CLINE", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="JENNINGS" & first_name=="JAMES", "H", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="LAIL" & first_name=="JOSH", "DAVID", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="LOUDERMILT" & first_name=="MARTY", "RAY", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="MAYBERRY" & first_name=="RYAN", "NEAL", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="MOOSE" & first_name=="JUDY", "MAYBERRY", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="PEAL" & first_name=="JEFFREY", "PATRICK", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="POWELL" & first_name=="KEVIN", "WADE", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="REESE" & first_name=="RONNIE", "LYNN", middle_name),
+middle_name=ifelse(county=="ALEXANDER" & last_name=="YODER" & first_name=="LARRY", "G", middle_name),
+middle_name=ifelse(county=="ALLEGHANY" & last_name=="COX" & first_name=="LARRY", "RANDOLPH", middle_name),
+middle_name=ifelse(county=="ALLEGHANY" & last_name=="DAVIS" & first_name=="LARRY", "PAUL", middle_name),
+middle_name=ifelse(county=="ALLEGHANY" & last_name=="GOUDREAU" & first_name=="JOHN", "JOSEPH", middle_name),
+middle_name=ifelse(county=="ALLEGHANY" & last_name=="RICHARDSON" & first_name=="MILLY", "B", middle_name),
+middle_name=ifelse(county=="ALLEGHANY" & last_name=="ROTEN" & first_name=="STEVENSON", "LEE", middle_name),
+middle_name=ifelse(county=="ALLEGHANY" & last_name=="WOODIE" & first_name=="ROBERT", "MARSHALL", middle_name),
+middle_name=ifelse(county=="ANSON" & last_name=="SIKES" & first_name=="BOBBY", "HILL", middle_name),
+middle_name=ifelse(county=="ANSON" & last_name=="STUDIVANT" & first_name=="VANCINE", "ROBINSON", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="BLACKBURN" & first_name=="RICHARD", "CARROLL", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="CARTER" & first_name=="ROY", "JAMES", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="DIX" & first_name=="LARRY", "COLEMAN", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="HENRY" & first_name=="NANCY", "L", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="JONES" & first_name=="POLLY", "SEXTON", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="RHODES" & first_name=="LARRY", "DEAN", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="ROARK" & first_name=="GARY", "WAYNE", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="SANDS" & first_name=="WILLIAM", "JOHNSON", middle_name),
+middle_name=ifelse(county=="ASHE" & last_name=="SHATLEY" & first_name=="DALLAS", "ARTHUR", middle_name),
+middle_name=ifelse(county=="AVERY" & last_name=="FORBES" & first_name=="PHYLLIS", "NAOMI", middle_name),
+middle_name=ifelse(county=="AVERY" & last_name=="GRIFFITH" & first_name=="ROBERT", "BENJAMIN", middle_name),
+middle_name=ifelse(county=="AVERY" & last_name=="HEATH" & first_name=="SCOTT", "FRANKLIN", middle_name),
+middle_name=ifelse(county=="AVERY" & last_name=="JOHNSON" & first_name=="GLENN", "ROY", middle_name),
+middle_name=ifelse(county=="AVERY" & last_name=="LACEY" & first_name=="FAITH", "GIBSON", middle_name),
+middle_name=ifelse(county=="AVERY" & last_name=="LAWS" & first_name=="MAXINE", "HARMON", middle_name),
+middle_name=ifelse(county=="AVERY" & last_name=="OWEN" & first_name=="DOUGLAS", "HUGH", middle_name),
+middle_name=ifelse(county=="AVERY" & last_name=="POTEAT" & first_name=="KENNY", "REGAN", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="ARNHOLS" & first_name=="BERTIE", "DANIELS", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="BELCHER" & first_name=="ROBERT", "GREGORY", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="BRINN" & first_name=="GARY", "LANE", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="EVANS" & first_name=="JERRY", "ONEAL", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="HARDING" & first_name=="CAROLYN", "WHITLEY", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="KIDWELL" & first_name=="KEITH", "D", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="LANGLEY" & first_name=="JERRY", "EARL", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="RICHARDSON" & first_name=="HOOD", "LANCE", middle_name),
+middle_name=ifelse(county=="BEAUFORT" & last_name=="SHAMSELDIN" & first_name=="SONYA", "KAY", middle_name),
+middle_name=ifelse(county=="BERTIE" & last_name=="DAVIS" & first_name=="JOHN", "HUNTER", middle_name),
+middle_name=ifelse(county=="BERTIE" & last_name=="HOGGARD" & first_name=="LEWIS", "C", middle_name),
+middle_name=ifelse(county=="BERTIE" & last_name=="WESSON" & first_name=="RONALD", "DEAN", middle_name),
+middle_name=ifelse(county=="BLADEN" & last_name=="BENTON" & first_name=="PAMELA", "AVANT", middle_name),
+middle_name=ifelse(county=="BLADEN" & last_name=="BULLOCK" & first_name=="ARTHUR", "ALEXANDER", middle_name),
+middle_name=ifelse(county=="BLADEN" & last_name=="GILLESPIE" & first_name=="MARK", "ANTHONY", middle_name),
+middle_name=ifelse(county=="BLADEN" & last_name=="GOODEN" & first_name=="DAVID", "RICHARD", middle_name),
+middle_name=ifelse(county=="BLADEN" & last_name=="SMITH" & first_name=="JAMES", "GRAHAM", middle_name),
+middle_name=ifelse(county=="BRUNSWICK" & last_name=="SYKES" & first_name=="PATRICIA", "L", middle_name),
+middle_name=ifelse(county=="BUNCOMBE" & last_name=="NEWMAN" & first_name=="BROWNIE", "WAYNE", middle_name),
+middle_name=ifelse(county=="BURKE" & last_name=="CARSWELL" & first_name=="JOHNNIE", "COY", middle_name),
+middle_name=ifelse(county=="BURKE" & last_name=="CHURCH" & first_name=="EMILY", "BLEYNAT", middle_name),
+middle_name=ifelse(county=="BURKE" & last_name=="RUST" & first_name=="DAVID", "LEE", middle_name),
+middle_name=ifelse(county=="BURKE" & last_name=="TAYLOR" & first_name=="MAYNARD", "MAYN", middle_name),
+middle_name=ifelse(county=="CABARRUS" & last_name=="HONEYCUTT" & first_name=="DIANE", "REE", middle_name),
+middle_name=ifelse(county=="CABARRUS" & last_name=="MORRIS" & first_name=="STEPHEN", "MARTIN", middle_name),
+middle_name=ifelse(county=="CABARRUS" & last_name=="MYNATT" & first_name=="GRACE", "MACDOUGALL", middle_name),
+middle_name=ifelse(county=="CABARRUS" & last_name=="POOLE" & first_name=="ELIZABETH", "FULLER", middle_name),
+middle_name=ifelse(county=="CALDWELL" & last_name=="INGLE" & first_name=="PHIL", "E", middle_name),
+middle_name=ifelse(county=="CALDWELL" & last_name=="LABROSE" & first_name=="MICHAEL", "WILLIAM", middle_name),
+middle_name=ifelse(county=="CAMDEN" & last_name=="MEIGGS" & first_name=="GARRY", "WILSON", middle_name),
+middle_name=ifelse(county=="CAMDEN" & last_name=="RIGGS" & first_name=="CLAYTON", "DALE", middle_name),
+middle_name=ifelse(county=="CAMDEN" & last_name=="SHAW" & first_name=="SAMUEL", "KENDAL", middle_name),
+middle_name=ifelse(county=="CARTERET" & last_name=="COMER" & first_name=="ROBIN", "VAN", middle_name),
+middle_name=ifelse(county=="CASWELL" & last_name=="HAMLETT" & first_name=="LARRY", "GENE", middle_name),
+middle_name=ifelse(county=="CASWELL" & last_name=="MCVEY" & first_name=="RICKY", "GORDON", middle_name),
+middle_name=ifelse(county=="CATAWBA" & last_name=="BEATTY" & first_name=="BARBARA", "G", middle_name),
+middle_name=ifelse(county=="CATAWBA" & last_name=="HUNSUCKER" & first_name=="DAN", "ALAN", middle_name),
+middle_name=ifelse(county=="CHATHAM" & last_name=="HALES" & first_name=="DIANA", "HESTOR", middle_name),
+middle_name=ifelse(county=="CHATHAM" & last_name=="HOWARD" & last_name=="KAREN", "ANN", middle_name),
+middle_name=ifelse(county=="CHEROKEE" & last_name=="ADAMS" & first_name=="ALVIN", "ALDEN", middle_name),
+middle_name=ifelse(county=="CHEROKEE" & last_name=="BADGER" & first_name=="DAVID", "ANDREW", middle_name),
+middle_name=ifelse(county=="CHEROKEE" & last_name=="BROWN" & first_name=="CURTIS", "MAC", middle_name),
+middle_name=ifelse(county=="CHEROKEE" & last_name=="EICHENBAUM" & first_name=="DANIEL", "MICHAEL", middle_name),
+middle_name=ifelse(county=="CHEROKEE" & last_name=="JAMES" & first_name=="GARY", "RODNEY", middle_name),
+middle_name=ifelse(county=="CHOWAN" & last_name=="WINBORNE" & first_name=="EMMETT", "ELLIOTT", middle_name),
+middle_name=ifelse(county=="CLAY" & last_name=="PENLAND" & first_name=="DWIGHT", "HUNTER", middle_name),
+middle_name=ifelse(county=="CLEVELAND" & last_name=="ALLEN" & first_name=="SUSAN", "KISNER", middle_name),
+middle_name=ifelse(county=="COLUMBUS" & last_name=="MCDOWELL" & first_name=="CHARLES", "THOMAS", middle_name),
+middle_name=ifelse(county=="COLUMBUS" & last_name=="MCKENZIE" & first_name=="AMON", "EUGENE", middle_name),
+middle_name=ifelse(county=="COLUMBUS" & last_name=="PREVATTE" & first_name=="JAMES", "EDWARD", middle_name),
+middle_name=ifelse(county=="CRAVEN" & last_name=="LINER" & first_name=="GEORGE", "SIMPSON", middle_name),
+middle_name=ifelse(county=="CUMBERLAND" & last_name=="DEVORE" & first_name=="LINDA", "S", middle_name),
+middle_name=ifelse(county=="CUMBERLAND" & last_name=="EVANS" & first_name=="CHARLES", "EDWARD", middle_name),
+middle_name=ifelse(county=="CUMBERLAND" & last_name=="GONZALEZ" & first_name=="JUANITA", "MARIA", middle_name),
+middle_name=ifelse(county=="CUMBERLAND" & last_name=="TAYLOR" & first_name=="PAUL", "LAWRENCE", middle_name),
+middle_name=ifelse(county=="CUMBERLAND" & last_name=="WHEATLY" & first_name=="DIANE", "D", middle_name),
+middle_name=ifelse(county=="CURRITUCK" & last_name=="ETHERIDGE" & first_name=="MARY", "R", middle_name),
+middle_name=ifelse(county=="DARE" & last_name=="D'AMBRA" & first_name=="FRANCIS", "T", middle_name),
+middle_name=ifelse(county=="DAVIDSON" & last_name=="BARRETT" & first_name=="LANCE", "VERNON", middle_name),
+middle_name=ifelse(county=="DAVIDSON" & last_name=="HEDRICK" & first_name=="JASON", "LYLE", middle_name),
+middle_name=ifelse(county=="DAVIDSON" & last_name=="MCCLURE" & first_name=="RONALD", "WILLIAM", middle_name),
+middle_name=ifelse(county=="DAVIDSON" & last_name=="WILLIAMS" & first_name=="KEVIN", "BURKE", middle_name),
+middle_name=ifelse(county=="DAVIE" & last_name=="FERGUSON" & first_name=="JOHN", "HOMER", middle_name),
+middle_name=ifelse(county=="DAVIE" & last_name=="POINDEXTER" & first_name=="RICHARD", "BURTON", middle_name),
+middle_name=ifelse(county=="DAVIE" & last_name=="RENEGAR" & first_name=="TERRY", "NORRIS", middle_name),
+middle_name=ifelse(county=="DUPLIN" & last_name=="LADSON" & first_name=="JESSIE", "HAND", middle_name),
+middle_name=ifelse(county=="DUPLIN" & last_name=="TURNER" & first_name=="CARY", "EDWIN", middle_name),
+middle_name=ifelse(county=="DURHAM" & last_name=="CARTER" & first_name=="HEIDI", "HALE", middle_name),
+middle_name=ifelse(county=="DURHAM" & last_name=="HILL" & first_name=="JAMES", "EDWARD", middle_name),
+middle_name=ifelse(county=="FORSYTH" & last_name=="FORSYTH" & first_name=="BILL", "HEATH", middle_name),
+middle_name=ifelse(county=="FRANKLIN" & last_name=="DICKERSON" & first_name=="SHELLEY", "LEONARD", middle_name),
+middle_name=ifelse(county=="FRANKLIN" & last_name=="FOY" & first_name=="HARRY", "LEE", middle_name),
+middle_name=ifelse(county=="GATES" & last_name=="JORDAN" & first_name=="HENRY", "LEE", middle_name),
+middle_name=ifelse(county=="GRAHAM" & last_name=="HOOPER" & first_name=="CHARLES", "GLENN", middle_name),
+middle_name=ifelse(county=="GRAHAM" & last_name=="HOOPER" & first_name=="WALTER", "MAX", middle_name),
+middle_name=ifelse(county=="GRAHAM" & last_name=="WILLIAMS" & first_name=="RAYMOND", "DAVID", middle_name),
+middle_name=ifelse(county=="GREENE" & last_name=="HEATH" & first_name=="BENNIE", "JAMES", middle_name),
+middle_name=ifelse(county=="GREENE" & last_name=="JONES" & first_name=="JERRY", "RANDALL", middle_name),
+middle_name=ifelse(county=="GREENE" & last_name=="SHACKLEFORD" & first_name=="JAMES", "THOMAS", middle_name),
+middle_name=ifelse(county=="HALIFAX" & last_name=="PIERCE" & first_name=="JAMES", "HAYWOOD", middle_name),
+middle_name=ifelse(county=="HARNETT" & last_name=="BURGIN" & first_name=="JAMES", "ANDREW", middle_name),
+middle_name=ifelse(county=="HARNETT" & last_name=="ELMORE" & first_name=="WILLIAM", "PERNON", middle_name),
+middle_name=ifelse(county=="HARNETT" & last_name=="MCKOY" & first_name=="BARBARA", "A", middle_name),
+middle_name=ifelse(county=="HAYWOOD" & last_name=="ENSLEY" & first_name=="LAWRENCE", "KEVIN", middle_name),
+middle_name=ifelse(county=="HAYWOOD" & last_name=="ROGERS" & first_name=="BRANDON", "CARY", middle_name),
+middle_name=ifelse(county=="HAYWOOD" & last_name=="SCOTT" & first_name=="MICHAEL", "H", middle_name),
+middle_name=ifelse(county=="HAYWOOD" & last_name=="SORRELLS" & first_name=="MICHAEL", "THOMAS", middle_name),
+middle_name=ifelse(county=="HAYWOOD" & last_name=="SWANGER" & first_name=="MARK", "SILAS", middle_name),
+middle_name=ifelse(county=="HAYWOOD" & last_name=="UPTON" & first_name=="BILL", "LEON", middle_name),
+middle_name=ifelse(county=="HENDERSON" & last_name=="MESSER" & first_name=="CHARLES", "DWAYNE", middle_name),
+middle_name=ifelse(county=="HERTFORD" & last_name=="GATLING" & first_name=="RONALD", "JEROME", middle_name),
+middle_name=ifelse(county=="HERTFORD" & last_name=="HORTON" & first_name=="JOHN", "DEWAYNE", middle_name),
+middle_name=ifelse(county=="HERTFORD" & last_name=="HUNTER" & first_name=="HOWARD", "JACQUE", middle_name),
+middle_name=ifelse(county=="HERTFORD" & last_name=="OUTLAW" & first_name=="SCOTT", "W", middle_name),
+middle_name=ifelse(county=="HOKE" & last_name=="BROWN" & first_name=="WILLIAM", "ANDREW", middle_name),
+middle_name=ifelse(county=="HOKE" & last_name=="MCNEILL" & first_name=="ELLEN", "CLARK", middle_name),
+middle_name=ifelse(county=="HOKE" & last_name=="POWELL" & first_name=="JEAN", "ELIZABETH", middle_name),
+middle_name=ifelse(county=="HOKE" & last_name=="SOUTHERLAND" & first_name=="HARRY", "LAMONT", middle_name),
+middle_name=ifelse(county=="HOKE" & last_name=="THOMAS" & first_name=="ALLEN", "MELVIN", middle_name),
+middle_name=ifelse(county=="HOKE" & last_name=="WRIGHT" & first_name=="ROBERT", "ALBERT", middle_name),
+middle_name=ifelse(county=="HYDE" & last_name=="TOPPING" & first_name=="JAMES", "ROGER", middle_name),
+middle_name=ifelse(county=="IREDELL" & last_name=="GRIFFITH" & first_name=="RENEE", "CROSSWHITE", middle_name),
+middle_name=ifelse(county=="IREDELL" & last_name=="ROBERTSON" & first_name=="KENNETH", "MERRILL", middle_name),
+middle_name=ifelse(county=="JACKSON" & last_name=="GREENE" & first_name=="VICKI", "JANE", middle_name),
+middle_name=ifelse(county=="JOHNSTON" & last_name=="HARRIS" & first_name=="PATRICK", "EDWARD", middle_name),
+middle_name=ifelse(county=="JONES" & last_name=="BRYANT" & first_name=="JEROL", "ROBERT", middle_name),
+middle_name=ifelse(county=="JONES" & last_name=="EMORY" & first_name=="CHARLES", "FRANKLIN", middle_name),
+middle_name=ifelse(county=="JONES" & last_name=="HADDOCK" & first_name=="WILLIAM", "M", middle_name),
+middle_name=ifelse(county=="JONES" & last_name=="KOONCE" & first_name=="ZACK", "AMOS", middle_name),
+middle_name=ifelse(county=="JONES" & last_name=="WILDER" & first_name=="MICHAEL", "A", middle_name),
+middle_name=ifelse(county=="LEE" & last_name=="DOLAN" & first_name=="MAX", "ROWLAND", middle_name),
+middle_name=ifelse(county=="LEE" & last_name=="OLDHAM" & first_name=="LARRY", "CARSON", middle_name),
+middle_name=ifelse(county=="LEE" & last_name=="SMITH" & first_name=="KIRK", "DOUGLAS", middle_name),
+middle_name=ifelse(county=="LENOIR" & last_name=="DAVIS" & first_name=="REUBEN", "JOSHUA", middle_name),
+middle_name=ifelse(county=="LINCOLN" & last_name=="MITCHEM" & first_name=="CARROL", "DEAN", middle_name),
+middle_name=ifelse(county=="LINCOLN" & last_name=="OAKES" & first_name=="MARTIN", "ANDREW", middle_name),
+middle_name=ifelse(county=="LINCOLN" & last_name=="PATTON" & first_name=="ALEX", "ERVIN", middle_name),
+middle_name=ifelse(county=="LINCOLN" & last_name=="PERMENTER" & first_name=="RICHARD", "WILLIAM", middle_name),
+middle_name=ifelse(county=="MACON" & last_name=="GILLESPIE" & first_name=="KARL", "ELLIS", middle_name),
+middle_name=ifelse(county=="MADISON" & last_name=="PONDER" & first_name=="DEBORAH", "MAE", middle_name),
+middle_name=ifelse(county=="MADISON" & last_name=="RICE" & first_name=="CLAYTON", "DWAIN", middle_name),
+middle_name=ifelse(county=="MADISON" & last_name=="TWEED" & first_name=="RANDY", "KIM", middle_name),
+middle_name=ifelse(county=="MADISON" & last_name=="WECHTEL" & first_name=="MATTHEW", "THOMAS", middle_name),
+middle_name=ifelse(county=="MARTIN" & last_name=="BOWEN" & first_name=="TOMMY", "W", middle_name),
+middle_name=ifelse(county=="MCDOWELL" & last_name=="CRAWFORD" & first_name=="MATTHEW", "PHILLIP", middle_name),
+middle_name=ifelse(county=="MCDOWELL" & last_name=="LAVENDER" & first_name=="MICHAEL", "KEITH", middle_name),
+middle_name=ifelse(county=="MCDOWELL" & last_name=="PRICE" & first_name=="MICHELLE", "WILSON", middle_name),
+middle_name=ifelse(county=="MCDOWELL" & last_name=="WILLIAMS" & first_name=="VIRGINIA", "MCCALL", middle_name),
+middle_name=ifelse(county=="MECKLENBURG" & last_name=="HARVEY" & first_name=="PAULA", "HAGLE", middle_name),
+middle_name=ifelse(county=="MECKLENBURG" & last_name=="HOBBS" & first_name=="MICHAEL", "RAY", middle_name),
+middle_name=ifelse(county=="MECKLENBURG" & last_name=="PETERSON" & first_name=="JAMES", "FRANCIS", middle_name),
+middle_name=ifelse(county=="MECKLENBURG" & last_name=="POWERS" & first_name=="WAYNE", "N", middle_name),
+middle_name=ifelse(county=="MECKLENBURG" & last_name=="RIDENHOUR" & first_name=="MATTHEW", "ROMANO", middle_name),
+middle_name=ifelse(county=="MECKLENBURG" & last_name=="SCARBOROUGH" & first_name=="ELLA", "BUTLER", middle_name),
+middle_name=ifelse(county=="MITCHELL" & last_name=="GRINDSTAFF" & first_name=="MATTHEW", "A", middle_name),
+middle_name=ifelse(county=="MITCHELL" & last_name=="HOLTSCLAW" & first_name=="KEITH", "SAMUEL", middle_name),
+middle_name=ifelse(county=="NEW HANOVER" & last_name=="BERGER" & first_name=="BRIAN", "MATTHEW", middle_name),
+middle_name=ifelse(county=="NEW HANOVER" & last_name=="BUTLER" & first_name=="DEBORAH", "A", middle_name),
+middle_name=ifelse(county=="NEW HANOVER" & last_name=="THOMPSON" & first_name=="JASON", "RANDALL", middle_name),
+middle_name=ifelse(county=="NEW HANOVER" & last_name=="BARRETT" & first_name=="JOSEPH", "ROBERT", middle_name),
+middle_name=ifelse(county=="ONSLOW" & last_name=="BRIGHT" & first_name=="JACK", "TERRY", middle_name),
+middle_name=ifelse(county=="ORANGE" & last_name=="JACOBS" & first_name=="BARRY", "MARC", middle_name),
+middle_name=ifelse(county=="ORANGE" & last_name=="MARCOPLOS" & first_name=="MARK", "WARREN", middle_name),
+middle_name=ifelse(county=="ORANGE" & last_name=="RICH" & first_name=="PENNY", "SUZAN", middle_name),
+middle_name=ifelse(county=="PASQUOTANK" & last_name=="WINSLOW" & first_name=="JOSEPH", "SAMUEL", middle_name),
+middle_name=ifelse(county=="PERSON" & last_name=="BLALOCK" & first_name=="FRANCES", "P", middle_name),
+middle_name=ifelse(county=="PITT" & last_name=="MCLAWHORN" & first_name=="MELVIN", "CURTIS", middle_name),
+middle_name=ifelse(county=="POLK" & last_name=="GASPERSON" & first_name=="RAY", "DOUGLAS", middle_name),
+middle_name=ifelse(county=="POLK" & last_name=="JOHNSON" & first_name=="JAKE", "HUNTER", middle_name),
+middle_name=ifelse(county=="POLK" & last_name=="LEWIS" & first_name=="RHONDA", "LOCKHART", middle_name),
+middle_name=ifelse(county=="POLK" & last_name=="MCDERMOTT" & first_name=="RENEE", "R", middle_name),
+middle_name=ifelse(county=="POLK" & last_name=="MELTON" & first_name=="TOMMY", "WALTER", middle_name),
+middle_name=ifelse(county=="POLK" & last_name=="YODER" & first_name=="MYRON", "LEE", middle_name),
+middle_name=ifelse(county=="RANDOLPH" & last_name=="ALLEN" & first_name=="DAVID", "LEE", middle_name),
+middle_name=ifelse(county=="RANDOLPH" & last_name=="KEMP" & first_name=="PHIL", "DOUGLAS", middle_name),
+middle_name=ifelse(county=="RANDOLPH" & last_name=="KIDD" & first_name=="KENNY", "JACK", middle_name),
+middle_name=ifelse(county=="RANDOLPH" & last_name=="LANIER" & first_name=="ARNOLD", "RAY", middle_name),
+middle_name=ifelse(county=="RICHMOND" & last_name=="BOSTIC" & first_name=="TAVARES", "ANTWAN", middle_name),
+middle_name=ifelse(county=="RICHMOND" & last_name=="BRYANT" & first_name=="DON", "MANSEL", middle_name),
+middle_name=ifelse(county=="RICHMOND" & last_name=="CAPPS" & first_name=="JIMMY", "LYNN", middle_name),
+middle_name=ifelse(county=="RICHMOND" & last_name=="COVINGTON" & first_name=="PEGGY", "JEAN", middle_name),
+middle_name=ifelse(county=="RICHMOND" & last_name=="GARNER" & first_name=="JOHN", "BOYD", middle_name),
+middle_name=ifelse(county=="RICHMOND" & last_name=="ROBINETTE" & first_name=="KENNETH", "RAY", middle_name),
+middle_name=ifelse(county=="RICHMOND" & last_name=="ROGERS" & first_name=="LARRY", "E", middle_name),
+middle_name=ifelse(county=="ROBESON" & last_name=="CUMMINGS" & first_name=="LACY", "LEDFORD", middle_name),
+middle_name=ifelse(county=="ROBESON" & last_name=="STEPHENS" & first_name=="JERRY", "LYNN", middle_name),
+middle_name=ifelse(county=="ROCKINGHAM" & last_name=="LAWSON" & first_name=="LEANNA", "BLACKWELL", middle_name),
+middle_name=ifelse(county=="ROCKINGHAM" & last_name=="RICHARDSON" & first_name=="MARK", "FRANCIS", middle_name),
+middle_name=ifelse(county=="ROCKINGHAM" & last_name=="STANLEY" & first_name=="BOBBY", "RAY", middle_name),
+middle_name=ifelse(county=="ROWAN" & last_name=="BELK" & first_name=="LEDA", "SHUPING", middle_name),
+middle_name=ifelse(county=="ROWAN" & last_name=="COLTRAIN" & first_name=="RAYMOND", "DURWOOD", middle_name),
+middle_name=ifelse(county=="ROWAN" & last_name=="EDDS" & first_name=="GREGORY", "CURTIS", middle_name),
+middle_name=ifelse(county=="RUTHERFORD" & last_name=="ECKLER" & first_name=="BILL", "E", middle_name),
+middle_name=ifelse(county=="RUTHERFORD" & last_name=="OWENS" & first_name=="JULIUS", "R", middle_name),
+middle_name=ifelse(county=="SAMPSON" & last_name=="KIRBY" & first_name=="ALBERT", "DAVID", middle_name),
+middle_name=ifelse(county=="SAMPSON" & last_name=="PARKER" & first_name=="HARRY", "LEE", middle_name),
+middle_name=ifelse(county=="SAMPSON" & last_name=="WOOTEN" & first_name=="CLARK", "HOUSTON", middle_name),
+middle_name=ifelse(county=="SCOTLAND" & last_name=="COOLEY" & first_name=="JOHN", "C", middle_name),
+middle_name=ifelse(county=="STANLY" & last_name=="DENNIS" & first_name=="TONY", "M", middle_name),
+middle_name=ifelse(county=="STANLY" & last_name=="DUNEVANT" & first_name=="LINDSEY", "RAY", middle_name),
+middle_name=ifelse(county=="STANLY" & last_name=="LOWDER" & first_name=="JANN", "K", middle_name),
+middle_name=ifelse(county=="STANLY" & last_name=="MORTON" & first_name=="JOSH", "J", middle_name),
+middle_name=ifelse(county=="STANLY" & last_name=="SWAIN" & first_name=="MATTHEW", "J", middle_name),
+middle_name=ifelse(county=="STOKES" & last_name=="INMAN" & first_name=="JAMES", "LEON", middle_name),
+middle_name=ifelse(county=="STOKES" & last_name=="JONES" & first_name=="RONDA", "RENE", middle_name),
+middle_name=ifelse(county=="STOKES" & last_name=="LANKFORD" & first_name=="ERNEST", "T", middle_name),
+middle_name=ifelse(county=="SURRY" & last_name=="GOINS" & first_name=="BILLIE", "RAY", middle_name),
+middle_name=ifelse(county=="SURRY" & last_name=="JOHNSON" & first_name=="PAUL", "MATTHEW", middle_name),
+middle_name=ifelse(county=="SURRY" & last_name=="TUCKER" & first_name=="VAN", "DOUGLAS", middle_name),
+middle_name=ifelse(county=="SWAIN" & last_name=="BURNS" & first_name=="DANNY", "ROBERT", middle_name),
+middle_name=ifelse(county=="TRANSYLVANIA" & last_name=="HOGSED" & first_name=="DARYLE", "BRUCE", middle_name),
+middle_name=ifelse(county=="TYRRELL" & last_name=="COMBS" & first_name=="CARL", "ANDREW", middle_name),
+middle_name=ifelse(county=="TYRRELL" & last_name=="EVERETT" & first_name=="NATHAN", "THOMPSON", middle_name),
+middle_name=ifelse(county=="TYRRELL" & last_name=="HILL" & first_name=="LARRY", "GREGORY", middle_name),
+middle_name=ifelse(county=="TYRRELL" & last_name=="WILLIS" & first_name=="CARL", "LINWOOD", middle_name),
+middle_name=ifelse(county=="UNION" & last_name=="RUSHING" & first_name=="STONY", "DWIGHT", middle_name),
+middle_name=ifelse(county=="UNION" & last_name=="SIMPSON" & first_name=="JERRY", "BENNETT", middle_name),
+middle_name=ifelse(county=="UNION" & last_name=="SIMPSON" & first_name=="LANCE", "WAKEFIELD", middle_name),
+middle_name=ifelse(county=="WARREN" & last_name=="BAKER" & first_name=="BERTADEAN", "WILLIAMS", middle_name),
+middle_name=ifelse(county=="WARREN" & last_name=="HUNT" & first_name=="VICTOR", "MCKINLEY", middle_name),
+middle_name=ifelse(county=="WASHINGTON" & last_name=="BOSTON" & first_name=="GREGORY", "SHARIFF", middle_name),
+middle_name=ifelse(county=="WILKES" & last_name=="ELLIOTT" & first_name=="ROGER", "WILSON", middle_name),
+middle_name=ifelse(county=="WILKES" & last_name=="GAMBILL" & first_name=="DAVID", "DUANE", middle_name),
+middle_name=ifelse(county=="WILKES" & last_name=="MINTON" & first_name=="BRIAN", "STEVEN", middle_name),
+middle_name=ifelse(county=="WILKES" & last_name=="PARKS" & first_name=="LUTHER", "JEROME", middle_name),
+middle_name=ifelse(county=="YADKIN" & last_name=="HEMRIC" & first_name=="GILBERT", "WAYNE", middle_name),
+middle_name=ifelse(county=="YADKIN" & last_name=="MOXLEY" & first_name=="DAVID", "VERNON", middle_name),
+middle_name=ifelse(county=="YADKIN" & last_name=="THOMAS" & first_name=="KEVIN", "ANTOINE", middle_name),
+middle_name=ifelse(county=="YADKIN" & last_name=="WELBORN" & first_name=="MARION", "GRAY", middle_name),
+middle_name=ifelse(county=="YADKIN" & last_name=="WOOTEN" & first_name=="BRADY", "ROBERT", middle_name),
+middle_name=ifelse(county=="YADKIN" & last_name=="ZACHARY" & first_name=="FRANK", "CURRY", middle_name),
+middle_name=ifelse(county=="YANCEY" & last_name=="STORIE" & first_name=="GERALDINE", "METCALF", middle_name)
+)
+#
+nrow(df_candidates_distinct_all_elections_aug)
+```
+
+```{r mull}
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::distinct()
+#
+nrow(df_candidates_distinct_all_elections_aug)
+```
+  
+BURKE, CARROLL, JACK middle_name shows as NMN  
+CABBARUS, BARNHARDT, ARCHIE is first_name "A", middle_name "Y"  
+CALDWELL, BOLLINGER, CLAY middle_name BERLIN  
+CALDWELL, BRATCHER, ROB first_name ROBIN  
+CALDWELL, GRIFFIN, BEN middle_name DOUGLAS  
+CHATHAM, BOCK, BRIAN middle_name LEX  
+CHATHAM, PETTY, WALTER middle_name LEE  
+CLEVELAND, HUTCHINS, ROHNNY is RONNIE BENJAMIN  
+DUPLIN, LADSON, JESSIE, make sure middle_name is HAND  
+DURHAM, HOWERTON, BRENDA middle_name H  
+DURHAM, RECKHOW, ELLEN is middle_name WALDMAN  
+HAYWOOD, SORRELLS, MICHEAEL, T., is MICHAEL THOMAS  
+HYDE, STYRON, DARLENE middle_name "R"  
+IREDELL, BOONE, DAVID, A change middle name to "A."  
+LINCOLN, PATTON, ALEX middle_name ERVIN  
+MCDOWELL, MCPETERS, BARRY middle_name EDWIN  
+MCDOWELL, WILLIAMS, VIRGINIA middle_name MCCALL  
+MECKLENBURG, HARVEY, PAULA middle_name HAGLE  
+NEW HANOVER, BERGER, BRIAN middle_name MATTHEW  
+NEW HANOVER, BUTLER, DEBORAH, middle_name ARMFIELD  
+NEW HANOVER, DAWSON, MARY force first_name MARY ELIZABETH and  middle_name FREEMAN  
+PERSON, NEWELL, DAVID SR middle_name BRUCE  
+POLK, MCDERMOTT, RENEE middle_name R  
+RICHMOND, MASKE, JIMMY change middle_name to "L"  < try this  
+ROBESON, SEALEY, HUBERT middle_name JUNIOR  
+ROWAN, WALTON, RALPH change middle_name to "M"  
+RUTHERFORD, ECKLER, WILLIAM middle_name EDWARD  
+RUTHERFORD, HOLLAND, EDWIN middle_name BAXTER  
+STANLY, DENNIS, TONY middle_name MAURICE  
+STOKES, SMITH, ZOLLIE middle_name "F"  
+SWAIN, BURNS, DANNY middle_name ROBERT  
+SWAIN, BUSHYHEAD, BENJAMIN middle_name LEE  
+SWAIN, MOON, STEVE change first_name to STEPHEN  
+SWAIN, WHITE, ROBERT middle_name ELWOOD  
+WARREN, JORDAN, JENNIFER middle_name "B"  
+and  
+SURRY, OSBURN-CHANDLER correct first_name KAREN, middle_name LOU  
+TRANSYLVANIA, WHITFIELD-CARGILE first_name DAVIS, middle_name ARJUNA  
+ROWAN, BELK, LEDA S. and LEDA SHUPING are the same persons (not in ncvoter anyway)   
+STOKES, GAMBILL first_name is "E", middle_name EDWARD  
+PERSON, "O ' NEIL" should be "O'NEIL"  
+CRAVEN, "O ' NEILL" should be "O'NEILL"  
+BUNCOMBE, BAILEY first_name K., middle_name RAY, first_name should be KENNETH  
+RICHMOND, "O ' NEAL" should be "O'NEAL"  
+
+Ambiguous, not enough information to tell which person:  
+
+BUNCOMBE, GANTT, DAVID  
+BUNCOMBE, JONES, HOLLY  
+CABARRUS, POOLE, ELIZABETH  
+CAMDEN, SHAW, SAMUEL, KENDALL there is a III  
+CHEROKEE, STILES, CALVIN, HAROLD there is a II  
+FORSYTH, WITHERSPOON, EVERETTE there is a NMN and a LEVON  
+GATES, OWENS, JACK  
+GRAHAM, WILLIAMS, RAYMOND, DAVID there are JR, SR, and no-suffix  
+  web site shows no suffix  
+IREDELL, JOHNSON, STEVE  
+IREDELL, ROBERTSON, KENNETH  
+JOHNSTON, BARBOUR, DEVAN III there is a IV  
+JONES, REGISTER, PEARLIE, DURWOOD there is a JR  
+MADISON, HAYNIE, ROGER, D. middle_name DALE  
+MADISON, MOORE, HALL middle_name PATTON  
+MADISON, SMATHERS, DYATT, F. there is one with no middle name  
+MECKLENBURG, RAMIREZ, JAIME  
+PERSON, LONG, DONALD  
+RANDOLPH, KEMP, PHILLIP, DOUGLAS there are JR and SR  
+ROWAN, BARBER, WILLIAM  
+ROWAN, SIDES, JAMES  
+SCOTLAND, ALFORD, JOHN T.  there is a JR  
+STANLY, MORTON, JOSHUA there is a JR  
+SWAIN, CARSON, PHILLIP, BARRY there is a JR and a no-suffix  
+WAYNE, BELL, JOHN  
+
+
+Not there:  
+DAVIE, HUMPHREY, CARLYLE, PAUL  
+LINCOLN, MARTIN, CECELIA there is a CECIL  
+POLK, JOHNSON, MARGARET PARKER  
+POLK, MIEROP, RUSSELL ADAM  
+ROCKINGHAM, TRAVIS, CRAIG  
+ROWAN, BELK, LEDA S.  
+SCOTLAND, GIBSON, WHIT  
+STANLY, LOWDER, JANN K.  
+VANCE, WILDER, GORDON  
+WAYNE, PEARSALL, FRANK, MIHLON  
+
+
+These should match. Why do they not?  
+
+ALAMANCE, MASSEY, LINDA H. (HARDER)  
+ALAMANCE, MANNING, THOMAS K. (KENT)  
+ASHE, SHATLEY, DALLAS A. (ARTHUR)  
+DAVIDSON, KEPLEY, BILLY JOE  
+FORSYTH, MARSHALL, WALTER  
+FORSYTH, WHITEHEART, WILLIAM, HEATH  
+HALIFAX, HUX, RACHEL, K (no further info on middle name)  
+HOKE, WRIGHT, ROBERT ALBERT there are JR and SR  
+JOHNSTON, STEWART, WADE, MINSON  
+JONES, HADDOCK, WILLIAM  
+JONES, KOONCE, ZACK, AMOS there is a III.  
+ONSLOW, MIDGETT, LIONELL  
+POLK, PACK, THOMAS, ERIC  
+ROCKINGHAM, KALLAM, JAMES, EDWARD  
+SURRY, JOHNSON, PAUL, MATTHEW  
+SWAIN, MONTEITH, DAVID  
+
+```{r movie}
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::mutate(
+    first_name=ifelse(
+      county=="CABARRUS" &
+      last_name=="BARNHARDT" &
+      first_name=="ARCHIE",
+      "A",
+      first_name
+    ),
+    middle_name=ifelse(
+      county=="CABARRUS" &
+      last_name=="BARNHARDT" &
+      first_name=="A",
+      "Y",
+      middle_name
+    ),
+    middle_name=ifelse(
+      county=="CALDWELL" &
+      last_name=="BOLLINGER" &
+      first_name=="CLAY",
+      "BERLIN",
+      middle_name
+    ),
+    first_name=ifelse(
+      county=="CALDWELL" &
+      last_name=="BRATCHER" &
+      first_name=="ROB",
+      "ROBIN",
+      first_name
+    ),
+    middle_name=ifelse(
+      county=="CALDWELL" &
+      last_name=="BRATCHER" &
+      first_name=="ROBIN",
+      "WAYNE",
+      middle_name
+    ),
+    middle_name=ifelse(
+      county=="CALDWELL" &
+      last_name=="GRIFFIN" &
+      first_name=="BEN",
+      "DOUGLAS",
+      middle_name
+    ),
+    middle_name=ifelse(
+      county=="CHATHAM" &
+      last_name=="BOCK" &
+      first_name=="BRIAN",
+      "LEX",
+      middle_name
+    ),
+    middle_name=ifelse(
+      county=="CHATHAM" &
+      last_name=="PETTY" &
+      first_name=="WALTER",
+      "LEE",
+      middle_name
+    ),
+    first_name=ifelse(
+      county=="CLEVELAND" &
+      last_name=="HUTCHINS" &
+      first_name=="RONNIE",
+      "ROHNNY",
+      first_name    
+    ),
+    middle_name=ifelse(
+      county=="CLEVELAND" &
+      last_name=="HUTCHINS" &
+      first_name=="ROHNNY",
+      "BENJAMIN",
+      middle_name    
+    ),
+    middle_name=ifelse(
+      county=="DURHAM" &
+      last_name=="RECKHOW" &
+      first_name=="ELLEN",
+      "WALDMAN",
+      middle_name
+    ),
+    middle_name=ifelse(
+      county=="DURHAM" &
+      last_name=="HOWERTON" &
+      first_name=="BRENDA",
+      "H",
+      middle_name
+    ),
+    first_name=ifelse(
+      county=="HAYWOOD" &
+      last_name=="SORRELLS" &
+      first_name=="MICHEAEL",
+      "MICHAEL",
+      first_name    
+    ),
+    middle_name=ifelse(
+      county=="HAYWOOD" &
+      last_name=="SORRELLS" &
+      first_name=="MICHAEL",
+      "THOMAS",
+      middle_name
+    ),
+    middle_name=ifelse(
+      county=="HYDE" &
+      last_name=="STYRON" &
+      first_name=="DARLENE",
+      "R",
+      middle_name
+    ),
+    middle_name=ifelse(
+      county=="IREDELL" &
+      last_name=="BOONE" &
+      first_name=="DAVID",
+      "A",
+      middle_name
+    ),    
+    middle_name=ifelse(
+      county=="LINCOLN" &
+      last_name=="PATTON" &
+      first_name=="ALEX",
+      "ERVIN",
+      middle_name
+    ),     
+    middle_name=ifelse(
+      county=="MADISON" &
+      last_name=="HAYNIE" &
+      first_name=="ROGER",
+      "DALE",
+      middle_name
+    ),      
+    middle_name=ifelse(
+      county=="MADISON" &
+      last_name=="MOORE" &
+      first_name=="HALL",
+      "PATTON",
+      middle_name
+    ),    
+    middle_name=ifelse(
+      county=="MCDOWELL" &
+      last_name=="MCPETERS" &
+      first_name=="BARRY",
+      "EDWIN",
+      middle_name
+    ),   
+    middle_name=ifelse(
+      county=="MCDOWELL" &
+      last_name=="WILLIAMS" &
+      first_name=="VIRGNIA",
+      "MCCALL",
+      middle_name
+    ),      
+    middle_name=ifelse(
+      county=="MECKLENBURG" &
+      last_name=="HARVEY" &
+      first_name=="PAULA",
+      "HAGLE",
+      middle_name
+    ),     
+    middle_name=ifelse(
+      county=="NEW HANOVER" &
+      last_name=="BERGER" &
+      first_name=="BRIAN",
+      "MATTHEW",
+      middle_name
+    ),   
+    middle_name=ifelse(
+      county=="NEW HANOVER" &
+      last_name=="BUTLER" &
+      first_name=="DEBORAH",
+      "ARMFIELD",
+      middle_name
+    ),       
+    first_name=ifelse(
+      county=="NEW HANOVER" & 
+      last_name=="DAWSON" &
+      stringr::str_sub(first_name,1,4)=="MARY",
+      "MARY ELIZABETH",
+      first_name
+    ),
+    middle_name=ifelse(
+      county=="NEW HANOVER" & 
+      last_name=="DAWSON" &
+      stringr::str_sub(first_name,1,4)=="MARY",
+      "FREEMAN",
+      middle_name
+    ),   
+    first_name=ifelse(
+      county=="PASQUOTANK" & 
+      last_name=="STERRITT" &
+      first_name=="W." &
+      suffix=="",
+      "WILLIAM",
+      first_name
+    ),   
+    middle_name=ifelse(
+      county=="PERSON" & 
+      last_name=="NEWELL" &
+      first_name=="DAVID" &
+      suffix=="SR",
+      "BRUCE",
+      middle_name
+    ),      
+    middle_name=ifelse(
+      county=="POLK" &
+      last_name=="MCDERMOTT" &
+      first_name=="RENEE",
+      "R",
+      middle_name
+    ), 
+    middle_name=ifelse(
+      county=="RICHMOND" &
+      last_name=="MASKE" &
+      first_name=="JIMMY",
+      "L",
+      middle_name
+    ),    
+    middle_name=ifelse(
+      county=="ROBESON" &
+      last_name=="SEALEY" &
+      first_name=="HUBERT",
+      "JUNIOR",
+      middle_name
+    ),  
+    middle_name=ifelse(
+      county=="ROWAN" &
+      last_name=="WALTON" &
+      first_name=="HUBERT",
+      "M",
+      middle_name
+    ),  
+    middle_name=ifelse(
+      county=="RUTHRFORD" &
+      last_name=="ECKLER" &
+      first_name=="WILLIAM",
+      "EDWARD",
+      middle_name
+    ),  
+    middle_name=ifelse(
+      county=="RUTHRFORD" &
+      last_name=="HOLLAND" &
+      first_name=="EDWIN",
+      "BAXTER",
+      middle_name
+    ),  
+    middle_name=ifelse(
+      county=="STANLY" &
+      last_name=="DENNIS" &
+      first_name=="TONY",
+      "MAURICE",
+      middle_name
+    ),
+    middle_name=ifelse(
+      county=="STOKES" &
+      last_name=="SMITH" &
+      first_name=="ZOLLIE",
+      "F",
+      middle_name
+    ),    
+    middle_name=ifelse(
+      county=="SWAIN" &
+      last_name=="BURNS" &
+      first_name=="DANNY",
+      "ROBERT",
+      middle_name
+    ),  
+    middle_name=ifelse(
+      county=="SWAIN" &
+      last_name=="BUSHYHEAD" &
+      first_name=="BENJAMIN",
+      "LEE",
+      middle_name
+    ),      
+    first_name=ifelse(
+      county=="SWAIN" &
+      last_name=="MOON" &
+      first_name=="STEVE",
+      "STEPHEN",
+      first_name
+    ),    
+    middle_name=ifelse(
+      county=="SWAIN" &
+      last_name=="MOON" &
+      first_name=="STEPHEN",
+      "WHITLEY",
+      middle_name
+    ), 
+    middle_name=ifelse(
+      county=="SWAIN" &
+      last_name=="WHITE" &
+      first_name=="ROBERT",
+      "ELWOOD",
+      middle_name
+    ), 
+    middle_name=ifelse(
+      county=="WARREN" &
+      last_name=="JORDAN" &
+      first_name=="JENNIFER",
+      "B",
+      middle_name
+    ),     
+    first_name=ifelse(
+      county=="SURRY" &
+      last_name=="OSBURN-CHANDLER",
+      "KAREN",
+      first_name
+    ),
+    middle_name=ifelse(
+      county=="SURRY" &
+      last_name=="OSBURN-CHANDLER",
+      "LOU",
+      middle_name
+    ),
+    first_name=ifelse(
+      county=="TRANSYLVANIA" &
+      last_name=="WHITFIELD-CARGILE",
+      "DAVIS",
+      first_name
+    ),
+    middle_name=ifelse(
+      county=="TRANSYLVANIA" &
+      last_name=="WHITFIELD-CARGILE",
+      "ARJUNA",
+      middle_name
+    )
+  )
+#
+#    Choice=ifelse(
+#      county=="DUPLIN" &
+#      last_name=="LADSON" &
+#      first_name=="JESSIE",
+#      "JESSIE HAND LADSON",
+#      Choice    
+#    ),
+#    
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::mutate(
+    first_name=ifelse(
+      county=="STOKES" &
+      last_name=="GAMBILL",
+      "E",
+      first_name
+    ),
+    last_name=ifelse(
+      county=="PERSON" &
+      last_name=="O ' NEIL",
+      "O'NEIL",
+      last_name
+    ),
+    last_name=ifelse(
+      county=="CRAVEN" &
+      last_name=="O ' NEILL",
+      "O'NEILL",
+      last_name
+    ),
+    first_name=ifelse(
+      county=="BUNCOMBE" &
+      last_name=="BAILEY" &
+      first_name=="K.",
+      "KENNETH",
+      first_name
+    ),
+    last_name=ifelse(
+      county=="RICHMOND" &
+      last_name=="O ' NEAL",
+      "O'NEAL",
+      last_name
+    )
+  )
+```
+
+```{r mule}
+nrow(df_candidates_distinct_all_elections_aug %>% distinct())
+```
+
+Simple match - test for county, last_name, first_name, middle_name, suffix:  
+
+```{r motet}
+df_cc_simple_match <-
+  dplyr::inner_join(
+    df_ncvoter_subset_distinct_demog %>%
+      dplyr::select(
+        -county_id,
+        -as_of,
+        -party_cd
+      ) %>%
+      dplyr::rename(
+        county=county_desc,
+        suffix=name_suffix_lbl
+      ) %>%
+      dplyr::distinct(),
+    df_candidates_distinct_all_elections_aug,
+    by=c("county","last_name","first_name","middle_name","suffix")
+  ) %>%
+  dplyr::select(
+    -middle_init.y
+  ) %>%
+  dplyr::rename(
+    middle_init=middle_init.x
+  ) %>%
+  dplyr::mutate(
+    match="LFMnameS"
+  )
+#
+str(df_cc_simple_match)
+save_these_objects <- c(save_these_objects,"df_cc_simple_match")
+```
+
+Apply distinct to df_cc_simple_match for simplicity. Eliminates duplicates but keeps only ancillary columns from a single occurrence.  
+
+```{r moth}
+df_candidates_distinct_all_elections_aug <-
+  dplyr::left_join(
+    df_candidates_distinct_all_elections_aug,
+    df_cc_simple_match %>%
+      dplyr::select(
+        -middle_init
+      ) %>%
+      dplyr::distinct(
+        county,
+        last_name,
+        first_name,
+        middle_name,
+        suffix,
+        .keep_all=TRUE
+      ),
+    by=c("county","last_name","first_name","middle_name","suffix")
+  ) %>%
+  dplyr::mutate(
+    match.x=ifelse(match.x=="?",
+      ifelse(is.na(match.y),
+        match.x,
+        match.y
+      ),
+      match.x
+    ),
+    long_first.x=ifelse(
+        is.na(long_first.y),
+        long_first.x,
+        long_first.y
+    )
+  ) %>%
+  dplyr::select(
+    -match.y,
+    -long_first.y
+  ) %>%
+  dplyr::rename(
+    match=match.x,
+    long_first=long_first.x
+  )
+#
+str(df_candidates_distinct_all_elections_aug)
+#
+df_candidates_distinct_all_elections_aug %>%
+  reshape2::dcast(
+    match~.,
+    margins=TRUE
+  )
+```
+
+Now test against middle_init instead of middle_name:   
+
+```{r motif}
+df_cc_simple_match2 <-
+  dplyr::inner_join(
+    df_ncvoter_subset_distinct_demog %>%
+      dplyr::select(
+        -county_id,
+        -as_of,
+        -party_cd
+      ) %>%
+      dplyr::mutate(
+        middle_init=ifelse(
+          nchar(middle_name)>0,
+          paste0(stringr::str_sub(middle_name,1,1),"."),
+          ""
+        )
+      ) %>%
+      dplyr::rename(
+        county=county_desc,
+        suffix=name_suffix_lbl
+      ) %>%
+      dplyr::distinct(),
+    df_candidates_distinct_all_elections_aug %>%
+      dplyr::filter(
+        match=="?"
+      ) %>%
+      dplyr::select(
+        -race_code,
+        -gender_code,
+        -ethnic_code,
+        -birth_year
+      ) %>%
+      dplyr::mutate(
+        middle_name=ifelse(
+          stringr::str_sub(middle_name,2,1)==".",
+          stringr::str_sub(middle_name,1,1),
+          middle_name
+        ),
+        middle_init=ifelse(
+          nchar(middle_name)>0,
+          paste0(stringr::str_sub(middle_name,1,1),"."),
+          ""
+        )
+      ) %>%
+      dplyr::select(
+        -middle_name
+      ),
+    by=c("county","last_name","first_name","middle_init","suffix")
+  ) %>%
+  dplyr::mutate(
+    match="LFMinitS"
+  )
+#
+str(df_cc_simple_match2)
+save_these_objects <- c(save_these_objects,"df_cc_simple_match2")
+```
+
+```{r motor}
+df_candidates_distinct_all_elections_aug <-
+  dplyr::left_join(
+    df_candidates_distinct_all_elections_aug %>%
+      dplyr::mutate(
+        middle_init=ifelse(
+          nchar(middle_name)>0,
+          paste0(stringr::str_sub(middle_name,1,1),"."),
+          ""
+        )
+      ),
+    df_cc_simple_match2 %>%
+      dplyr::select(
+        -middle_name
+      ),
+    by=c("county","last_name","first_name","middle_init","suffix")
+  ) %>%
+  dplyr::mutate(
+    match.x=ifelse(match.x=="?",
+      ifelse(is.na(match.y),
+        match.x,
+        match.y
+      ),
+      match.x
+    ),
+    race_code.x=ifelse(
+        match.x=="LFMinitS",
+        race_code.y,
+        race_code.x
+    ),
+    gender_code.x=ifelse(
+        match.x=="LFMinitS",
+        gender_code.y,
+        gender_code.x
+    ),
+    ethnic_code.x=ifelse(
+        match.x=="LFMinitS",
+        ethnic_code.y,
+        ethnic_code.x
+    ),
+    birth_year.x=ifelse(
+        match.x=="LFMinitS",
+        birth_year.y,
+        birth_year.x
+    )
+  ) %>%
+  dplyr::select(
+    -long_first.y,
+    -match.y,
+    -race_code.y,
+    -gender_code.y,
+    -ethnic_code.y,
+    -birth_year.y
+  ) %>%
+  dplyr::rename(
+    long_first=long_first.x,
+    match=match.x,
+    race_code=race_code.x,
+    gender_code=gender_code.x,
+    ethnic_code=ethnic_code.x,
+    birth_year=birth_year.x
+  )
+#
+str(df_candidates_distinct_all_elections_aug)
+#
+df_candidates_distinct_all_elections_aug %>%
+  reshape2::dcast(
+    match~.,
+    margins=TRUE
+  )
+```
+
+A somewhat looser test:  
+Test on last_name, first_name but not middle_name IF  
+a. candidate has no middle_name  
+b. there is only one (last_name,first_name) in ncvoter   
+c. use long_first  
+
+```{r munch}
+df_cc_simple_match3 <-
+  dplyr::inner_join(
+    df_ncvoter_subset_distinct_demog %>%
+      dplyr::select(
+        -county_id,
+        -as_of,
+        -party_cd
+      ) %>%
+      dplyr::rename(
+        county=county_desc,
+        suffix=name_suffix_lbl
+      ) %>%
+      dplyr::distinct(),
+    df_candidates_distinct_all_elections_aug %>%
+      dplyr::filter(
+        match=="?" &
+        middle_name==""
+      ) %>%
+      dplyr::select(
+        -first_name,
+        -middle_name,
+        -middle_init,
+        -race_code,
+        -gender_code,
+        -ethnic_code,
+        -birth_year
+      ),
+    by=c("county","last_name","first_name"="long_first","suffix")
+  ) %>%
+  dplyr::mutate(
+    long_first=first_name
+  ) %>%
+  dplyr::group_by(
+    county,
+    last_name,
+    first_name
+  ) %>%
+  dplyr::filter(
+    n()==1
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(
+    match="LFlong"
+  )
+#
+str(df_cc_simple_match3)
+save_these_objects <- c(save_these_objects,"df_cc_simple_match3")
+```
+
+```{r muon}
+df_candidates_distinct_all_elections_aug <-
+  dplyr::left_join(
+    df_candidates_distinct_all_elections_aug,
+    df_cc_simple_match3,
+    by=c("county","last_name","first_name"="long_first","suffix")
+  ) %>%
+  dplyr::mutate(
+    match.x=ifelse(match.x=="?",
+      ifelse(is.na(match.y),
+        match.x,
+        match.y
+      ),
+      match.x
+    ),
+    race_code.x=ifelse(
+        match.x=="LFlong",
+        race_code.y,
+        race_code.x
+    ),
+    gender_code.x=ifelse(
+        match.x=="LFlong",
+        gender_code.y,
+        gender_code.x
+    ),
+    ethnic_code.x=ifelse(
+        match.x=="LFlong",
+        ethnic_code.y,
+        ethnic_code.x
+    ),
+    birth_year.x=ifelse(
+        match.x=="LFlong",
+        birth_year.y,
+        birth_year.x
+    )
+  ) %>%
+  dplyr::select(
+    -match.y,
+    -first_name.y,
+    -middle_name.y,
+    -middle_init.y,
+    -race_code.y,
+    -gender_code.y,
+    -ethnic_code.y,
+    -birth_year.y
+  ) %>%
+  dplyr::rename(
+    match=match.x,
+    middle_init=middle_init.x,
+    middle_name=middle_name.x,
+    race_code=race_code.x,
+    gender_code=gender_code.x,
+    ethnic_code=ethnic_code.x,
+    birth_year=birth_year.x
+  )
+#
+str(df_candidates_distinct_all_elections_aug)
+#
+df_candidates_distinct_all_elections_aug %>%
+  reshape2::dcast(
+    match~.,
+    margins=TRUE
+  )
+```
+
+As per previous step simple_match 3 except use first_name, not long_first  
+
+```{r munch2}
+df_cc_simple_match4 <-
+  dplyr::inner_join(
+    df_ncvoter_subset_distinct_demog %>%
+      dplyr::select(
+        -county_id,
+        -as_of,
+        -party_cd
+      ) %>%
+      dplyr::rename(
+        county=county_desc,
+        suffix=name_suffix_lbl
+      ) %>%
+      dplyr::distinct(),
+    df_candidates_distinct_all_elections_aug %>%
+      dplyr::filter(
+        match=="?" &
+        middle_name==""
+      ) %>%
+      dplyr::select(
+        -middle_name,
+        -middle_init,
+        -race_code,
+        -gender_code,
+        -ethnic_code,
+        -birth_year
+      ),
+    by=c("county","last_name","first_name","suffix")
+  ) %>%
+  dplyr::group_by(
+    county,
+    last_name,
+    first_name
+  ) %>%
+  dplyr::filter(
+    n()==1
+  ) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(
+    match="LF"
+  )
+#
+str(df_cc_simple_match4)
+save_these_objects <- c(save_these_objects,"df_cc_simple_match4")
+```
+
+```{r muon2}
+df_candidates_distinct_all_elections_aug <-
+  dplyr::left_join(
+    df_candidates_distinct_all_elections_aug,
+    df_cc_simple_match4 %>%
+      dplyr::select(
+        -middle_name,
+        -middle_init
+      ),
+    by=c("county","last_name","first_name","suffix")
+  ) %>%
+  dplyr::mutate(
+    match.x=ifelse(match.x=="?",
+      ifelse(is.na(match.y),
+        match.x,
+        match.y
+      ),
+      match.x
+    ),
+    race_code.x=ifelse(
+        match.x=="LF",
+        race_code.y,
+        race_code.x
+    ),
+    gender_code.x=ifelse(
+        match.x=="LF",
+        gender_code.y,
+        gender_code.x
+    ),
+    ethnic_code.x=ifelse(
+        match.x=="LF",
+        ethnic_code.y,
+        ethnic_code.x
+    ),
+    birth_year.x=ifelse(
+        match.x=="LF",
+        birth_year.y,
+        birth_year.x
+    )
+  ) %>%
+  dplyr::select(
+    -match.y,
+    -long_first.y,
+    -race_code.y,
+    -gender_code.y,
+    -ethnic_code.y,
+    -birth_year.y
+  ) %>%
+  dplyr::rename(
+    match=match.x,
+    long_first=long_first.x,
+    race_code=race_code.x,
+    gender_code=gender_code.x,
+    ethnic_code=ethnic_code.x,
+    birth_year=birth_year.x
+  )
+#
+str(df_candidates_distinct_all_elections_aug)
+#
+df_candidates_distinct_all_elections_aug %>%
+  reshape2::dcast(
+    match~.,
+    margins=TRUE
+  )
+```
+
+Eliminate duplicate records.  
+
+```{r mount}
+nrow(df_candidates_distinct_all_elections_aug)
+#
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::distinct()
+#
+nrow(df_candidates_distinct_all_elections_aug)
+#
+df_candidates_distinct_all_elections_aug %>%
+  reshape2::dcast(
+    match~.,
+    margins=TRUE
+  )
+```
+
+```{r mouse}
+df_candidates_distinct_all_elections_aug %<>%
+  dplyr::distinct(
+    county,
+    last_name,
+    long_first,
+    middle_init,
+    suffix,
+    long_first,
+    .keep_all=TRUE
+  )
+#
+df_candidates_distinct_all_elections_aug %>% 
+  reshape2::dcast(
+    match~.,
+    margins=TRUE
+  )
+```
+
+### Work on df_candidates_distinct_all_elections_aug where match is "?"  
+
+Look at df_ncvoter_subset_distinct_demog  
+Some candidates will not be there at all.  
+BEAUFORT ARNHOLS no one there with first_name anything like BERTIE  
+
+```{r muck}
+df_cc_match_last_long_name <-
+  dplyr::inner_join(
+    df_candidates_distinct_all_elections_aug %>%
+      dplyr::select(
+        county,
+        last_name,
+        first_name,
+        middle_name,
+        suffix,
+        long_first,
+        match
+      ) %>%
+      dplyr::filter(
+        match == "?" &
+        first_name != long_first
+      ),
+    df_ncvoter_subset_distinct_demog,
+    by=c("county"="county_desc","last_name","long_first"="first_name","middle_name","suffix"="name_suffix_lbl")
+  ) %>%
+  dplyr::mutate(
+    match="long_first"
+  ) %>%
+  dplyr::select(
+    -county_id,
+    -first_name,
+    -middle_init,
+    -party_cd,
+    -as_of
+  )
+#
+nrow(df_cc_match_last_long_name)
+save_these_objects <- c(save_these_objects,"df_cc_match_last_long_name")
+```
+
+```{r mud}
+if (nrow(df_cc_match_last_long_name) > 0){
+  df_candidates_distinct_all_elections_aug <-
+  dplyr::left_join(
+    df_candidates_distinct_all_elections_aug,
+    df_cc_match_last_long_name,
+    by=c("county","last_name","long_first","middle_name","suffix")
+  ) %>%
+  dplyr::mutate(
+    match.x=ifelse(
+      is.na(match.y),
+      match.x,
+      match.y
+    ),
+    race_code.x=ifelse(
+      is.na(match.y),
+      race_code.x,
+      race_code.y
+    ),
+    gender_code.x=ifelse(
+      is.na(match.y),
+      gender_code.x,
+      gender_code.y
+    ),
+    ethnic_code.x=ifelse(
+      is.na(match.y),
+      ethnic_code.x,
+      ethnic_code.y
+    ),
+    birth_year.x=ifelse(
+      is.na(match.y),
+      birth_year.x,
+      birth_year.y
+    )
+  ) %>%
+  dplyr::select(
+    -match.y,
+    -race_code.y,
+    -gender_code.y,
+    -ethnic_code.y,
+    -birth_year.y
+  ) %>%
+  dplyr::rename(
+    match=match.x,
+    race_code=race_code.x,
+    gender_code=gender_code.x,
+    ethnic_code=ethnic_code.x,
+    birth_year=birth_year.x
+  )
+  #
+df_candidates_distinct_all_elections_aug %>%
+  reshape2::dcast(
+    match~.,
+    margins=TRUE
+  )
+  #
+  str(df_candidates_distinct_all_elections_aug)
+}
+```
+One more try at distinct:  
+
+```{r murky}
+nrow(df_candidates_distinct_all_elections_aug)
+#
+df_candidates_distinct_all_elections_aug %<>%
+  distinct(
+    county,
+    last_name,
+    long_first,
+    middle_init,
+    suffix,
+    .keep_all=TRUE
+  )
+#
+df_candidates_distinct_all_elections_aug %>%
+  reshape2::dcast(
+    match~.,
+    margins=TRUE
+  )
+```
+
+### Look at candidate of match "?" and see if we can say when encountered.  
+Try for match only on county and last name.  
+
+Primaries only.  
+
+```{r mummy}
+df_cc_fuzzy_found_in_all_primaries <-
+df_candidates_distinct_all_elections_aug %>%
+  dplyr::filter(
+    match=="?"
+  ) %>%
+  dplyr::select(
+    county,
+    last_name,
+    first_name,
+    middle_name,
+    middle_init,
+    suffix,
+    long_first
+  ) %>%
+  dplyr::inner_join(
+    df_cc_results_primaries %>%
+      dplyr::select(
+        County,
+        Choice,
+        Election
+      ) %>%
+      dplyr::mutate(
+        Choice=toupper(Choice)
+      ) %>%
+      dplyr::distinct(),
+    by=c("county"="County")
+  ) %>%
+  dplyr::rowwise() %>%
+  dplyr::filter(
+    stringr::str_detect(Choice,paste0("^",first_name," ")) &
+    stringr::str_detect(Choice,paste0(" ",last_name,"$"))
+  ) %>%
+  as.data.frame()
+#
+nrow(df_cc_fuzzy_found_in_all_primaries)
+nrow(df_cc_fuzzy_found_in_all_primaries %>% 
+  dplyr::distinct(
+    Choice
+  )
+)
+#
+save_these_objects <- c(save_these_objects,"df_cc_fuzzy_found_in_all_primaries")
+```
+
+Here are the breakdowns by primary election.  
+
+```{r mum}
+df_cc_fuzzy_found_in_all_primaries %>% 
+  reshape2::dcast(
+    Election~.
+  )
+#
+df_cc_fuzzy_found_in_all_primaries %>% 
+  dplyr::distinct(
+    Choice,
+    .keep_all=TRUE
+  ) %>% 
+  reshape2::dcast(
+    Election~.
+  )
+```
+
+General elections only.  
+
+```{r mummy2}
+df_cc_found_in_all_generals <-
+df_candidates_distinct_all_elections_aug %>%
+  dplyr::filter(
+    match=="?"
+  ) %>%
+  dplyr::select(
+    county,
+    last_name,
+    first_name,
+    middle_name,
+    middle_init,
+    suffix,
+    long_first
+  ) %>%
+  dplyr::inner_join(
+    df_general_candidate_list %>%
+      dplyr::select(
+        county,
+        last_name,
+        first_name,
+        middle_name,
+        suffix,
+        Year
+      ),
+    by=c("county","last_name","first_name","middle_name","suffix")
+  )
+#
+nrow(df_cc_found_in_all_generals)
+nrow(df_cc_found_in_all_generals %>% 
+  dplyr::distinct(
+    county,
+    last_name,
+    first_name,
+    middle_init
+  )
+nrow(df_cc_found_in_all_generals %>% 
+  dplyr::distinct(
+    county,
+    last_name,
+    long_first,
+    middle_init
+  )
+)
+#
+save_these_objects <- c(save_these_objects,"df_cc_found_in_all_generals")
+```
+
+Here are the breakdowns by general election.  
+
+```{r mum2}
+df_cc_found_in_all_generals %>% 
+  reshape2::dcast(
+    Year~.
+  )
+#
+df_cc_found_in_all_generals %>% 
+  dplyr::distinct(
+    county,
+    last_name,
+    first_name,
+    middle_name,
+    suffix,
+    .keep_all=TRUE
+  ) %>% 
+  reshape2::dcast(
+    Year~.
+  )
+```
+
+### People by Election  
+
+People by general election: 
+
+```{r murk}
+df_general_candidate_list %>% 
+  reshape2::dcast(
+    .~Year,
+    margins=TRUE
+  )
+```
+
+People by primary election:  
+
+```{r mural}
+df_cc_results_primaries %>% 
+  dplyr::distinct(
+    County,
+    Choice,
+    Election
+  ) %>%
+  reshape2::dcast(
+    .~Election,
+    margins=TRUE
+  )
+```
+
+Saving  
+
+```{r mouth}
+# remove duplicates
+save_these_objects <- union(save_these_objects,save_these_objects)
+#
+save(
+  list=save_these_objects,
+  file="primaries_and_general_elections.RData"
+)
+```
+
+### END

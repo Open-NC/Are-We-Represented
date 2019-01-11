@@ -1,0 +1,63 @@
+---
+title: "AreWeRepresented Sim Cleanup"
+output:
+  html_document: default
+author: "D. Hopp"
+date: "December 22, 2018"
+---
+
+## One-Off Cleanup  
+```{r }
+df_voting_sim_counts_all <-
+  rbind(
+    df_voting_sim_counts_1000_rep_1234,
+    df_voting_sim_counts_1000_rep_2912,
+    df_voting_sim_counts_1000_rep_4303,
+    df_voting_sim_counts_1000_rep_4537,
+    df_voting_sim_counts_2000_rep_1264,
+    df_voting_sim_counts_2000_rep_1677,
+    df_voting_sim_counts_2000_rep_2935,
+    df_voting_sim_counts_2000_rep_3226
+  )
+
+
+df_voting_sim_counts_hits_all <-
+  rbind(
+    df_voting_sim_counts_hits_1000_rep_1234,
+    df_voting_sim_counts_hits_1000_rep_2912,
+    df_voting_sim_counts_hits_1000_rep_4303,
+    df_voting_sim_counts_hits_1000_rep_4537,
+    df_voting_sim_counts_hits_2000_rep_1264,
+    df_voting_sim_counts_hits_2000_rep_1677,
+    df_voting_sim_counts_hits_2000_rep_2935,
+    df_voting_sim_counts_hits_2000_rep_3226
+  )
+  
+rm(
+    df_voting_sim_counts_1000_rep_1234,
+    df_voting_sim_counts_1000_rep_2912,
+    df_voting_sim_counts_1000_rep_4303,
+    df_voting_sim_counts_1000_rep_4537,
+    df_voting_sim_counts_2000_rep_1264,
+    df_voting_sim_counts_2000_rep_1677,
+    df_voting_sim_counts_2000_rep_2935,
+    df_voting_sim_counts_2000_rep_3226
+  )
+#
+rm(
+    df_voting_sim_counts_hits_1000_rep_1234,
+    df_voting_sim_counts_hits_1000_rep_2912,
+    df_voting_sim_counts_hits_1000_rep_4303,
+    df_voting_sim_counts_hits_1000_rep_4537,
+    df_voting_sim_counts_hits_2000_rep_1264,
+    df_voting_sim_counts_hits_2000_rep_1677,
+    df_voting_sim_counts_hits_2000_rep_2935,
+    df_voting_sim_counts_hits_2000_rep_3226
+  )
+```  
+
+```{r }
+save(df_voting_sim_counts_all,file="df_voting_sim_counts_all.RData")
+save(df_voting_sim_counts_hits_all,file="df_voting_sim_counts_hits_all.RData")
+```
+

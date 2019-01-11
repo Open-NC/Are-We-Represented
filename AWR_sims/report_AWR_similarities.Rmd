@@ -1,0 +1,817 @@
+---
+title: "AreWeRepresented Similarities"
+output:
+  html_document: default
+author: "D. Hopp"
+date: "August 22, 2018"
+---
+
+```{r aback, echo=FALSE}
+load("prep_sim.RData")
+```
+```{r abase, echo=FALSE}
+df_tmp <- df_NCACC_demog %>% 
+  reshape2::dcast(
+    ncomm~.,
+    value.var = "Hrace",
+    fun.aggregate = length
+  )
+```
+### Introduction  
+
+There being one hundred counties in North Carolina, it would be helpful to have some quick way to assess and compare the similarities, or differences, regarding how the composition of the elected boards resemble that of their electorate. This report will restrict its remarks to the County Commissioners, although there are city boards that will be included at a later time.  
+
+The Boards of County Commissioners are composed of a small number of persons, most frequently 5 (`r df_tmp[df_tmp$ncomm==5,2]` counties) and 7 (`r df_tmp[df_tmp$ncomm==7,2]` counties), the remaining having 6, 8 or 9 members. The election process is varied, and is described at the [NC Association of County Commissioners web site](http://ncacc.org/409/County-Elections).  
+
+The NCACC provides convenient reports tallying the racial, gender, and political composition of the boards [gathered by decade](http://ncacc.org/196/Makeup-of-County-Boards-by-Decade), and [by county by year](http://ncacc.org/197/Election-Results). NCACC categorizes race as African-American, American Indian, Asian, and White, there being no 'Other' for any year.  
+
+Making comparisons with county populations can be carried out by use of Census Bureau data. That data is published as estimates for all non-decadal years. These data are conveniently found at the [American FactFinder](https://factfinder.census.gov/faces/nav/jsf/pages/searchresults.xhtml?refresh=t). The race categories in the Census Bureau include those of the NCACC plus others. It appears that there is not a simple one-to-one match between NCACC and Census Bureau races due to the different ways race is recorded, such as the Census Bureau recognizing a more than one race category. This report will conform to the NCACC categories and count all others in the Census Bureau data as 'Other'. We will try to provide some estimates of the impact of these methodological differences. 
+
+Section A of this report will provide background, describing in broad terms some relevant facts and trends. Section B will discuss methodolgies of demonstrating similarities.  
+
+### Section A. Background  
+
+**Composition of County Commissioners 2002 to 2016**  
+
+During the years from 2002 to 2016 the number of North Carolina county commissioners increased from `r df_NCACC_summary[df_NCACC_summary$Year==2002,"Ncomm"]` 
+to `r df_NCACC_summary[df_NCACC_summary$Year==2016,"Ncomm"]`. Figure A.1 shows the number of new commissioners and counts by party by year. It appears that the election of 2008 was the high water mark for the Democrats. Since 2008 there has been a decrease in turnover and an increase in Republican commissioners. The number of other party commissioners has varied between four and six since 2008. The number of women was 96 in 2008 and declined to 91 in 2016.  
+
+```{r abash, echo=FALSE}
+dat <-
+  df_NCACC_summary %>%
+  dplyr::select(
+    Year,
+    Ncomm,
+    New,
+    Rep,
+    Dem
+  ) 
+#
+p <- plotly::plot_ly(dat, x=~Year) %>%
+  plotly::add_trace(
+    y=~New, name="New", type="scatter", mode="lines+markers", line=list(color='black',width=3)
+  ) %>%
+  plotly::add_trace(
+    y=~Rep, name="Rep", type="scatter", mode="lines+markers", line=list(color='red',width=3)
+  ) %>%
+  plotly::add_trace(
+    y=~Dem, name="Dem", type="scatter", mode="lines+markers", line=list(color='blue',width=3)
+  ) %>%
+  plotly::layout(
+    title = 'County Commissioners 2002 to 2016',
+    xaxis = list(title = 'Year'),
+    yaxis = list(title = 'Count')
+  )
+```
+```{r abate, fig.cap="Figure A.1", fig.height=6, fig.width=9, echo=FALSE}
+p
+```  
+
+Figure A.2 shows the racial composition of the boards. This is limited to African-American and White, since the only other representation reported by the NCACC was American Indian, of which there were between five and seven in each year.  
+
+```{r abbas, echo=FALSE}
+dat <-
+  df_NCACC_summary %>%
+  dplyr::select(
+    Year,
+    White,
+    AfAm
+  ) 
+#
+p <- plotly::plot_ly(dat, x=~Year) %>%
+  plotly::add_trace(
+    y=~AfAm, name="Af-Amer", type="scatter", mode="lines+markers", line=list(color='black',width=3)
+  ) %>%
+  plotly::add_trace(
+    y=~White, name="White", type="scatter", mode="lines+markers", line=list(color='blue',width=3)
+  )  %>%
+  plotly::layout(
+    title = "County Commissioners 2002 to 2016",
+    xaxis = list(title = "Year"),
+    yaxis = list(title = "Count", zeroline=TRUE, range=c(0,500))
+  )
+```  
+```{r abbe, fig.cap="Figure A.2", fig.height=6, fig.width=9, echo=FALSE}
+p
+``` 
+
+**National Voting Patterns**  
+
+The Census Bureau reports the voting rates of racial groups for presidential elections from 2004 to 2016 [here](https://www2.census.gov/programs-surveys/cps/tables/time-series/voting-historical-time-series/a4.xlsx). Figure A.3 shows these rates for registration and voting.  
+
+```{r abbey, echo=FALSE}
+dat <-
+df_voting_rates_summary %>%
+dplyr::select(
+  Year,
+  Group,
+  TotalCit,
+  BlackCit,
+  AsianCit,
+  WhiteCit
+) %>%
+dplyr::rename(
+  Total=TotalCit,
+  AfAmer=BlackCit,
+  Asian=AsianCit,
+  White=WhiteCit
+) %>%
+reshape2::melt(
+  id.vars=c("Year","Group")
+) %>%
+dplyr::mutate(
+  groupby=paste0(Group,variable)
+)
+#
+p <-
+dat %>%
+ggplot(
+  aes(x=Year, y=value, group=groupby, shape=Group, color=variable)
+) +
+geom_line(size=2) +
+geom_point(size=4) +
+labs(
+  y="Percentage"
+) +
+ylim(40,80) +
+ggtitle("Percentage Turnout By Race, Presidential Elections") +
+theme(
+  plot.title=element_text(hjust=0.5)
+) +
+guides(
+  color=guide_legend(title=NULL),
+  shape=guide_legend(title=NULL)
+) +
+scale_color_discrete(
+  limits=c("Total","AfAmer","Asian","White")
+)
+```  
+```{r abbot, fig.cap="Figure A.3", fig.height=6, fig.width=9, echo=FALSE}
+#pg <- plotly::ggplotly(p)
+#pg
+p
+```  
+
+### Section B. Measures of Similarity  
+
+Comparing the racial composition of County Commissioners Boards to that of their counties can be carried out one at a time, but then we are presented with one hundred graphics, or sets of numbers, etc. It would be more helpful to be able to direct attention to the most and least representative counties. Supplemented with a detailed analysis of the counties, this could save time and effort. It would also be helpful to be able summarize, compare, and determine what has changed over time. This challenge appears in economics (comparing socio-economic groups, wealth, etc.) and in demographic and sociological research, and has an abundant scholarly literature. This report will discuss two measures of quite different nature: Euclidean distance, and simulation.  
+
+Both of these methods measure similarity, or disparity, between the county and the board racial composition. Both methods are intended to discover extreme cases, and distinguish these cases from what might be more frequently encountered. It will appear below that this goal is achieved, allowing for a focussed pursuit of cause and effect.  
+
+Gender is split about 49% male, 51% female in most counties, while there are about 90 females of the 580 commissioners (15% female). This is so disparate in comparison to populations that it is immediately obvious. While it would benefit from a detailed investigation, that is not the intent of this report. Ethnicity, specifically Hispanic or non-Hispanic, is not reported by the NCACC for commissioners. Inspection of voter registration records for board members show none who responded as being Hispanic.  
+
+**B.1 County Commissioner 2016 Candidates**  
+
+```{r mink, echo=FALSE, warning=FALSE, message=FALSE}
+d <- df_cc_distinct_election_wide %>%
+dplyr::rowwise() %>%
+dplyr::mutate(
+  Ncand=max(N.20160315,N.20161108)
+) %>%
+dplyr::select(
+  County,
+  Ncand,
+  Ncomm
+)
+#
+# summary of d
+# see if complete
+#
+d2 <- 
+d %>% 
+  reshape2::dcast(
+    Ncand~.
+  ) %>% 
+  plyr::rename(
+    c("."="N")
+  )
+#
+if (nrow(d2) != max(d2$Ncand)-min(d2$Ncand)+1){
+  # fix things
+  v_Ncand <- seq(min(d2$Ncand),max(d2$Ncand),1)
+  v_N <- rep(0,max(d2$Ncand)-min(d2$Ncand)+1)
+  d3 <- data.frame(v_Ncand,v_N)
+  names(d3) <- c("Ncand","N")
+  #
+  d4 <-
+  dplyr::full_join(
+    d2,
+    d3,
+    by="Ncand"
+  ) %>%
+  dplyr::select(
+    Ncand,
+    N.x
+  ) %>%
+  dplyr::mutate(
+    N.x=ifelse(is.na(N.x),0,N.x)
+  ) %>%
+  dplyr::rename(
+    N=N.x
+  ) %>%
+  dplyr::arrange(
+    Ncand
+  )
+  #
+  d2 <- d4 
+}
+#
+# back to making the graph
+#
+p <- 
+d2 %>% 
+ggplot(
+  aes(
+    x=factor(Ncand),
+    y=N)
+  ) + 
+  geom_bar(
+    stat="identity",
+    fill='white',
+    color='black'
+) +
+ggtitle(
+  "Larger of the Number of Board Candidates for the 2016 Primary and General Election"
+) +
+theme(
+  plot.title=element_text(hjust=0.5,face='plain',size=12)
+) +
+labs(
+  x="Number of County Commissioner Candidates",
+  y="Number of Counties"
+)
+#
+sum_all <- sum((d2 %>% dplyr::rowwise() %>% dplyr::mutate(Ntot=Ncand*N))[,"Ntot"])
+sum_lt8 <- sum((d2 %>% dplyr::rowwise() %>% dplyr::filter(Ncand<8) %>% dplyr::mutate(Ntot=Ncand*N))[,"Ntot"])
+```  
+
+There were a small number of candidates for county commissioner, that is, those appearing on 2016 ballots in the primary and general election, which is typical of other years. This, of course, is fundamental to the race-based representation that this report will analyze. This is not a straightforward count of candidates because of the variety of ways in which county commissioners are elected, and also their term start dates, described on this [NCACC web page](http://www.ncacc.org/195/County-Election-Methods ). Figure B.1.1 is a histogram of the number of candidates by county. It presents the larger of the number of candidates appearing on the primary and general election ballots. Of the `r sum_all` candidates enumerated, `r sum_lt8` (`r round(sum_lt8*100/sum_all)`%) were associated with counties with seven or fewer candidates. Considering that the number of commissioners tends to be five or seven, with a few counties having somewhat more or less, there does not appear to be a large amount of choice for voters.  
+
+```{r abc, fig.cap="Figure B.1.1", fig.height=6, fig.width=9, echo=FALSE}
+p
+```  
+
+**B.2 Euclidean Distance**  
+
+A Euclidean distance is a measure of how far apart two points are in a coordinate space. In two-dimensional space, it is just the familiar square root of the sum of the squares of the differences of their x and y coordinates, Pythagoras' Rule. This can be generalized to larger number of dimensions (loosely speaking). See, for instance, [here](http://www.econ.upf.edu/~michael/stanford/maeb4.pdf ). Euclidean distances should be interpreted in a comparative, not an absolute, fashion. Smaller distances indicate stronger similarities, larger distances indicate more disparities. These distances do not speak to which of the race categories accoount for similarities or differences, but they do indicate into which counties it might be productive to look further.  
+
+If race is enumerated in the same categories in Boards and in counties, the computation, using percentages, is simple. Unfortunately, the NCACC data uses three categories (White, Black, and American Indian), with no 'Other', while census data uses those along with Asian and somewhat of a jumble that constitutes 'other'. The NCACC data is self-consistent, that is, the three categories add up to the total number of commissioners. It follows that Other can be assigned a value of zero. However, the assumption has to be made that commissioners would report race in a similar way to the Census Bureau. Using the Census Bureau data as described (three categories and Other) dismisses the information in their additional categories, and reinforces the unprovable assumption regarding commissioner reporting. Fortunately, an independent investigation of county commissioner voting registration records was carried out in June 2018 and the results are available [here](https://github.com/Open-NC/Are-We-Represented/blob/master/nc-cc-data/cc-db-21june2018.csv ). The data therein verifies the race category counts presented in the NCACC data. This report will use the White, Black, American Indian, and Other (this last being zero for NCACC data) categories and compute a measure that will be examined for reasonability.   
+
+As numeric guides, for the populations dealt with here, the minimum value of the distance would be the square root of the percentage of Other as reported in the census data for each county. The maximum value for any county would approximately be 140 (100 times square root of 2).  
+
+Figure B.2.1 is a histogram of the Euclidean distance for the 2016 boards and estimated county populations. This shows a clumping in the smaller distances (comparatively less racial disparity than the larger distances) and some high disparity counties. Put another way, most counties are more or less the same but there are some whose boards are much less representative of their populations. This mitigates against rank ordering the Euclidean distances. It would be helpful to look at quantiles and identify the counties in the upper quartile or quintile, but because of the asymmetry, not using the lowest quantile by itself.  
+
+```{r abe, echo=FALSE}
+qE <- quantile(df_Euclidean_race$dist,probs=seq(0,1,0.2))
+qE1 <- qE[2]
+qE4 <- qE[5]
+```  
+The quintiles (five divisions of 20% each) for the Euclidean distances are:  
+```{r abed, echo=FALSE}
+qE
+```  
+The asymmetry is clear, the upper quintile starting at `r qE[5]` and extending to the maximum value, `r qE[6]`, leaving the lower 80% between `r qE[1]` and `r qE[5]`. This reinforces the lack of usefulness of rank ordering the distances.  
+
+
+```{r abel, echo=FALSE}
+p <-
+df_Euclidean_race %>%
+dplyr::select(
+  dist
+) %>%
+ggplot(
+  aes(x=dist)
+) +
+geom_histogram(
+  bins=50,
+  fill='white',
+  color='black'
+) +
+ggtitle(
+  "Race-based County Commissioner Euclidean Distances for the 2016 Election"
+) +
+theme(
+  plot.title=element_text(hjust=0.5,face='plain',size=12)
+) +
+labs(
+  x="<-better   Euclidean Distances Between County Population and Board Composition   worse->"
+)
+```  
+```{r abet, fig.cap="Figure B.2.1", fig.height=6, fig.width=9, echo=FALSE}
+p
+```  
+
+Figure B.2.2 presents an alternative view of the distribution of distances by using a density diagram. The area under the curve is 1.0.   
+```{r abide, echo=FALSE}
+p <-
+df_Euclidean_race %>%
+dplyr::select(
+  dist
+) %>%
+ggplot(
+  aes(x=dist)
+) +
+geom_density() +
+ggtitle(
+  "Density Diagram Race-based Euclidean Distances for the 2016 Election"
+) +
+theme(
+  plot.title=element_text(hjust=0.5,face='plain',size=12)
+) +
+labs(
+  x="<-better   Euclidean Distances Between County Population and Board Composition   worse->"
+)
+```  
+```{r abject, fig.cap="Figure B.2.2", fig.height=6, fig.width=9, echo=FALSE}
+p
+```  
+
+```{r ablaze, echo=FALSE}
+d <-
+df_Euclidean_race %>%
+dplyr::select(
+  FIPS3,
+  dist
+) %>%
+dplyr::inner_join(
+  df_FIPS %>%
+    dplyr::select(
+      FIPS3,
+      County
+    ),
+  by="FIPS3"
+) %>%
+dplyr::inner_join(
+  df_Tier %>%
+    dplyr::select(
+      FIPS3,
+      Tier
+    ),
+  by="FIPS3"
+) %>%
+dplyr::inner_join(
+  df_cc_method %>%
+    dplyr::filter(
+      asof==2014
+    ) %>%
+    dplyr::select(
+      FIPS3,
+      Method
+    ),
+  by="FIPS3"
+) %>%
+dplyr::select(
+  County,
+  dist,
+  Tier,
+  Method
+) %>%
+dplyr::mutate(
+  Tier=as.character(Tier)
+) %>%
+dplyr::filter(
+  dist >= qE4
+)
+#
+# the number of Tier 3 counties
+#
+ntier3 <- nrow(d %>% dplyr::filter(Tier==3))
+#
+p <-
+d %>%
+ggplot(
+  aes(x=dist,y=reorder(County,dist),shape=Tier,color=Tier)
+)  +
+geom_point(
+  size=5
+) +
+theme_bw() +
+labs(
+  title="Race-based County Commissioner Euclidean Distance 20 Worst Counties 2016",
+  subtitle="Note: Tier 1 Most Economically Distressed",
+  x="<-better     Euclidean Distances Between County Population and Board Composition     worse->",
+  y=NULL
+) +
+theme(
+  panel.grid.major.x=element_blank(),
+  panel.grid.minor.x=element_blank(),
+  panel.grid.major.y=element_line(color='grey60',linetype='dashed'),
+  legend.position=c(0.8,0.3)
+) +
+theme(
+  plot.title=element_text(hjust=0.5,face='plain',size=12),
+  plot.subtitle=element_text(hjust=0.5,face='plain',size=8)
+) +
+guides(
+  color=guide_legend(title="Tier")
+) +
+scale_shape_discrete(
+  name="Election\nMethod",
+  labels=c("At Large","District","Mixed")
+)
+```  
+
+Pursuing these diagrams Figure B.4 concentrates on the counties in the upper 20% of the distances. This graphic also shows Tier, which is set each year by the [NC Department of Commerce](https://www.nccommerce.com/research-publications/incentive-reports/county-tier-designations) There are three tiers, with forty counties assigned to Tier 3, the most distressed, forty to Tier 2, and twenty to least distressed Tier 1.  
+
+
+```{r able, fig.cap="Figure B.2.3", fig.height=6, fig.width=9, echo=FALSE}
+p
+``` 
+
+**B.3 Simulations Using Census County Population Estimates**  
+
+A measure of similarity can be found in simulating the random selection of persons from the census of county populations and observing how frequently the actual county commissioner race categories are encountered. For this report, simulations were carried out `r n_sim` times for each of the 100 counties. Each simulation drew the same number of persons as there are commissioners from the population estimates provided by the Census Bureau for 2016. Figure B.3.1 shows the counties arranged from most to least representative. The horizontal axis is the percentage of simulation runs that produced the actual 2016 Board compositions, specifically for the American Indian, Black, and White race categories. The graphic includes the identification of the economic Tier for each county.  
+
+```{r abode, echo=FALSE}
+# 
+# df_totalbyrace_sim_counts_hits_census_161108_300 and
+# df_totalbyrace_sim_counts_census_161108_300
+#
+load("totalbyrace_sim_counts_census_161108_300_180803.RData")
+```  
+
+```{r abort, echo=FALSE}
+p <-
+# df_totalbyrace_sim_counts_hits %>%
+df_totalbyrace_sim_counts_hits_census_161108_300 %>%
+ggplot(
+  aes(x=Npct,y=reorder(County,N),shape=as.character(Method),color=as.character(Tier))
+)  +
+geom_point(
+  size=5
+) +
+theme_bw() +
+labs(
+  title="Race-based County Commissioner Simulation Results for Census Population 2016",
+  subtitle="Note: Tier 1 Most Distressed",
+  x="<-poor match       Percentage of Replications of Board Composition       good match->",
+  y=NULL
+) +
+theme(
+  panel.grid.major.x=element_blank(),
+  panel.grid.minor.x=element_blank(),
+  panel.grid.major.y=element_line(color='grey60',linetype='dashed')
+) +
+theme(
+  plot.title=element_text(hjust=0.5,face='plain',size=12),
+  plot.subtitle=element_text(hjust=0.5,face='plain',size=8),
+  legend.position=c(0.8,0.2)
+) +
+guides(
+  color=guide_legend(title="Tier")
+) +
+scale_shape_discrete(
+  name="Election\nMethod",
+  labels=c("At Large","District","Mixed")
+)
+```
+```{r about, fig.cap="Figure B.3.1", fig.height=12, fig.width=9, echo=FALSE}
+p
+``` 
+
+This can also be viewed using a histogram based on the horizontal axis in the Figure B.3.1. 
+
+```{r above, echo=FALSE}
+p <-
+# df_totalbyrace_sim_counts_hits %>%
+df_totalbyrace_sim_counts_hits_census_161108_300 %>%
+dplyr::select(
+  Npct
+) %>%
+ggplot(
+  aes(x=Npct)
+) +
+geom_histogram(
+  bins=50,
+  fill='white',
+  color='black'
+) +
+ggtitle(
+  "Race-based Board Simulation for Census Population 2016 Election"
+) +
+theme(
+  plot.title=element_text(hjust=0.5,face='plain',size=12)
+) +
+labs(
+  x="<-poor match      Percentage of Replications of Board Composition      good match->"
+)
+```  
+```{r abrade, fig.cap="Figure B.3.2", fig.height=6, fig.width=9, echo=FALSE}
+p
+```  
+
+Figure B.3.3 presents an alternative view of the distribution using a density diagram. The area under the curve is 1.0.   
+```{r abram, echo=FALSE}
+p <-
+# df_totalbyrace_sim_counts_hits %>%
+df_totalbyrace_sim_counts_hits_census_161108_300 %>%
+dplyr::select(
+  Npct
+) %>%
+ggplot(
+  aes(x=Npct)
+) +
+geom_density() +
+ggtitle(
+  "Density Diagram for Race-based Simulation for Census Population 2016 Election"
+) +
+theme(
+  plot.title=element_text(hjust=0.5,face='plain',size=12)
+) +
+labs(
+  x="<-poor match      Percentage of Replications of Board Composition      good match->"
+)
+```  
+```{r absorb, fig.cap="Figure B.3.3", fig.height=6, fig.width=9, echo=FALSE}
+p
+```  
+
+```{r abuse, echo=FALSE}
+#qS <- quantile(df_totalbyrace_sim_counts_hits$Npct,probs=seq(0,1,0.2))
+qS <- quantile(df_totalbyrace_sim_counts_hits_census_161108_300$Npct,probs=seq(0,1,0.2))
+qS1 <- qS[2]
+qS4 <- qS[5]
+```  
+
+The quintiles (five divisions of 20% each) for the percentage of replications are:  
+```{r abut, echo=FALSE}
+qS
+```  
+
+*Further analysis of what appears to be a bimodal beta distribution of simulation results will be carried out.*  
+
+**B.4 Correspondences Between the Two Methods**  
+
+```{r abyss, echo=FALSE}
+both_in_q1 <-
+dplyr::inner_join(
+  df_Euclidean_race %>%
+    dplyr::filter(
+      dist >= qE4 
+    ) %>%
+    dplyr::select(
+      FIPS3,
+      dist
+    ),
+  #df_totalbyrace_sim_counts_hits %>%
+  df_totalbyrace_sim_counts_hits_census_161108_300 %>%
+    dplyr::filter(
+      Npct <= qS1
+    ) %>%
+    dplyr::select(
+      FIPS3,
+      County,
+      Npct
+    ),
+  by="FIPS3"
+) %>%
+dplyr::select(
+  FIPS3,
+  County,
+  dist,
+  Npct
+) %>%
+dplyr::inner_join(
+  df_counties_out %>%
+    dplyr::select(
+      FIPS3,
+      Total,
+      BlackPct,
+      WhitePct,
+      AmIndPct,
+      Tier
+    ),
+    by="FIPS3"
+) %>%
+dplyr::inner_join(
+  df_NCACC_demog %>%
+    dplyr::filter(
+      Year==2016
+    ) %>%
+    dplyr::select(
+      FIPS3,
+      nafam,
+      nwhite,
+      namin
+    ),
+  by="FIPS3"
+) %>%
+dplyr::select(
+  County,
+  Total,
+  BlackPct,
+  nafam,
+  WhitePct,
+  nwhite,
+  AmIndPct,
+  namin,
+  Tier
+) %>%
+dplyr::rename(
+  Population=Total,
+  N_Black=nafam,
+  N_White=nwhite,
+  N_AmInd=namin
+) %>%
+dplyr::arrange(
+  County
+)
+#
+both_in_q4 <-
+dplyr::inner_join(
+  df_Euclidean_race %>%
+    dplyr::filter(
+      dist <= qE1 
+    ) %>%
+    dplyr::select(
+      FIPS3,
+      dist
+    ),
+  #df_totalbyrace_sim_counts_hits %>%
+  df_totalbyrace_sim_counts_hits_census_161108_300 %>%
+    dplyr::filter(
+      Npct >= qS4
+    ) %>%
+    dplyr::select(
+      FIPS3,
+      County,
+      Npct
+    ),
+  by="FIPS3"
+) %>%
+dplyr::select(
+  FIPS3,
+  County,
+  dist,
+  Npct
+) %>%
+dplyr::inner_join(
+  df_counties_out %>%
+    dplyr::select(
+      FIPS3,
+      Total,
+      BlackPct,
+      WhitePct,
+      AmIndPct,
+      Tier
+    ),
+    by="FIPS3"
+) %>%
+dplyr::inner_join(
+  df_NCACC_demog %>%
+    dplyr::filter(
+      Year==2016
+    ) %>%
+    dplyr::select(
+      FIPS3,
+      nafam,
+      nwhite,
+      namin
+    ),
+  by="FIPS3"
+) %>%
+dplyr::select(
+  County,
+  Total,
+  BlackPct,
+  nafam,
+  WhitePct,
+  nwhite,
+  AmIndPct,
+  namin,
+  Tier
+) %>%
+dplyr::rename(
+  Population=Total,
+  N_Black=nafam,
+  N_White=nwhite,
+  N_AmInd=namin
+) %>%
+dplyr::arrange(
+  County
+)
+```
+
+Looking at the counties in the top 20% and in the bottom 20% from the results for both methods provides some insight into the usefulness of the methods. The following `r nrow(both_in_q1)` counties are in the bottom 20 counties (least correspondence between county and board composition, i.e., having the greatest disparities) for both Euclidean distance and simulation:  
+
+```{r acadia, echo=FALSE,results='asis'}
+knitr::kable(as.data.frame(both_in_q1),caption="Table B.4.1")
+```  
+
+The following `r nrow(both_in_q4)` counties are in the top 20 counties (best correspondence) for both Euclidean distance and simulation. It appears that these counties are characterized by being almost entirely white, and having all white commissioners.   
+```{r accra, echo=FALSE,results='asis'}
+knitr::kable(as.data.frame(both_in_q4),caption="Table B.4.2")
+```  
+
+**B.5 Simulations Using Voter Turnout**  
+
+In addition to the Census Bureau county population estimates, NCSBE data is available for voter turnout. The Appendix Figure 1 shows the results of a race-based simulation with voter turnout. This can be compared to the population estimates in section B.3.  
+
+```{r accrue, echo=FALSE}
+#
+# df_totalbyrace_sim_counts_hits_voting_161108_300 and
+# df_totalbyrace_sim_counts_voting_161108_300
+#
+load("totalbyrace_sim_counts_voting_161108_300_180803.RData")
+```  
+
+Figure B.5.1 is a scattergram comparing the census-based and the voter turnout-based simulation results. Since we are dealing with percentages, and some of the results are near zero or one hundred percent, it is useful to convert the data to log odds (logits). When p is a percentage, then logit is log(p/(1-p)), where the log is the natural logarithm.  
+
+Figure B.5.1 shows that, generally speaking, county boards are more representative of the voters than of the general population. This suggests that it would be of interest to look further at the counties that are distinguished by being farther from the dotted line, that is, that show notable differences between board representation for the general population and voters.  
+
+```{r ace, echo=FALSE}
+p <-
+dplyr::inner_join( 
+  df_totalbyrace_sim_counts_hits_voting_161108_300 %>%
+    dplyr::mutate(
+      Nlogit=round(log(Npct/(100-Npct)),digits=4)
+    ) %>%
+    dplyr::select(
+      County,
+      Nlogit
+    ),
+  df_totalbyrace_sim_counts_hits_census_161108_300 %>%
+    dplyr::mutate(
+      Nlogit=round(log(Npct/(100-Npct)),digits=4)
+    ) %>%
+    dplyr::select(
+      County,
+      Nlogit
+    ),
+  by="County"
+) %>%
+ggplot(
+  aes(x=Nlogit.x, y=Nlogit.y, text=County)
+) +
+geom_point() +
+labs(
+  title="Log Odds Hits County Commissioners 2016 Population vs. Voter Turnout",
+  x="<-worse match        Log Odds Voter Turnout        better match->",
+  y="<-worse match        Log Odds Population        better match->"
+) +
+xlim(-4,2) +
+ylim(-4,2) +
+geom_abline(
+  intercept=0,
+  slope=1,
+  linetype="dotted"
+) +
+annotate(
+  "text",
+  x=-2.5,
+  y=1.5,
+  label=paste0(
+    "Dotted line indicates equality\nit is not a regression line",
+    "\n\nCounties to right of line are more representative\nof voter turnout than of overall population"
+    )
+)
+#
+pp <- plotly::ggplotly(p)
+```  
+```{r acetic, fig.cap="Figure B.5.1", fig.height=6, fig.width=9, echo=FALSE}
+pp
+```  
+
+
+## Appendix  
+
+```{r ache, echo=FALSE}
+p <-
+# df_totalbyrace_sim_counts_hits %>%
+df_totalbyrace_sim_counts_hits_voting_161108_300 %>%
+ggplot(
+  aes(x=Npct,y=reorder(County,N),shape=as.character(Method),color=as.character(Tier))
+)  +
+geom_point(
+  size=5
+) +
+theme_bw() +
+labs(
+  title="Race-based County Commissioner Simulation Results for Voter Turnout 2016",
+  subtitle="Note: Tier 1 Most Distressed",
+  x="<-poor match       Percentage of Replications of Board Composition       good match->",
+  y=NULL
+) +
+theme(
+  panel.grid.major.x=element_blank(),
+  panel.grid.minor.x=element_blank(),
+  panel.grid.major.y=element_line(color='grey60',linetype='dashed')
+) +
+theme(
+  plot.title=element_text(hjust=0.5,face='plain',size=12),
+  plot.subtitle=element_text(hjust=0.5,face='plain',size=8),
+  legend.position=c(0.8,0.2)
+) +
+guides(
+  color=guide_legend(title="Tier")
+) +
+scale_shape_discrete(
+  name="Election\nMethod",
+  labels=c("At Large","District","Mixed")
+)
+```
+```{r acid, fig.cap="Appendix Figure 1", fig.height=12, fig.width=9, echo=FALSE}
+p
+``` 
+
+### --- END ---
