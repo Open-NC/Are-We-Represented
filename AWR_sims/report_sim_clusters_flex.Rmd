@@ -5,9 +5,8 @@ output:
     toc: true
     toc_depth: 3
 author: "D. Hopp"
-date: "January 9, 2019"
+date: "January 11, 2019"
 ---
-
 
 ```{r setup, echo=FALSE}
 # https://stackoverflow.com/questions/15258233/using-table-caption-on-r-markdown-file-using-knitr-to-use-in-pandoc-to-convert-t
@@ -38,7 +37,7 @@ knitr::knit_hooks$set(output = function(x, options) {
 do_diag <- FALSE
 #
 # use for population or turnout
-# POP or VOTING
+# POP or VOTE
 #
 do_for_which <- "POP"
 ```
@@ -51,7 +50,7 @@ load("prep.RData")
 if (do_for_which=="POP"){
   load(paste0(output_dir,"archive_cluster_ACS_jf_10k.RData"))
   load(paste0(output_dir,"ACS_sim_objects_jf_10k.RData"))
-} else if (do_for_which=="VOTING"){
+} else if (do_for_which=="VOTE"){
   load(paste0(output_dir,"this_sim_objects_5000_voting_rep_1655.RData"))
   load(paste0(output_dir,"archive_cluster_voting_5000.RData"))
 } else {
@@ -95,7 +94,7 @@ if (do_for_which=="POP"){
   df_cluster_5_withinss <- df_cluster_5_jf_10k_rep
 }
 #
-if (do_for_which=="VOTING"){
+if (do_for_which=="VOTE"){
   need3_ <- c(
     "df_voting_sim_counts_5000_rep_1655",
     "df_cluster_3_row_voting_5000_rep_1655",
@@ -1177,7 +1176,7 @@ dfT5 %>%
 
 ### Clusters  
 
-Which counties had boards that did, or did not, well-represent the racial composition of the `r ifelse(do_for_which=="POP","population","turnout")`? What objective criteria can we establish? I will use clustering, which is a mathematical approach to sweeping together simulated board compositions that have nearly the same probabilities. It is far from simple to compute clusters. Briefly, for this analysis, I will use the R package [Ckmeans.1d.dp](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5148156/). Picture, then, a histogram of the percentage of the simulation runs that resulted in each board compositions, Npct. Now arrange this histogram in descending order by Npct. The computation starts with supposing that there are a small number k of clusters, perhaps three to five. It proceeds to find k (or fewer) positions for the Npct such that the within cluster sum of squares to each cluster mean (*withinss*) is minimized. This takes a lot of work and I depend entirely on the sagacity of the authors of that package. I will number the clusters from left to right, that is, cluster 1 will correspond to the grouping of the highest values for Npct. Not all data is amenable to cluster analysis - the flatter the distribution of the variable of interest, the less well can it be said to have clusters. The Appendix pursues *withinss* at more length.  
+Which counties had boards that did, or did not, well-represent the racial composition of the `r ifelse(do_for_which=="POP","population","turnout")`? What objective criteria can we establish? I will use clustering, which is a mathematical approach to sweeping together simulated board compositions that have nearly the same probabilities. It is far from simple to compute clusters. Briefly, for this analysis, I will use the R package [Ckmeans.1d.dp](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5148156/). A more general discussion of clustering using R can be found [here](https://smorbieu.gitlab.io/generate-datasets-to-understand-some-clustering-algorithms-behavior/). Picture, then, a histogram of the percentage of the simulation runs that resulted in each board compositions, Npct. Now arrange this histogram in descending order by Npct. The computation starts with supposing that there are a small number k of clusters, perhaps three to five. It proceeds to find k (or fewer) positions for the Npct such that the within cluster sum of squares to each cluster mean (*withinss*) is minimized. This takes a lot of work and I depend entirely on the sagacity of the authors of that package. I will number the clusters from left to right, that is, cluster 1 will correspond to the grouping of the highest values for Npct. Not all data is amenable to cluster analysis - the flatter the distribution of the variable of interest, the less well can it be said to have clusters. The Appendix pursues *withinss* at more length.  
 
 I will use the clusters computed for the board composition simulations based on `r ifelse(do_for_which=="POP","population","turnout")` estimates of all the counties. Using both three and five cluster targets, I will determine the cluster number for the actual 2016 board compositions. I have already mentioned that there were `r nrow(df_ACS_years_aug2 %>% dplyr::filter(Year=="2016" & BlackPct <= 10))` counties with under 10% Black population. It seems reasonable to expect that there would be good matches for these counties since there are few choices other than all White commissioners. In light of this I will note counties as being over or under 10% Black population proportion when that seems useful.  
 
@@ -1597,6 +1596,7 @@ df_H_board_3 %>%
 The `r nrow(df_H_board_3 %>% dplyr::filter(Cluster != "1" & Hboard==0))` counties with Board Diversity Index of zero that are in clusters 2 or 3 are shown below in Hcty order, with their `r ifelse(do_for_which=="POP","populations","turnouts")` and 2016 board compositions. Since they all have boards composed of persons of a single race, and they were in cluster 2 or 3, where the board composition was an unlikely consequence of their `r ifelse(do_for_which=="POP","population","turnout")` proportions, they may all be considered unrepresentative. These counties merit further study.  
 
 ```{r echo=FALSE}
+df_county_to_pursue_0 <-
 df_H_board_3 %>% 
   dplyr::filter(
     Cluster != "1" &
@@ -1654,7 +1654,9 @@ df_H_board_3 %>%
   ) %>%
   dplyr::arrange(
     Hcty
-  ) %>%
+  ) 
+#
+df_county_to_pursue_0 %>%
   knitr::kable() %>%
   kableExtra::kable_styling() %>%
   kableExtra::scroll_box(
@@ -1666,6 +1668,7 @@ df_H_board_3 %>%
 The remaining `r nrow(df_H_board_3 %>% dplyr::filter(Cluster != "1" & Hboard>0))` counties in this plot are in the following list. They are arranged by the difference between the county `r ifelse(do_for_which=="POP","population","turnout")` H and the board H, in ascending order. These counties have boards composed of more than one race, and are in cluster 2 or 3, the less likely simulation compositions. These counties are of less pronounced representation concerns than those discussed immediately above but may merit further study.  
 
 ```{r echo=FALSE}
+df_county_to_pursue_gt0 <-
 df_H_board_3 %>% 
   dplyr::filter(
     Cluster != "1" &
@@ -1726,7 +1729,9 @@ df_H_board_3 %>%
   ) %>%
   dplyr::arrange(
     Hdiff
-  ) %>%
+  ) 
+#
+df_county_to_pursue_gt0 %>%
   knitr::kable() %>%
   kableExtra::kable_styling() %>%
   kableExtra::scroll_box(
@@ -1735,6 +1740,34 @@ df_H_board_3 %>%
   )
 ```
 
+```{r echo=FALSE}
+#
+# save for further analysis
+#
+if (do_for_which=="POP"){
+  df_county_to_pursue_0_pop <- df_county_to_pursue_0
+  df_county_to_pursue_0_pop$for_which <- "POP"
+  df_county_to_pursue_gt0_pop <- df_county_to_pursue_gt0
+  df_county_to_pursue_gt0_pop$for_which <- "POP"
+  save(
+    df_county_to_pursue_0_pop,
+    df_county_to_pursue_gt0_pop,
+    file=paste0(output_dir,"df_county_to_pursue_",do_for_which,".RData")
+  )
+} 
+#
+if (do_for_which=="VOTE"){
+  df_county_to_pursue_0_vote <- df_county_to_pursue_0
+  df_county_to_pursue_0_vote$for_which <- "VOTE"
+  df_county_to_pursue_gt0_vote <- df_county_to_pursue_gt0
+  df_county_to_pursue_gt0_vote$for_which <- "VOTE"
+  save(
+    df_county_to_pursue_0_vote,
+    df_county_to_pursue_gt0_vote,
+    file=paste0(output_dir,"df_county_to_pursue_",do_for_which,".RData")
+  )
+}
+```
 <br/>  
 
 ## Appendix A: Comments on the American Indian Population  

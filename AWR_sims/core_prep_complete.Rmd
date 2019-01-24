@@ -3,7 +3,7 @@ title: "AreWeRepresented neo4j Preparation"
 output:
   html_document: default
 author: "D. Hopp"
-date: "September 17, 2018"
+date: "January 22, 2019"
 ---
 
 ```{r}
@@ -103,11 +103,15 @@ str(df_Tier)
 
 ### Added July 21, 2018: Additional data from NCACC.org and Census Bureau  
 
-This is data from NCACC.org from the link http://www.ncacc.org/DocumentCenter/View/3858 on the page http://www.ncacc.org/197/Election-Results (7/21/18). The file delivered is '2016 Election Demographics for Website_1.xlsx'. I expect this name to change after the 2018 election, since it is not consistent with the names of other files on that same page. This spreadsheet appears in not quite curated condition. I have extracted from it the data in my data file NCACC_2002_2016_summary.csv by hand, since the spreadsheet makes it inordinately difficult to do so programatically.  
+This is data from NCACC.org from the link http://www.ncacc.org/DocumentCenter/View/3858 on the page http://www.ncacc.org/197/Election-Results (7/21/18). The file delivered is '2016 Election Demographics for Website_1.xlsx'. I expect this name to change after the 2018 election, since it is not consistent with the names of other files on that same page.  
+
+(1/16/19) There has been a change. Now there is '2016 Election Demographics for Website_5.xlsx' as well as '2018 Election Demographics for Website_1.xlsx'  
+
+This spreadsheet appears in not quite curated condition. I have built my data file 'NCACC_2002_2018_summary.csv' by hand, since the spreadsheets makes it inordinately difficult to do so programatically.  
 
 ```{r mosaic}
 df_NCACC_summary <- read.csv(
-  paste0(data_dir,"NCACC_2002_2016_summary.csv"),
+  paste0(data_dir,"NCACC_2002_2018_summary.csv"),
   header=TRUE,
   sep="\t",
   stringsAsFactors = FALSE
@@ -182,117 +186,122 @@ str(df_largest_cities)
 ### NCACC Elections spreadsheet  
 
 Source is https://www.ncacc.org/409/County-Elections  
-File is "2016 Election Demographics for Website_1_extract.csv"  
-Skip row 1, which holds text for columns.  
+Change this as of 1/21/2019 to use updated xls files provided by NCACC  
+and munged by DIH to properly deal with 0 items.  
 
-Added 24 Jul,2018 Use CORRECTED file Cleveland and Duplin incorrected in original  
+Files are  
+ "NCACC 2016 Election Demographics for Website_5.2.csv"  
+ [1] "County"           "No..of.Comm."     "New"              "Repub."           "Dem."  
+ [6] "Other"            "Female"           "White"            "African.American" "American.Indian"  
+[11] "Other.1"  
+
+ "NCACC 2018 Election Demographics for Website_1.2.csv"  
+ [1] "County"          "No..of.Comm."    "New"             "Repub."          "Dem."  
+ [6] "Other.Party"     "Female"          "White"           "Black"           "American.Indian"  
+[11] "Other.Race"  
+
 
 ```{r  grown}
 df_NCACC_2016_demog <- read.csv(
-  paste0(data_dir,"2016 Election Demographics CORRECTED for Website_1_extract.csv"),
-  sep=",",
-  skip=1,
+  paste0(data_dir,"NCACC 2016 Election Demographics for Website_5.2.csv"),
+  sep="\t",
   header=TRUE,
   stringsAsFactors=FALSE
+) %>%
+dplyr::rename(
+  Other.Party=Other,
+  Black=African.American,
+  Other.Race=Other.1
+) %>%
+dplyr::mutate(
+  Year=2016
+)
+#
+df_NCACC_2018_demog <- read.csv(
+  paste0(data_dir,"NCACC 2018 Election Demographics for Website_1.2.csv"),
+  sep="\t",
+  header=TRUE,
+  stringsAsFactors=FALSE
+) %>%
+dplyr::mutate(
+  Year=2018
 )
 ```
 
-```{r very}
-str(df_NCACC_2016_demog)
+Column names are the same so we can bind dataframes.  
+ [1] "County"          "No..of.Comm."    "New"             "Repub."          "Dem."  
+ [6] "Other.Party"     "Female"          "White"           "Black"           "American.Indian"  
+[11] "Other.Race"      "Year"  
+
+```{r grown2}
+df_NCACC_16_18 <-
+  rbind(
+    df_NCACC_2016_demog,
+    df_NCACC_2018_demog
+  ) %>%
+  plyr::rename(c(
+    "No..of.Comm."="ncomm",
+    "New"="new",
+    "Repub."="nrep",
+    "Dem."="ndem",
+    "Other.Party"="nother",
+    "Female"="nfemale",
+    "White"="nwhite",
+    "Black"="nafam",
+    "American.Indian"="namin",
+    "Other.Race"="nother_race"
+    )
+  )
+#
+str(df_NCACC_16_18)
 ```
 
-Check for error in commissioner count. MUST BE ZERO.  
-
-```{r pump}
-if (
-  nrow(
-    df_NCACC_2016_demog %>%
-      dplyr::mutate_if(
-        is.numeric, funs(ifelse(is.na(.), 0, .))
-      ) %>%
-      dplyr::filter(
-        ncomm != nwhite + nafam + namin
-      )
-    ) != 0
-  ) knitr::knit_exit()
-```  
-End July 24, 2018  
-
-Add FIPS3 and remove County  
-Replace NA with zero  
-
-Note that this matches the 2016 NCACC file which has exactly the race categories White, Afam, and Amind.  
-This is different from the county population data, which also has Asian and Other.  
-Data for other years will have to be reviewed to see if there are other races reported.  
-
-```{r stroll}
-df_NCACC_demog <-
-df_NCACC_2016_demog %>%
-  dplyr::inner_join(
-    df_FIPS,
-    by="County"
-  ) %>%
-  dplyr::select(
-    FIPS3,
-    ncomm,
-    new,
-    nrep,
-    ndem,
-    nother,
-    nfemale,
-    nwhite,
-    nafam,
-    namin
-  ) %>%
-  dplyr::mutate_if(
-    is.numeric, funs(ifelse(is.na(.), 0, .))
-  ) %>%
-  dplyr::mutate(
-    id=paste0("CC_",FIPS3),
-    Year=2016,
-    Hrace=round(
-      (nwhite/ncomm)*ifelse(nwhite>0,log(nwhite/ncomm),0)+
-      (nafam/ncomm)*ifelse(nafam>0,log(nafam/ncomm),0)+
-      (namin/ncomm)*ifelse(namin>0,log(namin/ncomm),0),
-       digits=4)
+```{r grown3}
+  rm(
+    df_NCACC_2016_demog,
+    df_NCACC_2018_demog
   )
 ```
 
-```{r peru}
-str(df_NCACC_demog)
-```
+Names are now  
+ [1] "County"      "ncomm"       "new"         "nrep"        "ndem"        "nother"      "nfemale"   
+ [8] "nwhite"      "nafam"       "namin"       "nother_race" "Year"  
+
+End July 24, 2018  
+
+
  
 Added August 5, 2018. Incorporate prior years of NCACC. Source http://www.ncacc.org/197/Election-Results  
+xls file formats changed in 2014 and again in 2016.  
+Note some items are omitted when 0 but some 0s are there.  
+2006 County	New	Repub.	Dem.	Other	No. of Comm.	Female	African American	Native American	Other  
+2008 County	New	Repub.	Dem.	Other	No. of Comm.	Female	African American	Native American	Other  
+2010 County	New	Repub.	Dem.	Other	No. of Comm.	Female	African American	Native American	Other  
+2012 County	New	Repub.	Dem.	Other	No. of Comm.	Female	African American	Native American	Other  
+
+2014 County	No. of Comm.	New	Repub.	Dem.	Other	Female	African American	Native American	Other  
+
+2016 County	No. of Comm.	New	Repub.	Dem.	Other	Female	White	African American	American Indian	Other  
+2018 County	No. of Comm.	New	Repub.	Dem.	Other Party	Female	White	Black	American Indian	Other Race  
+
+1/21/2019 DIH munged the 2014 NCACC file by hand. Moved no. of commis column to match position in earlier NCACC files.  
 
 ```{r gear}
 fn_NCACC_build <- function(){
-  # start with df_NCACC_2016_demog and add to it
-  df_all <- 
-    df_NCACC_2016_demog %>%
-    dplyr::mutate_if(
-      is.numeric, funs(ifelse(is.na(.), 0, .))
-    ) %>%
-    dplyr::mutate(
-      nother_race=0,
-      Year="2016"
-    )
   #
   NCACC_files <- list(
-    c("2004","NCACC_electionresults04_201209251258330448.2004.csv"),
-    c("2006","NCACC_electionresults04_201209251258330448.2006.csv"),
-    c("2008","NCACC_electionresults08_201209251258339823.2008.csv"),
-    c("2010","NCACC_electionresults10_201209251258349042.2010.csv"),
-    c("2012","NCACC_electionresults12_201302190817370069.2012.csv"),
-    c("2014","NCACC_electionresults14_201503031245453010.2014.csv")
+    c("2004","NCACC_electionresults04_201209251258330448.2.csv"),
+    c("2006","NCACC_electionresults06_201209251258337011.2.csv"),
+    c("2008","NCACC_electionresults08_201209251258339823.2.csv"),
+    c("2010","NCACC_electionresults10_201209251258349042.2.csv"),
+    c("2012","NCACC_electionresults12_201302190817370069.2.csv"),
+    c("2014","NCACC_electionresults14_201503031245453010.3.csv")
   )
   for (i in 1:length(NCACC_files)){
     df_ <- read.csv(
       paste0(data_dir,NCACC_files[[i]][2]),
       sep="\t",
       stringsAsFactors=FALSE
-    ) %>%
-    dplyr::mutate_if(
-      is.numeric, funs(ifelse(is.na(.), 0, .))
     ) %>%
     plyr::rename(c(
       "No..of.Comm."="ncomm",
@@ -323,12 +332,19 @@ fn_NCACC_build <- function(){
       namin,
       nother_race,
       Year
+    ) %>%
+    dplyr::mutate(
+      Year=as.numeric(Year)
     )
     #
-    df_all <- rbind(
-      df_all,
-      df_
-    )
+    if (!exists("df_all",inherits=FALSE)){
+      df_all <- df_NCACC_16_18
+    } else {
+      df_all <- rbind(
+        df_all,
+        df_
+      )
+    }
   }
   return(df_all)
 }
@@ -337,7 +353,65 @@ fn_NCACC_build <- function(){
 ```{r sybil}
 df_NCACC_years <- fn_NCACC_build()
 str(df_NCACC_years)
+#
+if (do_write_csv==TRUE){
+  df_NCACC_years %>%
+  dplyr::arrange(
+    Year,
+    County
+  ) %>%
+  readr::write_csv(
+    paste0(output_dir,"df_NCACC_years.csv"),
+    col_names = TRUE
+  )
+}
 ```  
+
+Add FIPS3 and remove County  
+
+Note that this matches the 2016 NCACC file which has exactly the race categories White, Afam, and Amind.  
+This is different from the county population data, which also has Asian and Other.  
+Data for other years will have to be reviewed to see if there are other races reported.  
+
+```{r stroll}
+df_NCACC_demog <-
+df_NCACC_years %>%
+  dplyr::mutate(
+    County=as.character(County)
+  ) %>%
+  dplyr::inner_join(
+    df_FIPS,
+    by="County"
+  ) %>%
+  dplyr::select(
+    FIPS3,
+    ncomm,
+    new,
+    nrep,
+    ndem,
+    nother,
+    nfemale,
+    nwhite,
+    nafam,
+    namin,
+    Year
+  ) %>%
+  dplyr::mutate_if(
+    is.numeric, funs(ifelse(is.na(.), 0, .))
+  ) %>%
+  dplyr::mutate(
+    id=paste0("CC_",Year,"_",FIPS3),
+    Hrace=round(
+      (nwhite/ncomm)*ifelse(nwhite>0,log(nwhite/ncomm),0)+
+      (nafam/ncomm)*ifelse(nafam>0,log(nafam/ncomm),0)+
+      (namin/ncomm)*ifelse(namin>0,log(namin/ncomm),0),
+       digits=4)
+  )
+```
+
+```{r peru}
+str(df_NCACC_demog)
+```
 
 ### County election methods  
 http://www.ncacc.org/195/County-Election-Methods  
@@ -751,7 +825,8 @@ if (do_write_csv==TRUE) {
       nfemale,
       nwhite,
       nafam,
-      namin
+      namin,
+      Year
     ) %>%
   readr::write_csv(
     paste0(output_dir,"boards.csv"),
@@ -769,7 +844,8 @@ if (do_write_csv==TRUE) {
   df_NCACC_demog %>%
     dplyr::select(
       FIPS3,
-      id
+      id,
+      Year
     ) %>%
   readr::write_csv(
     paste0(output_dir,"countyBoards.csv"),
@@ -794,64 +870,6 @@ if (do_write_csv==TRUE) {
 }
 ```
 
-
-### Euclidean Separation  
-
-Try to make some sense out of a Euclidean distance between races for counties and commissioners.  
-Use df_counties_out BlackPct,WhitePct,AmIndPct,AsianPct,OtherPct and df_NCACC_demog nwhite,nafam,hnamin and ncomm. There is asymmetry here that will have to be addressed, but the NCACC data is what it is.  
-
-```{r tusk}
-df_Euclidean_race <-
-  dplyr::inner_join(
-    df_counties_out %>%
-      dplyr::select(
-          FIPS3,
-          BlackPct,
-          WhitePct,
-          AmIndPct,
-          AsianPct,
-          OtherPct
-        ),
-    df_NCACC_demog %>%
-      dplyr::mutate(
-        whitePct=round(nwhite*100/ncomm,digits=1),
-        afamPct=round(nafam*100/ncomm,digits=1),
-        aminPct=round(namin*100/ncomm,digits=1)
-      ) %>%
-      dplyr::select(
-        FIPS3,
-        whitePct,
-        afamPct,
-        aminPct
-      ),
-    by="FIPS3"
-  ) %>%
-  dplyr::mutate(
-    dist=round(
-      sqrt(
-        (WhitePct-whitePct)^2 + (BlackPct-afamPct)^2 + (AmIndPct-aminPct)^2 + AsianPct^2 + OtherPct^2
-      ),
-      digits=1
-      )
-    )
-#
-# in order to use the Euclidean distance with an edge, as a weight,
-# it should be heavier for smaller values, just the opposite of what it is.
-# so recompute it into dist_wt
-#
-dist_adjust <- min(df_Euclidean_race$dist) + max(df_Euclidean_race$dist)
-#
-df_Euclidean_race %<>%
-  dplyr::rowwise() %>%
-  dplyr::mutate(
-    dist_wt=dist_adjust-dist
-  ) %>%
-  dplyr::ungroup()
-```
-
-```{r cecil}
-str(df_Euclidean_race)
-```
 
 ### Entropy
 
